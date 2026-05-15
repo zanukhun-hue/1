@@ -2,7 +2,7 @@
 
 Что добавлено:
 
-- сайт разделён на страницы: `index.html`, `plugins.html`, `plugin.html`, `install.html`, `faq.html`, `about.html`, `stats.html`;
+- сайт разделён на страницы: `index.html`, `plugins.html`, `plugin.html`, `install.html`, `faq.html`, `stats.html`;
 - плагины вынесены в `plugins.js`;
 - каталог с поиском, категориями, сортировкой и избранным;
 - отдельная страница каждого плагина через `plugin.html?id=...`;
