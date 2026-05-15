@@ -25,11 +25,11 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%AC%3C/text%3E%3C/svg%3E" rel="icon" type="image/svg+xml">
-<title>AE Plugins Vault | Бесплатные плагины для After Effects</title>
-<meta name="description" content="Каталог плагинов, скриптов и пресетов для Adobe After Effects.">
+<title>Каталог плагинов | AE Plugins Vault</title>
+<meta name="description" content="Поиск, категории, избранное и статусы плагинов After Effects.">
 
 </head>
-<body data-page="home">
+<body data-page="plugins">
 <header class="header">
   <div class="container nav-container">
     <a class="logo" href="index.html" aria-label="AE Plugins Vault">
@@ -53,65 +53,49 @@
 </header>
 <main>
 
-<section class="hero page-hero-home">
-  <div class="container hero-grid">
-    <div class="hero-content reveal">
-      <span class="eyebrow"><i class="fas fa-sparkles"></i> AE 2022 и новее</span>
-      <h1>Профессиональные плагины для <span class="highlight">After Effects</span></h1>
-      <p>Каталог эффектов, скриптов, пресетов и комплектов для монтажа, графики, трекинга и анимации. Поиск, избранное, статусы ссылок и инструкции уже внутри.</p>
-      <div class="hero-actions">
-        <a class="btn btn-primary" href="plugins.html"><i class="fas fa-plug"></i> Открыть каталог</a>
-        <a class="btn btn-ghost" href="install.html"><i class="fas fa-download"></i> Как установить</a>
+<section class="subpage-hero">
+  <div class="container">
+    <span class="eyebrow"><i class="fas fa-plug"></i> Каталог</span>
+    <h1>Плагины для After Effects</h1>
+    <p>Ищи по названию, тегам, категории или описанию. Большинство позиций рассчитаны на AE 2022 и новее.</p>
+  </div>
+</section>
+<section class="section catalog-section">
+  <div class="container">
+    <div class="catalog-panel reveal">
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input id="pluginSearch" type="text" placeholder="Поиск: Saber, glow, text, script...">
+        <button id="clearSearch" title="Очистить"><i class="fas fa-times"></i></button>
       </div>
-      <div class="hero-stats" id="homeStats"></div>
+      <div class="catalog-row">
+        <div class="filter-tabs" id="categoryFilters"></div>
+        <div class="catalog-controls">
+          <select id="sortPlugins" aria-label="Сортировка">
+            <option value="popular">Сначала популярные</option>
+            <option value="new">Сначала новые</option>
+            <option value="az">По названию A–Z</option>
+            <option value="available">Сначала проверенные</option>
+            <option value="size">По размеру файла</option>
+          </select>
+          <button class="favorites-filter-btn" id="favoritesOnly" type="button"><i class="far fa-heart"></i> Только избранные</button>
+        </div>
+      </div>
+      <div class="catalog-meta"><span id="resultCount">Найдено: 0</span><span id="activeFilterLabel">Все категории</span></div>
     </div>
-    <div class="hero-visual stable-visual" aria-hidden="true">
-      <div class="visual-float visual-float-ae"><div class="visual-element ae-card"><span>Ae</span></div></div>
-      <div class="visual-float visual-float-plugin"><div class="visual-element"><i class="fas fa-puzzle-piece"></i></div></div>
-      <div class="visual-float visual-float-download"><div class="visual-element"><i class="fas fa-cloud-arrow-down"></i></div></div>
-    </div>
-  </div>
-</section>
-<section class="section">
-  <div class="container">
-    <div class="section-head reveal">
-      <span class="eyebrow">Быстрый старт</span>
-      <h2>Что появилось в новой версии</h2>
-      <p>Сайт теперь не одностраничник: у каталога, инструкции, FAQ и каждого плагина есть отдельное место.</p>
-    </div>
-    <div class="feature-grid">
-      <div class="feature-card reveal"><i class="fas fa-layer-group"></i><h3>Каталог по категориям</h3><p>Поиск, сортировка, фильтры, избранное и статусы: проверено или обновляется.</p></div>
-      <div class="feature-card reveal"><i class="fas fa-file-lines"></i><h3>Страницы плагинов</h3><p>У каждого плагина теперь есть отдельная страница с описанием, размером, версией и похожими позициями.</p></div>
-      <div class="feature-card reveal"><i class="fas fa-screwdriver-wrench"></i><h3>Инструкции установки</h3><p>Отдельно для .aex, .jsx/.jsxbin, .ffx и типичных проблем после установки.</p></div>
-      <div class="feature-card reveal"><i class="fas fa-chart-simple"></i><h3>Статистика</h3><p>Локальный счётчик визитов работает сразу. Глобальная статистика подключается через конфиг.</p></div>
-    </div>
-  </div>
-</section>
-<section class="section soft-section">
-  <div class="container">
-    <div class="section-head reveal">
-      <span class="eyebrow">Популярное</span>
-      <h2>Плагины, с которых стоит начать</h2>
-      <p>Несколько карточек из каталога. Полный список находится на отдельной странице.</p>
-    </div>
-    <div class="plugins-grid compact" id="featuredPlugins"></div>
-    <div class="center-actions"><a class="btn btn-primary" href="plugins.html">Смотреть все плагины</a></div>
-  </div>
-</section>
-<section class="section">
-  <div class="container two-column">
-    <div class="notice-card reveal">
+    <div class="pre-download-notice reveal">
       <div class="notice-title"><i class="fas fa-triangle-exclamation"></i> Перед установкой</div>
-      <ul class="clean-list">
+      <ul>
         <li>Проверьте совместимость плагина с вашей версией After Effects.</li>
         <li>Закройте After Effects перед копированием файлов.</li>
         <li>Запускайте After Effects от имени администратора, если плагин не появился.</li>
       </ul>
-      <a class="btn btn-ghost" href="install.html">Открыть инструкцию</a>
     </div>
-    <div class="updates-card reveal">
-      <h3><i class="fas fa-clock-rotate-left"></i> Последние обновления</h3>
-      <div id="updatesList" class="updates-list"></div>
+    <div class="plugins-grid" id="pluginsGrid"></div>
+    <div class="empty-state" id="emptyState" hidden>
+      <i class="fas fa-magnifying-glass"></i>
+      <h3>Ничего не найдено</h3>
+      <p>Попробуйте другое название, тег или категорию.</p>
     </div>
   </div>
 </section>

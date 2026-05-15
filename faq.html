@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>
+  (function(){
+    try {
+      var savedTheme = localStorage.getItem('theme');
+      var isDark = savedTheme ? savedTheme === 'dark' : true;
+      document.documentElement.classList.toggle('dark-mode', isDark);
+      document.documentElement.classList.toggle('light-mode', !isDark);
+    } catch (e) {
+      document.documentElement.classList.add('dark-mode');
+    }
+  })();
+</script>
+<style>
+  html.dark-mode, html.dark-mode body { background:#080a12; color:#f8fafc; color-scheme:dark; }
+  html.light-mode, html.light-mode body { background:#f8fafc; color:#111827; color-scheme:light; }
+</style>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%AC%3C/text%3E%3C/svg%3E" rel="icon" type="image/svg+xml">
+<title>FAQ | AE Plugins Vault</title>
+<meta name="description" content="Ответы на частые вопросы по плагинам After Effects.">
+
+</head>
+<body data-page="faq">
+<header class="header">
+  <div class="container nav-container">
+    <a class="logo" href="index.html" aria-label="AE Plugins Vault">
+      <span class="logo-icon">🎬</span>
+      <span class="logo-text">AE Plugins Vault</span>
+    </a>
+    <nav class="nav-links" id="navLinks">
+      <a class="nav-link" data-nav="home" href="index.html"><i class="fas fa-house"></i> Главная</a>
+      <a class="nav-link" data-nav="plugins" href="plugins.html"><i class="fas fa-plug"></i> Каталог</a>
+      <a class="nav-link" data-nav="install" href="install.html"><i class="fas fa-download"></i> Установка</a>
+      <a class="nav-link" data-nav="faq" href="faq.html"><i class="fas fa-circle-question"></i> FAQ</a>
+      <a class="nav-link" data-nav="about" href="about.html"><i class="fas fa-info-circle"></i> О сайте</a>
+    </nav>
+    <div class="header-actions">
+      <a class="favorite-pill" href="plugins.html?favorites=1" title="Избранное"><i class="fas fa-heart"></i><span id="favoriteCount">0</span></a>
+      <a class="telegram-link" data-telegram-link href="https://t.me/ae_plugins_vault" target="_blank" rel="noopener" aria-label="Telegram"><i class="fab fa-telegram"></i></a>
+      <button class="theme-toggle" id="themeToggle" aria-label="Переключить тему"><i class="fas fa-moon"></i></button>
+      <button class="menu-toggle" id="menuToggle" aria-label="Открыть меню"><i class="fas fa-bars"></i></button>
+    </div>
+  </div>
+</header>
+<main>
+
+<section class="subpage-hero">
+  <div class="container">
+    <span class="eyebrow"><i class="fas fa-circle-question"></i> FAQ</span>
+    <h1>Частые вопросы</h1>
+    <p>Короткие ответы на самые частые проблемы с плагинами After Effects.</p>
+  </div>
+</section>
+<section class="section">
+  <div class="container faq-list">
+    <details class="faq-item" open><summary>Почему плагин не появился в After Effects?</summary><p>Чаще всего файл положили не в ту папку, AE не был перезапущен или скрипт нужно искать в меню Window, а не в Effects. Для .jsx/.jsxbin проверьте папку Scripts или ScriptUI Panels.</p></details>
+    <details class="faq-item"><summary>Что значит статус “Проверено”?</summary><p>У карточки есть рабочая ссылка на Google Drive. Это не заменяет вашу личную проверку файла перед запуском, но показывает, что ссылка не пустая.</p></details>
+    <details class="faq-item"><summary>Что значит “Обновляется”?</summary><p>У карточки пока нет нормальной ссылки на Google Drive или файл временно не готов. Кнопка скачивания специально отключена, чтобы не вести в пустоту.</p></details>
+    <details class="faq-item"><summary>Подойдут ли плагины для AE 2024 / 2025?</summary><p>В основе сайт ориентирован на AE 2022 и новее. Но совместимость зависит от конкретного плагина, поэтому перед установкой лучше смотреть страницу плагина.</p></details>
+    <details class="faq-item"><summary>Куда кидать .aex?</summary><p>В папку Plug-ins вашей версии After Effects. Например: Program Files → Adobe → Adobe After Effects 2022 → Support Files → Plug-ins.</p></details>
+    <details class="faq-item"><summary>Куда кидать .ffx?</summary><p>В Documents → Adobe → After Effects → User Presets. После этого пресет ищется через панель Effects & Presets.</p></details>
+    <details class="faq-item"><summary>Как сообщить о нерабочей ссылке?</summary><p>Можно написать в Telegram-канал проекта. Ссылку оставил в шапке и футере сайта.</p></details>
+  </div>
+</section>
+
+</main>
+<footer class="footer">
+  <div class="container footer-grid">
+    <div>
+      <div class="footer-brand"><span>🎬</span> AE Plugins Vault</div>
+      <p>Каталог плагинов, скриптов и пресетов для After Effects. Сделано как удобная витрина без лишнего шума.</p>
+    </div>
+    <div>
+      <h4>Разделы</h4>
+      <a href="plugins.html">Каталог</a>
+      <a href="install.html">Установка</a>
+      <a href="faq.html">FAQ</a>
+      <a href="stats.html">Статистика</a>
+    </div>
+    <div>
+      <h4>Связь</h4>
+      <a data-telegram-link href="https://t.me/ae_plugins_vault" target="_blank" rel="noopener"><i class="fab fa-telegram"></i> Telegram-канал</a>
+      <span class="local-counter"><i class="fas fa-eye"></i> Ваши визиты: <b id="localVisitCount">0</b></span>
+      <span class="public-counter" id="publicCounter" hidden></span>
+    </div>
+  </div>
+  <div class="container footer-bottom">© 2026 AE Plugins Vault. Все материалы добавляются для ознакомления.</div>
+</footer>
+<button class="back-to-top" id="backToTop" aria-label="Наверх"><i class="fas fa-arrow-up"></i></button>
+<script src="config.js"></script>
+<script src="plugins.js"></script>
+<script src="app.js"></script>
+
+</body>
+</html>

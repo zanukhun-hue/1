@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>
+  (function(){
+    try {
+      var savedTheme = localStorage.getItem('theme');
+      var isDark = savedTheme ? savedTheme === 'dark' : true;
+      document.documentElement.classList.toggle('dark-mode', isDark);
+      document.documentElement.classList.toggle('light-mode', !isDark);
+    } catch (e) {
+      document.documentElement.classList.add('dark-mode');
+    }
+  })();
+</script>
+<style>
+  html.dark-mode, html.dark-mode body { background:#080a12; color:#f8fafc; color-scheme:dark; }
+  html.light-mode, html.light-mode body { background:#f8fafc; color:#111827; color-scheme:light; }
+</style>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%AC%3C/text%3E%3C/svg%3E" rel="icon" type="image/svg+xml">
+<title>Страница плагина | AE Plugins Vault</title>
+<meta name="description" content="Подробная страница плагина для After Effects.">
+
+</head>
+<body data-page="plugin">
+<header class="header">
+  <div class="container nav-container">
+    <a class="logo" href="index.html" aria-label="AE Plugins Vault">
+      <span class="logo-icon">🎬</span>
+      <span class="logo-text">AE Plugins Vault</span>
+    </a>
+    <nav class="nav-links" id="navLinks">
+      <a class="nav-link" data-nav="home" href="index.html"><i class="fas fa-house"></i> Главная</a>
+      <a class="nav-link" data-nav="plugins" href="plugins.html"><i class="fas fa-plug"></i> Каталог</a>
+      <a class="nav-link" data-nav="install" href="install.html"><i class="fas fa-download"></i> Установка</a>
+      <a class="nav-link" data-nav="faq" href="faq.html"><i class="fas fa-circle-question"></i> FAQ</a>
+      <a class="nav-link" data-nav="about" href="about.html"><i class="fas fa-info-circle"></i> О сайте</a>
+    </nav>
+    <div class="header-actions">
+      <a class="favorite-pill" href="plugins.html?favorites=1" title="Избранное"><i class="fas fa-heart"></i><span id="favoriteCount">0</span></a>
+      <a class="telegram-link" data-telegram-link href="https://t.me/ae_plugins_vault" target="_blank" rel="noopener" aria-label="Telegram"><i class="fab fa-telegram"></i></a>
+      <button class="theme-toggle" id="themeToggle" aria-label="Переключить тему"><i class="fas fa-moon"></i></button>
+      <button class="menu-toggle" id="menuToggle" aria-label="Открыть меню"><i class="fas fa-bars"></i></button>
+    </div>
+  </div>
+</header>
+<main>
+
+<section class="subpage-hero plugin-detail-hero">
+  <div class="container">
+    <a class="back-link" href="plugins.html"><i class="fas fa-arrow-left"></i> Назад в каталог</a>
+    <div id="pluginDetail"></div>
+  </div>
+</section>
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">Похожие</span>
+      <h2>Похожие плагины</h2>
+    </div>
+    <div class="plugins-grid compact" id="relatedPlugins"></div>
+  </div>
+</section>
+
+</main>
+<footer class="footer">
+  <div class="container footer-grid">
+    <div>
+      <div class="footer-brand"><span>🎬</span> AE Plugins Vault</div>
+      <p>Каталог плагинов, скриптов и пресетов для After Effects. Сделано как удобная витрина без лишнего шума.</p>
+    </div>
+    <div>
+      <h4>Разделы</h4>
+      <a href="plugins.html">Каталог</a>
+      <a href="install.html">Установка</a>
+      <a href="faq.html">FAQ</a>
+      <a href="stats.html">Статистика</a>
+    </div>
+    <div>
+      <h4>Связь</h4>
+      <a data-telegram-link href="https://t.me/ae_plugins_vault" target="_blank" rel="noopener"><i class="fab fa-telegram"></i> Telegram-канал</a>
+      <span class="local-counter"><i class="fas fa-eye"></i> Ваши визиты: <b id="localVisitCount">0</b></span>
+      <span class="public-counter" id="publicCounter" hidden></span>
+    </div>
+  </div>
+  <div class="container footer-bottom">© 2026 AE Plugins Vault. Все материалы добавляются для ознакомления.</div>
+</footer>
+<button class="back-to-top" id="backToTop" aria-label="Наверх"><i class="fas fa-arrow-up"></i></button>
+<script src="config.js"></script>
+<script src="plugins.js"></script>
+<script src="app.js"></script>
+
+</body>
+</html>
