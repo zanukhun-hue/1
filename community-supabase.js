@@ -181,7 +181,7 @@
     const endpoint = `${supabaseBaseUrl()}/rest/v1/edit_submissions`;
     const resp = await fetch(endpoint, {
       method: 'POST',
-      headers: supabaseHeaders({ Prefer: 'return=representation' }),
+      headers: supabaseHeaders({ Prefer: 'return=minimal' }),
       body: JSON.stringify(payload)
     });
 
@@ -190,8 +190,7 @@
       throw new Error(normalizeSupabaseError(resp, body));
     }
 
-    const data = await resp.json();
-    return data && data[0] ? data[0] : payload;
+    return payload;
   }
 
   async function renderRemoteCommunity(){
