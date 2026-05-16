@@ -16,17 +16,14 @@ window.AE_SITE_CONFIG = {
   function loadCommunitySupabaseBridge(){
     if(document.querySelector('script[data-community-supabase-bridge]')) return;
     var script = document.createElement('script');
-    script.src = 'community-supabase.js?v=1';
-    script.async = true;
+    script.src = 'community-supabase.js?v=2';
     script.dataset.communitySupabaseBridge = '1';
     document.body.appendChild(script);
   }
 
   if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', function(){
-      setTimeout(loadCommunitySupabaseBridge, 0);
-    });
+    document.addEventListener('DOMContentLoaded', loadCommunitySupabaseBridge);
   } else {
-    setTimeout(loadCommunitySupabaseBridge, 0);
+    loadCommunitySupabaseBridge();
   }
 })();
