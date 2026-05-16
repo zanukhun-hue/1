@@ -4,14 +4,13 @@
   const page = document.body.dataset.page || '';
 
   const $ = (sel, root=document) => root.querySelector(sel);
-  const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
 
   function isSupabaseReady(){
     return Boolean(config.supabaseUrl && config.supabaseAnonKey);
   }
 
   function supabaseBaseUrl(){
-    return String(config.supabaseUrl || '').replace(/\/$/, '');
+    return String(config.supabaseUrl || '').replace(/\/rest\/v1\/?$/,'').replace(/\/$/, '');
   }
 
   function supabaseHeaders(extra={}){
@@ -37,7 +36,7 @@
     }
     t.textContent = text;
     t.classList.add('show');
-    setTimeout(()=>t.classList.remove('show'), 3000);
+    setTimeout(()=>t.classList.remove('show'), 4200);
   }
 
   function detectVideo(url){
@@ -95,10 +94,21 @@
     try { return JSON.parse(localStorage.getItem(EDIT_SUBMISSIONS_KEY)) || []; } catch(e){ return []; }
   }
 
+  function setLocalSubmissions(list){
+    localStorage.setItem(EDIT_SUBMISSIONS_KEY, JSON.stringify(list));
+  }
+
   function saveLocalSubmission(item){
     const list = getLocalSubmissions();
     list.unshift(item);
-    localStorage.setItem(EDIT_SUBMISSIONS_KEY, JSON.stringify(list));
+    setLocalSubmissions(list);
+  }
+
+  function deleteLocalSubmission(id){
+    const list = getLocalSubmissions().filter(item => String(item.id) !== String(id));
+    setLocalSubmissions(list);
+    renderLocalSubmissions();
+    showToast('Заявка удалена из этого браузера.');
   }
 
   function editCard(item, local=false){
@@ -108,7 +118,9 @@
     const used = escapeHtml(item.plugins || '');
     const platform = item.platform || detectVideo(item.url)?.platform || 'video';
     const thumb = item.thumb || detectVideo(item.url)?.thumb || '';
+    const localId = escapeHtml(item.id || item.created || item.url || '');
     const status = local ? '<span class="pending-badge"><i class="fas fa-clock"></i> На проверке</span>' : '';
+    const deleteBtn = local ? `<button class="details-btn delete-local-edit" type="button" data-local-id="${localId}"><i class="fas fa-trash"></i> Удалить</button>` : '';
 
     return `<article class="edit-card reveal revealed">
       <a class="edit-thumb" href="${escapeHtml(item.url)}" target="_blank" rel="noopener">
@@ -125,20 +137,35 @@
           ${used ? `<span><i class="fas fa-plug"></i> ${used}</span>` : ''}
         </div>
       </div>
-      <div class="edit-actions"><a class="details-btn" href="${escapeHtml(item.url)}" target="_blank" rel="noopener"><i class="fas fa-up-right-from-square"></i> Открыть</a></div>
+      <div class="edit-actions">
+        <a class="details-btn" href="${escapeHtml(item.url)}" target="_blank" rel="noopener"><i class="fas fa-up-right-from-square"></i> Открыть</a>
+        ${deleteBtn}
+      </div>
     </article>`;
+  }
+
+  function normalizeSupabaseError(resp, bodyText){
+    let text = bodyText || '';
+    try {
+      const data = JSON.parse(bodyText);
+      text = data.message || data.hint || data.details || bodyText;
+    } catch(e) {}
+    return `${resp.status} ${resp.statusText}${text ? ': ' + text : ''}`;
   }
 
   async function fetchApprovedRemoteEdits(){
     if(!isSupabaseReady()) return [];
     const endpoint = `${supabaseBaseUrl()}/rest/v1/edit_submissions?select=id,url,platform,thumb,title,author,plugins,description,status,created_at&status=eq.approved&order=created_at.desc`;
     const resp = await fetch(endpoint, { headers: supabaseHeaders() });
-    if(!resp.ok) throw new Error('Не удалось загрузить общие работы');
+    if(!resp.ok){
+      const body = await resp.text();
+      throw new Error(normalizeSupabaseError(resp, body));
+    }
     return await resp.json();
   }
 
   async function sendRemoteSubmission(item){
-    if(!isSupabaseReady()) throw new Error('Supabase не настроен');
+    if(!isSupabaseReady()) throw new Error('Supabase не настроен в config.js');
 
     const payload = {
       url: item.url,
@@ -158,7 +185,11 @@
       body: JSON.stringify(payload)
     });
 
-    if(!resp.ok) throw new Error('Не удалось отправить заявку');
+    if(!resp.ok){
+      const body = await resp.text();
+      throw new Error(normalizeSupabaseError(resp, body));
+    }
+
     const data = await resp.json();
     return data && data[0] ? data[0] : payload;
   }
@@ -174,7 +205,7 @@
       list = await fetchApprovedRemoteEdits();
     } catch(e){
       console.warn(e);
-      showToast('Не удалось загрузить общие работы из базы.');
+      showToast('Ошибка загрузки базы: ' + e.message);
       return;
     }
 
@@ -196,6 +227,15 @@
     const count = $('#editCount');
     if(count) count.textContent = `Работ: ${list.length}`;
     const empty = $('#communityEmpty');
+    if(empty) empty.hidden = list.length !== 0;
+  }
+
+  function renderLocalSubmissions(){
+    const grid = $('#mySubmissionsGrid');
+    if(!grid) return;
+    const list = getLocalSubmissions();
+    grid.innerHTML = list.map(x => editCard(x, true)).join('');
+    const empty = $('#mySubmissionsEmpty');
     if(empty) empty.hidden = list.length !== 0;
   }
 
@@ -235,16 +275,10 @@
     } catch(err){
       console.warn(err);
       saveLocalSubmission(item);
-      showToast('База пока не настроена. Заявка сохранена только в этом браузере.');
+      showToast('Ошибка базы: ' + err.message + '. Заявка сохранена только в этом браузере.');
     }
 
-    const grid = $('#mySubmissionsGrid');
-    if(grid){
-      const list = getLocalSubmissions();
-      grid.innerHTML = list.map(x => editCard(x, true)).join('');
-    }
-    const empty = $('#mySubmissionsEmpty');
-    if(empty) empty.hidden = getLocalSubmissions().length !== 0;
+    renderLocalSubmissions();
   }
 
   function init(){
@@ -256,7 +290,14 @@
     }
 
     if(page === 'submit'){
+      renderLocalSubmissions();
       document.addEventListener('submit', submitToRemoteOnly, true);
+      document.addEventListener('click', (e)=>{
+        const btn = e.target.closest('.delete-local-edit');
+        if(!btn) return;
+        e.preventDefault();
+        deleteLocalSubmission(btn.dataset.localId);
+      });
     }
   }
 
