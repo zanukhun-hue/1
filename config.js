@@ -1,15 +1,15 @@
 // Настройки сайта.
 // Для публичной статистики создайте код в GoatCounter и вставьте его ниже.
-// Для общей публикации видео подключите Supabase и заполните supabaseUrl + supabaseAnonKey.
+// Для общей публикации видео подключен Supabase.
 window.AE_SITE_CONFIG = {
   goatCounterCode: "",
   telegramUrl: "https://t.me/ae_plugins_vault",
 
-  // Supabase Project URL. Пример: "https://abcd1234.supabase.co"
-  supabaseUrl: "",
+  // Supabase Project URL.
+  supabaseUrl: "https://qfugshwpslhdgrogrcyl.supabase.co",
 
   // Supabase anon/public key. Service role key сюда вставлять нельзя.
-  supabaseAnonKey: ""
+  supabaseAnonKey: "sb_publishable_EKsmv1T88vEI8fCoZJgxRw_T8H1CzE6"
 };
 
 (function(){
