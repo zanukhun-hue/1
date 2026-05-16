@@ -1,6 +1,6 @@
 -- Supabase SQL Editor → вставить и нажать RUN.
--- Это включает общую базу заявок на видео.
--- Посетители смогут отправлять заявки, а на сайте будут видны только записи со status = 'approved'.
+-- Общая база заявок на видео.
+-- Посетители отправляют заявки со status = 'pending'. На сайте видны только status = 'approved'.
 
 create extension if not exists pgcrypto;
 
@@ -19,20 +19,25 @@ create table if not exists public.edit_submissions (
 
 alter table public.edit_submissions enable row level security;
 
-grant select, insert on public.edit_submissions to anon;
+grant usage on schema public to anon, authenticated;
+grant select, insert on public.edit_submissions to anon, authenticated;
+
+-- Удаляем старые политики, если они уже были созданы.
+drop policy if exists "Anyone can submit pending edits" on public.edit_submissions;
+drop policy if exists "Anyone can read approved edits" on public.edit_submissions;
+drop policy if exists "Public can submit pending edits" on public.edit_submissions;
+drop policy if exists "Public can read approved edits" on public.edit_submissions;
 
 -- Любой посетитель может отправить только заявку на модерацию.
-drop policy if exists "Anyone can submit pending edits" on public.edit_submissions;
-create policy "Anyone can submit pending edits"
+create policy "Public can submit pending edits"
 on public.edit_submissions
 for insert
-to anon
+to anon, authenticated
 with check (status = 'pending');
 
 -- Любой посетитель может видеть только одобренные работы.
-drop policy if exists "Anyone can read approved edits" on public.edit_submissions;
-create policy "Anyone can read approved edits"
+create policy "Public can read approved edits"
 on public.edit_submissions
 for select
-to anon
+to anon, authenticated
 using (status = 'approved');
