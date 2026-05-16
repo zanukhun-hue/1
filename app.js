@@ -342,7 +342,7 @@
       list.unshift(item);
       saveSubmissions(list);
       renderSubmissions();
-      showToast('Заявка сохранена. Сейчас она видна только в твоём браузере.');
+      showToast('Заявка добавлена и ожидает проверки.');
     });
   }
 
