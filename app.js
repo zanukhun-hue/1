@@ -1,11 +1,13 @@
 
 (function(){
   const plugins = window.AE_PLUGINS || [];
+  const edits = window.AE_EDITS || [];
   const config = window.AE_SITE_CONFIG || {};
   const FAVORITES_KEY = 'aePluginFavorites';
   const THEME_KEY = 'theme';
   const VISITS_KEY = 'aeSiteVisits';
   const LAST_VISIT_KEY = 'aeSiteLastVisit';
+  const EDIT_SUBMISSIONS_KEY = 'aeEditSubmissions';
   const page = document.body.dataset.page || 'home';
 
   const $ = (sel, root=document) => root.querySelector(sel);
@@ -189,6 +191,161 @@
     syncFavoriteUI();
   }
 
+
+
+  function escapeHtml(str){
+    return String(str || '').replace(/[&<>'"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]));
+  }
+  function getSubmissions(){ try { return JSON.parse(localStorage.getItem(EDIT_SUBMISSIONS_KEY)) || []; } catch(e){ return []; } }
+  function saveSubmissions(arr){ localStorage.setItem(EDIT_SUBMISSIONS_KEY, JSON.stringify(arr)); }
+  function detectVideo(url){
+    const value = String(url || '').trim();
+    let u;
+    try { u = new URL(value); } catch(e){ return null; }
+    const host = u.hostname.replace(/^www\./,'').toLowerCase();
+    if(host.includes('youtu.be')){
+      const id = u.pathname.split('/').filter(Boolean)[0];
+      if(id) return {platform:'youtube', id, url:value, embed:`https://www.youtube.com/embed/${id}`, thumb:`https://i.ytimg.com/vi/${id}/hqdefault.jpg`};
+    }
+    if(host.includes('youtube.com')){
+      let id = u.searchParams.get('v');
+      const parts = u.pathname.split('/').filter(Boolean);
+      if(!id && ['shorts','embed','live'].includes(parts[0])) id = parts[1];
+      if(id) return {platform:'youtube', id, url:value, embed:`https://www.youtube.com/embed/${id}`, thumb:`https://i.ytimg.com/vi/${id}/hqdefault.jpg`};
+    }
+    if(host.includes('tiktok.com')){
+      const match = value.match(/video\/(\d+)/);
+      return {platform:'tiktok', id: match ? match[1] : '', url:value, embed:value, thumb:''};
+    }
+    return null;
+  }
+  function platformLabel(platform){ return platform === 'tiktok' ? 'TikTok' : platform === 'youtube' ? 'YouTube' : 'Видео'; }
+  function platformIcon(platform){ return platform === 'tiktok' ? 'fab fa-tiktok' : platform === 'youtube' ? 'fab fa-youtube' : 'fas fa-video'; }
+  async function buildVideoPreview(url){
+    const base = detectVideo(url);
+    if(!base) throw new Error('Поддерживаются ссылки YouTube и TikTok');
+    if(base.platform === 'youtube') return base;
+    try {
+      const resp = await fetch(`https://www.tiktok.com/oembed?url=${encodeURIComponent(base.url)}`);
+      if(resp.ok){
+        const data = await resp.json();
+        return {...base, title:data.title || '', author:data.author_name || '', thumb:data.thumbnail_url || '', html:data.html || ''};
+      }
+    } catch(e) {}
+    return base;
+  }
+  function editCard(item, local=false){
+    const title = escapeHtml(item.title || 'Без названия');
+    const author = escapeHtml(item.author || 'Автор');
+    const desc = escapeHtml(item.description || '');
+    const used = escapeHtml(item.plugins || '');
+    const platform = item.platform || detectVideo(item.url)?.platform || 'video';
+    const thumb = item.thumb || detectVideo(item.url)?.thumb || '';
+    const status = local ? '<span class="pending-badge"><i class="fas fa-clock"></i> На проверке</span>' : '';
+    return `<article class="edit-card reveal">
+      <a class="edit-thumb" href="${escapeHtml(item.url)}" target="_blank" rel="noopener">
+        ${thumb ? `<img src="${escapeHtml(thumb)}" alt="${title}" loading="lazy">` : '<div class="edit-thumb-placeholder"><i class="fas fa-video"></i></div>'}
+        <span class="platform-badge"><i class="${platformIcon(platform)}"></i> ${platformLabel(platform)}</span>
+        <span class="play-badge"><i class="fas fa-play"></i></span>
+      </a>
+      <div class="edit-body">
+        <div class="badge-stack">${status}</div>
+        <h3>${title}</h3>
+        <p>${desc || 'Пользовательская работа After Effects.'}</p>
+        <div class="edit-meta">
+          <span><i class="fas fa-user"></i> ${author}</span>
+          ${used ? `<span><i class="fas fa-plug"></i> ${used}</span>` : ''}
+        </div>
+      </div>
+      <div class="edit-actions"><a class="details-btn" href="${escapeHtml(item.url)}" target="_blank" rel="noopener"><i class="fas fa-up-right-from-square"></i> Открыть</a></div>
+    </article>`;
+  }
+  let activeEditPlatform = 'all';
+  function renderCommunity(){
+    const grid = $('#communityGrid');
+    if(!grid) return;
+    const query = ($('#editSearch')?.value || '').trim().toLowerCase();
+    let list = edits.filter(x => (x.status || 'approved') === 'approved');
+    list = list.filter(x => {
+      const platform = x.platform || detectVideo(x.url)?.platform || 'video';
+      const platformOk = activeEditPlatform === 'all' || platform === activeEditPlatform;
+      const text = [x.title,x.author,x.description,x.plugins,platform].join(' ').toLowerCase();
+      return platformOk && (!query || text.includes(query));
+    });
+    grid.innerHTML = list.map(x=>editCard(x)).join('');
+    $('#editCount') && ($('#editCount').textContent = `Работ: ${list.length}`);
+    $('#communityEmpty') && ($('#communityEmpty').hidden = list.length !== 0);
+    setupReveals();
+  }
+  function renderSubmissions(){
+    const grid = $('#mySubmissionsGrid');
+    if(!grid) return;
+    const list = getSubmissions();
+    grid.innerHTML = list.map(x=>editCard(x, true)).join('');
+    $('#mySubmissionsEmpty') && ($('#mySubmissionsEmpty').hidden = list.length !== 0);
+    setupReveals();
+  }
+  function showToast(text){
+    let t = $('#toastMessage');
+    if(!t){ t = document.createElement('div'); t.id = 'toastMessage'; t.className = 'toast-message'; document.body.appendChild(t); }
+    t.textContent = text;
+    t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'), 2600);
+  }
+  async function fillEditPreview(){
+    const box = $('#editPreview');
+    const url = $('#editUrl')?.value || '';
+    if(!box) return null;
+    box.innerHTML = '<i class="fas fa-spinner fa-spin"></i><p>Загружаю превью...</p>';
+    try {
+      const meta = await buildVideoPreview(url);
+      if(meta.title && !$('#editTitle').value) $('#editTitle').value = meta.title.slice(0,80);
+      if(meta.author && !$('#editAuthor').value) $('#editAuthor').value = meta.author.slice(0,40);
+      const item = {
+        url: meta.url,
+        platform: meta.platform,
+        thumb: meta.thumb,
+        title: $('#editTitle')?.value || meta.title || platformLabel(meta.platform),
+        author: $('#editAuthor')?.value || meta.author || 'Автор',
+        plugins: $('#editPlugins')?.value || '',
+        description: $('#editDescription')?.value || ''
+      };
+      box.classList.remove('edit-preview-placeholder');
+      box.innerHTML = editCard(item);
+      setupReveals();
+      return item;
+    } catch(err){
+      box.classList.add('edit-preview-placeholder');
+      box.innerHTML = `<i class="fas fa-triangle-exclamation"></i><p>${escapeHtml(err.message || 'Не удалось сделать превью')}</p>`;
+      return null;
+    }
+  }
+  function initSubmitPage(){
+    renderSubmissions();
+    $('#previewEditBtn')?.addEventListener('click', fillEditPreview);
+    $('#editUrl')?.addEventListener('change', fillEditPreview);
+    $('#editSubmitForm')?.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const meta = await fillEditPreview();
+      if(!meta) return;
+      const item = {
+        ...meta,
+        id: 'local-' + Date.now(),
+        title: $('#editTitle')?.value || meta.title,
+        author: $('#editAuthor')?.value || meta.author || 'Автор',
+        plugins: $('#editPlugins')?.value || '',
+        description: $('#editDescription')?.value || '',
+        status:'pending',
+        created:new Date().toISOString()
+      };
+      const list = getSubmissions();
+      list.unshift(item);
+      saveSubmissions(list);
+      renderSubmissions();
+      showToast('Заявка сохранена. Сейчас она видна только в твоём браузере.');
+    });
+  }
+
   function renderStats(){
     const visits = JSON.parse(localStorage.getItem(VISITS_KEY) || '{}');
     $('#statsTotalVisits') && ($('#statsTotalVisits').textContent = visits.total || 0);
@@ -203,6 +360,8 @@
     if(page === 'plugins') renderCatalog();
     if(page === 'plugin') renderPluginDetail();
     if(page === 'stats') renderStats();
+    if(page === 'community') renderCommunity();
+    if(page === 'submit') renderSubmissions();
   }
 
   function applyTheme(isDark){
@@ -276,6 +435,17 @@
       btn.classList.add('active');
       renderCatalog();
     });
+    $('#editSearch')?.addEventListener('input', renderCommunity);
+    $('#clearEditSearch')?.addEventListener('click', () => { const input=$('#editSearch'); if(input){ input.value=''; input.focus(); renderCommunity(); } });
+    $('#editFilters')?.addEventListener('click', (e)=>{
+      const btn = e.target.closest('.filter-btn');
+      if(!btn) return;
+      activeEditPlatform = btn.dataset.platform;
+      $$('.filter-btn', $('#editFilters')).forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      renderCommunity();
+    });
+    if(page === 'submit') initSubmitPage();
     const top = $('#backToTop');
     window.addEventListener('scroll', () => top?.classList.toggle('show', window.scrollY > 500));
     top?.addEventListener('click', () => scrollTo({top:0, behavior:'smooth'}));

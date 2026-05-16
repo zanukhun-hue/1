@@ -25,11 +25,10 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%AC%3C/text%3E%3C/svg%3E" rel="icon" type="image/svg+xml">
-<title>FAQ | AE Plugins Vault</title>
-<meta name="description" content="Ответы на частые вопросы по плагинам After Effects.">
-
+<title>Работы пользователей | AE Plugins Vault</title>
+<meta name="description" content="Эдиты и видео пользователей, сделанные с After Effects.">
 </head>
-<body data-page="faq">
+<body data-page="community">
 <header class="header">
   <div class="container nav-container">
     <a class="logo" href="index.html" aria-label="AE Plugins Vault">
@@ -52,32 +51,49 @@
   </div>
 </header>
 <main>
-
 <section class="subpage-hero">
   <div class="container">
-    <span class="eyebrow"><i class="fas fa-circle-question"></i> FAQ</span>
-    <h1>Частые вопросы</h1>
-    <p>Короткие ответы на самые частые проблемы с плагинами After Effects.</p>
+    <span class="eyebrow"><i class="fas fa-film"></i> Комьюнити</span>
+    <h1>Работы пользователей</h1>
+    <p>Эдиты, шоурилы и ролики, которые люди сделали в After Effects. Здесь отображаются только одобренные работы.</p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="submit.html"><i class="fas fa-plus"></i> Поделиться эдитом</a>
+      <a class="btn btn-ghost" href="plugins.html"><i class="fas fa-plug"></i> Плагины</a>
+    </div>
   </div>
 </section>
 <section class="section">
-  <div class="container faq-list">
-    <details class="faq-item" open><summary>Почему плагин не появился в After Effects?</summary><p>Чаще всего файл положили не в ту папку, AE не был перезапущен или скрипт нужно искать в меню Window, а не в Effects. Для .jsx/.jsxbin проверьте папку Scripts или ScriptUI Panels.</p></details>
-    <details class="faq-item"><summary>Что значит статус “Проверено”?</summary><p>У карточки есть рабочая ссылка на Google Drive. Это не заменяет вашу личную проверку файла перед запуском, но показывает, что ссылка не пустая.</p></details>
-    <details class="faq-item"><summary>Что значит “Обновляется”?</summary><p>У карточки пока нет нормальной ссылки на Google Drive или файл временно не готов. Кнопка скачивания специально отключена, чтобы не вести в пустоту.</p></details>
-    <details class="faq-item"><summary>Подойдут ли плагины для AE 2024 / 2025?</summary><p>В основе сайт ориентирован на AE 2022 и новее. Но совместимость зависит от конкретного плагина, поэтому перед установкой лучше смотреть страницу плагина.</p></details>
-    <details class="faq-item"><summary>Куда кидать .aex?</summary><p>В папку Plug-ins вашей версии After Effects. Например: Program Files → Adobe → Adobe After Effects 2022 → Support Files → Plug-ins.</p></details>
-    <details class="faq-item"><summary>Куда кидать .ffx?</summary><p>В Documents → Adobe → After Effects → User Presets. После этого пресет ищется через панель Effects & Presets.</p></details>
-    <details class="faq-item"><summary>Как сообщить о нерабочей ссылке?</summary><p>Можно написать в Telegram-канал проекта. Ссылку оставил в шапке и футере сайта.</p></details>
+  <div class="container">
+    <div class="catalog-panel reveal">
+      <div class="search-wrap">
+        <i class="fas fa-search"></i>
+        <input id="editSearch" type="search" placeholder="Поиск по названию, автору или платформе...">
+        <button id="clearEditSearch" type="button"><i class="fas fa-xmark"></i></button>
+      </div>
+      <div class="catalog-row">
+        <div class="filter-tabs" id="editFilters">
+          <button class="filter-btn active" data-platform="all">Все</button>
+          <button class="filter-btn" data-platform="youtube">YouTube</button>
+          <button class="filter-btn" data-platform="tiktok">TikTok</button>
+        </div>
+        <div class="catalog-meta"><span id="editCount">Работ: 0</span></div>
+      </div>
+    </div>
+    <div class="edits-grid" id="communityGrid"></div>
+    <div class="empty-state" id="communityEmpty" hidden>
+      <i class="fas fa-video"></i>
+      <h3>Работ пока нет</h3>
+      <p>Добавь первую ссылку через кнопку “Поделиться эдитом”. Без бэкенда заявка сохранится только в твоём браузере, но превью уже будет работать.</p>
+      <a class="btn btn-primary" href="submit.html"><i class="fas fa-plus"></i> Добавить работу</a>
+    </div>
   </div>
 </section>
-
 </main>
 <footer class="footer">
   <div class="container footer-grid">
     <div>
       <div class="footer-brand"><span>🎬</span> AE Plugins Vault</div>
-      <p>Каталог плагинов, скриптов и пресетов для After Effects. Сделано как удобная витрина без лишнего шума.</p>
+      <p>Каталог плагинов, скриптов, пресетов и работ пользователей для After Effects.</p>
     </div>
     <div>
       <h4>Разделы</h4>
@@ -89,6 +105,8 @@
     <div>
       <h4>Связь</h4>
       <a data-telegram-link href="https://t.me/ae_plugins_vault" target="_blank" rel="noopener"><i class="fab fa-telegram"></i> Telegram-канал</a>
+      <span class="local-counter"><i class="fas fa-eye"></i> Ваши визиты: <b id="localVisitCount">0</b></span>
+      <span class="public-counter" id="publicCounter" hidden></span>
     </div>
   </div>
   <div class="container footer-bottom">© 2026 AE Plugins Vault. Все материалы добавляются для ознакомления.</div>
