@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: ae-vault-ssr
+    name: null-object-ae
     runtime: node
     plan: free
     buildCommand: npm install
@@ -10,5 +10,7 @@ services:
     envVars:
       - key: NODE_VERSION
         value: 20
+      - key: SITE_URL
+        value: https://null-object-ae.onrender.com
       - key: TELEGRAM_URL
         value: https://t.me/ae_plugins_vault
