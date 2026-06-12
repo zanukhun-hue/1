@@ -25,7 +25,7 @@
       .version-selector summary{list-style:none;cursor:pointer;padding:16px 18px;display:flex;align-items:center;justify-content:space-between;gap:14px;font-weight:900;color:var(--text)}
       .version-selector summary::-webkit-details-marker{display:none}.version-selector summary span{display:flex;align-items:center;gap:10px}.version-selector summary .chevron{transition:transform .2s ease}.version-selector[open] summary .chevron{transform:rotate(180deg)}
       .version-selector-body{padding:0 18px 18px}.version-selector-list{display:flex;flex-wrap:wrap;gap:10px}.version-option{border:1px solid var(--border);background:var(--surface-2);color:var(--text);border-radius:14px;padding:12px 14px;font-weight:900;display:inline-flex;align-items:center;gap:8px;transition:var(--transition);text-decoration:none}
-      .version-option.active{background:linear-gradient(135deg,var(--primary),#8b5cf6);border-color:transparent;color:#fff}.version-option:hover{transform:translateY(-2px);box-shadow:var(--shadow-soft)}.version-note{margin-top:12px;color:var(--muted);font-size:.9rem;font-weight:700}
+      .version-option.active{background:linear-gradient(135deg,var(--primary),#8b5cf6);border-color:transparent;color:#fff}.version-option:hover{transform:translateY(-2px);box-shadow:var(--shadow-soft)}.version-note{margin-top:12px;color:var(--muted);font-size:.9rem;font-weight:700}.version-note.success{color:#22c55e}.version-note.error{color:#ef4444}
       @media(max-width:900px){.stable-visual{height:390px!important;min-height:390px!important;padding:38px!important;margin:-38px!important}.visual-float-ae{left:4%!important;top:9%!important}.visual-float-plugin{right:4%!important;top:19%!important}.visual-float-download{left:40%!important;bottom:5%!important}.ae-card{width:164px!important;height:164px!important}.visual-element{width:122px!important;height:122px!important}.plugin-detail-content .hero-actions .btn.favorite-btn,.hero-actions .btn.favorite-btn{min-width:156px!important;min-height:50px!important}.version-selector-list{flex-direction:column}.version-option{justify-content:center;width:100%}}
     `;
     document.head.appendChild(style);
@@ -153,18 +153,58 @@
     grid.innerHTML=list.map(item=>`<article class="edit-card revealed"><div class="edit-body"><div class="badge-stack"><span class="pending-badge"><i class="fas fa-clock"></i> На проверке</span></div><h3>${escapeHtml(item.title)}</h3><p>${escapeHtml(item.description||'Пользовательская работа After Effects.')}</p><div class="edit-meta"><span><i class="fas fa-user"></i> ${escapeHtml(item.author)}</span>${item.plugins?`<span><i class="fas fa-plug"></i> ${escapeHtml(item.plugins)}</span>`:''}</div></div><div class="edit-actions"><a class="details-btn" href="${escapeHtml(item.url)}" target="_blank" rel="noopener"><i class="fas fa-up-right-from-square"></i> Открыть</a></div></article>`).join('');
     const empty=$('#mySubmissionsEmpty');if(empty)empty.hidden=list.length!==0;
   }
-  function initSubmit(){renderSubmissions();$('#editSubmitForm')?.addEventListener('submit',event=>{event.preventDefault();const item={id:'local-'+Date.now(),url:$('#editUrl')?.value||'',title:$('#editTitle')?.value||'Без названия',author:$('#editAuthor')?.value||'Автор',plugins:$('#editPlugins')?.value||'',description:$('#editDescription')?.value||'',created:new Date().toISOString()};const list=readSubmissions();list.unshift(item);writeJson(EDIT_SUBMISSIONS_KEY,list);event.target.reset();renderSubmissions()})}
+
+  function setSubmitStatus(message,type){
+    const status=$('#submitStatus');
+    if(!status) return;
+    status.hidden=false;
+    status.textContent=message;
+    status.classList.remove('success','error');
+    if(type) status.classList.add(type);
+  }
+
+  function initSubmit(){
+    renderSubmissions();
+    $('#editSubmitForm')?.addEventListener('submit',async event=>{
+      event.preventDefault();
+      const form=event.target;
+      const button=form.querySelector('button[type="submit"]');
+      const item={
+        url:$('#editUrl')?.value||'',
+        title:$('#editTitle')?.value||'Без названия',
+        author:$('#editAuthor')?.value||'Автор',
+        plugins:$('#editPlugins')?.value||'',
+        description:$('#editDescription')?.value||''
+      };
+      try{
+        if(button) button.disabled=true;
+        setSubmitStatus('Отправляю заявку...',null);
+        const response=await fetch('/api/edit-submissions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(item)});
+        const data=await response.json().catch(()=>({}));
+        if(!response.ok) throw new Error(data.error||'Не удалось отправить заявку');
+        const list=readSubmissions();
+        list.unshift({id:'local-'+Date.now(),...item,created:new Date().toISOString()});
+        writeJson(EDIT_SUBMISSIONS_KEY,list);
+        form.reset();
+        renderSubmissions();
+        setSubmitStatus('Заявка отправлена на проверку. После approved она появится в работах.', 'success');
+      }catch(error){
+        setSubmitStatus(error.message||'Ошибка отправки заявки', 'error');
+      }finally{
+        if(button) button.disabled=false;
+      }
+    });
+  }
 
   function initFlowVersionSelector(){
     if(location.pathname!=='/plugin/flow') return;
     const actions=$('.plugin-detail-content .hero-actions');
     const downloadBtn=$('.plugin-detail-content .hero-actions .btn-primary');
     if(!actions||!downloadBtn||$('#flowVersionSelector')) return;
-    const flow141=['https://drive.google.com/file/d/','1tyKN0vTzWbjKpd_eziVGAR-jKLqG9PPb','/view?usp=drive_link'].join('');
     const box=document.createElement('details');
     box.id='flowVersionSelector';
     box.className='version-selector reveal revealed';
-    box.innerHTML=`<summary><span><i class="fas fa-code-branch"></i> Выбрать версию Flow</span><i class="fas fa-chevron-down chevron"></i></summary><div class="version-selector-body"><div class="version-selector-list"><a class="version-option" href="${flow141}" target="_blank" rel="noopener"><i class="fas fa-download"></i> Скачать v1.4.1</a><a class="version-option active" href="/download/flow" target="_blank" rel="noopener"><i class="fas fa-check-circle"></i> Скачать v1.5.2</a></div><div class="version-note">Нажми на нужную версию. Основная кнопка скачивания ведёт на Flow v1.5.2.</div></div>`;
+    box.innerHTML=`<summary><span><i class="fas fa-code-branch"></i> Выбрать версию Flow</span><i class="fas fa-chevron-down chevron"></i></summary><div class="version-selector-body"><div class="version-selector-list"><a class="version-option" href="/download/flow?version=v141" target="_blank" rel="noopener"><i class="fas fa-download"></i> Скачать v1.4.1</a><a class="version-option active" href="/download/flow" target="_blank" rel="noopener"><i class="fas fa-check-circle"></i> Скачать v1.5.2</a></div><div class="version-note">Нажми на нужную версию. Основная кнопка скачивания ведёт на Flow v1.5.2.</div></div>`;
     actions.parentNode.insertBefore(box,actions);
     downloadBtn.innerHTML='<i class="fas fa-download"></i> Скачать v1.5.2';
   }
