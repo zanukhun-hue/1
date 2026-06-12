@@ -7,13 +7,18 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const ROOT = __dirname;
 
+app.disable('x-powered-by');
+app.set('trust proxy', 1);
+
 function loadWindowArray(fileName, propertyName) {
   const filePath = path.join(ROOT, fileName);
   if (!fs.existsSync(filePath)) return [];
+
   const code = fs.readFileSync(filePath, 'utf8');
   const sandbox = { window: {} };
   vm.createContext(sandbox);
   vm.runInContext(code, sandbox, { filename: fileName });
+
   return Array.isArray(sandbox.window[propertyName]) ? sandbox.window[propertyName] : [];
 }
 
@@ -54,7 +59,7 @@ function pluginSizeMB(plugin) {
   return n;
 }
 
-function categories() {
+function getCategories() {
   const map = new Map();
   plugins.forEach((plugin) => map.set(plugin.category, plugin.categoryLabel));
   return [['all', 'Все'], ...Array.from(map.entries())];
@@ -98,6 +103,7 @@ function header(active = 'home') {
     ['install', '/install', 'fas fa-download', 'Установка'],
     ['faq', '/faq', 'fas fa-circle-question', 'FAQ']
   ];
+
   return `<header class="header"><div class="container nav-container">
 <a class="logo" href="/" aria-label="${esc(site.title)}"><span class="logo-icon">🎬</span><span class="logo-text">${esc(site.title)}</span></a>
 <nav class="nav-links" id="navLinks">${links.map(([id, href, icon, label]) => `<a class="nav-link ${id === active ? 'active' : ''}" data-nav="${id}" href="${href}"><i class="${icon}"></i> ${label}</a>`).join('')}</nav>
@@ -115,9 +121,10 @@ function layout({ active, title, description, body }) {
 
 function pluginCard(plugin) {
   const download = plugin.status === 'available'
-    ? `<a class="download-btn" href="/download/${url(plugin.id)}"><i class="fas fa-download"></i> Скачать</a>`
+    ? `<a class="download-btn" href="/download/${url(plugin.id)}" target="_blank" rel="noopener"><i class="fas fa-download"></i> Скачать</a>`
     : '<button class="download-btn disabled" disabled><i class="fas fa-clock"></i> Обновляется</button>';
   const tags = (plugin.tags || []).slice(0, 4).map((tag) => `<span>#${esc(tag)}</span>`).join('');
+
   return `<article class="plugin-card reveal" data-plugin-card data-id="${esc(plugin.id)}" data-category="${esc(plugin.category)}" data-status="${esc(plugin.status)}" data-name="${esc(plugin.name)}" data-size="${pluginSizeMB(plugin)}">
 <div class="plugin-card-header"><div class="badge-stack"><span class="plugin-badge">${esc(plugin.badge || plugin.categoryLabel)}</span>${statusBadge(plugin)}</div><div class="card-actions"><button class="favorite-btn" data-id="${esc(plugin.id)}" type="button" aria-label="Избранное"><i class="far fa-heart"></i></button><div class="plugin-icon"><i class="${esc(plugin.icon || 'fas fa-plug')}"></i></div></div></div>
 <div class="plugin-card-content"><h3>${esc(plugin.name)}</h3><p>${esc(plugin.description)}</p><div class="plugin-tags">${tags}</div><div class="plugin-meta"><span><i class="fas fa-hdd"></i> ${esc(plugin.size)}</span><span><i class="fas fa-calendar"></i> ${esc(plugin.version)}</span><span><i class="fas fa-check-circle"></i> AE ${esc(plugin.minAe)}+</span></div></div>
@@ -129,18 +136,28 @@ function homePage() {
   const categoryCount = new Set(plugins.map((plugin) => plugin.category)).size;
   const featured = sortPlugins(plugins).filter((plugin) => /популяр/i.test(plugin.badge || '') && plugin.status === 'available').slice(0, 3);
   const updates = plugins.slice(0, 6).map((plugin) => `<a href="/plugin/${url(plugin.id)}" class="update-row"><span>${statusBadge(plugin)}</span><b>${esc(plugin.name)}</b><small>${esc(plugin.updated)}</small></a>`).join('');
-  return layout({ active: 'home', title: `${site.title} | Бесплатные плагины для After Effects`, description: site.description, body: `
-<section class="hero page-hero-home"><div class="container hero-grid"><div class="hero-content reveal"><span class="eyebrow"><i class="fas fa-sparkles"></i> AE 2022 и новее</span><h1>Профессиональные плагины для <span class="highlight">After Effects</span></h1><p>Каталог эффектов, скриптов, пресетов и комплектов для монтажа, графики, трекинга и анимации.</p><div class="hero-actions"><a class="btn btn-primary" href="/plugins"><i class="fas fa-plug"></i> Открыть каталог</a><a class="btn btn-ghost" href="/install"><i class="fas fa-download"></i> Как установить</a></div><div class="hero-stats"><div class="stat"><span>${plugins.length}</span><small>плагинов</small></div><div class="stat"><span>${available}</span><small>ссылок проверено</small></div><div class="stat"><span>${categoryCount}</span><small>категорий</small></div></div></div><div class="hero-visual stable-visual" aria-hidden="true"><div class="visual-float visual-float-ae"><div class="visual-element ae-card"><span>Ae</span></div></div><div class="visual-float visual-float-plugin"><div class="visual-element"><i class="fas fa-puzzle-piece"></i></div></div><div class="visual-float visual-float-download"><div class="visual-element"><i class="fas fa-cloud-arrow-down"></i></div></div></div></div></section>
-<section class="section"><div class="container"><div class="section-head reveal"><span class="eyebrow">Быстрый старт</span><h2>Что есть на сайте</h2><p>Каталог, инструкции, FAQ, страницы плагинов и работы пользователей вынесены отдельно.</p></div><div class="feature-grid"><div class="feature-card reveal"><i class="fas fa-layer-group"></i><h3>Каталог по категориям</h3><p>Поиск, сортировка, фильтры, избранное и статусы.</p></div><div class="feature-card reveal"><i class="fas fa-file-lines"></i><h3>Страницы плагинов</h3><p>У каждого плагина есть отдельная страница с описанием и похожими позициями.</p></div><div class="feature-card reveal"><i class="fas fa-screwdriver-wrench"></i><h3>Инструкции установки</h3><p>Отдельно для .aex, .jsx/.jsxbin, .ffx и частых проблем.</p></div><div class="feature-card reveal"><i class="fas fa-chart-simple"></i><h3>SSR-отрисовка</h3><p>Основная разметка и данные каталога формируются на сервере.</p></div></div></div></section>
+
+  return layout({
+    active: 'home',
+    title: `${site.title} | Плагины для After Effects`,
+    description: site.description,
+    body: `<section class="hero page-hero-home"><div class="container hero-grid"><div class="hero-content reveal"><span class="eyebrow"><i class="fas fa-sparkles"></i> AE 2022 и новее</span><h1>Профессиональные плагины для <span class="highlight">After Effects</span></h1><p>Каталог эффектов, скриптов, пресетов и комплектов для монтажа, графики, трекинга и анимации.</p><div class="hero-actions"><a class="btn btn-primary" href="/plugins"><i class="fas fa-plug"></i> Открыть каталог</a><a class="btn btn-ghost" href="/install"><i class="fas fa-download"></i> Как установить</a></div><div class="hero-stats"><div class="stat"><span>${plugins.length}</span><small>плагинов</small></div><div class="stat"><span>${available}</span><small>ссылок проверено</small></div><div class="stat"><span>${categoryCount}</span><small>категорий</small></div></div></div><div class="hero-visual stable-visual" aria-hidden="true"><div class="visual-float visual-float-ae"><div class="visual-element ae-card"><span>Ae</span></div></div><div class="visual-float visual-float-plugin"><div class="visual-element"><i class="fas fa-puzzle-piece"></i></div></div><div class="visual-float visual-float-download"><div class="visual-element"><i class="fas fa-cloud-arrow-down"></i></div></div></div></div></section>
+<section class="section"><div class="container"><div class="section-head reveal"><span class="eyebrow">Быстрый старт</span><h2>Что есть на сайте</h2><p>Каталог, инструкции, FAQ, страницы плагинов и работы пользователей вынесены отдельно.</p></div><div class="feature-grid"><div class="feature-card reveal"><i class="fas fa-layer-group"></i><h3>Каталог по категориям</h3><p>Поиск, сортировка, фильтры, избранное и статусы.</p></div><div class="feature-card reveal"><i class="fas fa-file-lines"></i><h3>Страницы плагинов</h3><p>У каждого плагина есть отдельная страница с описанием и похожими позициями.</p></div><div class="feature-card reveal"><i class="fas fa-screwdriver-wrench"></i><h3>Инструкции установки</h3><p>Отдельно для .aex, .jsx/.jsxbin, .ffx и частых проблем.</p></div><div class="feature-card reveal"><i class="fas fa-server"></i><h3>SSR-отрисовка</h3><p>Основная разметка и каталог формируются на сервере.</p></div></div></div></section>
 <section class="section soft-section"><div class="container"><div class="section-head reveal"><span class="eyebrow">Популярное</span><h2>Плагины, с которых стоит начать</h2><p>Несколько карточек из каталога.</p></div><div class="plugins-grid compact">${featured.map(pluginCard).join('')}</div><div class="center-actions"><a class="btn btn-primary" href="/plugins">Смотреть все плагины</a></div></div></section>
-<section class="section"><div class="container two-column"><div class="notice-card reveal"><div class="notice-title"><i class="fas fa-triangle-exclamation"></i> Перед установкой</div><ul class="clean-list"><li>Проверьте совместимость плагина с вашей версией After Effects.</li><li>Закройте After Effects перед копированием файлов.</li><li>Запускайте After Effects от имени администратора, если плагин не появился.</li></ul><a class="btn btn-ghost" href="/install">Открыть инструкцию</a></div><div class="updates-card reveal"><h3><i class="fas fa-clock-rotate-left"></i> Последние обновления</h3><div class="updates-list">${updates}</div></div></div></section>` });
+<section class="section"><div class="container two-column"><div class="notice-card reveal"><div class="notice-title"><i class="fas fa-triangle-exclamation"></i> Перед установкой</div><ul class="clean-list"><li>Проверьте совместимость плагина с вашей версией After Effects.</li><li>Закройте After Effects перед копированием файлов.</li><li>Запускайте After Effects от имени администратора, если плагин не появился.</li></ul><a class="btn btn-ghost" href="/install">Открыть инструкцию</a></div><div class="updates-card reveal"><h3><i class="fas fa-clock-rotate-left"></i> Последние обновления</h3><div class="updates-list">${updates}</div></div></div></section>`
+  });
 }
 
 function pluginsPage() {
-  const filters = categories().map(([id, label]) => `<button class="filter-btn ${id === 'all' ? 'active' : ''}" data-category="${esc(id)}">${esc(label)}</button>`).join('');
-  return layout({ active: 'plugins', title: `Каталог плагинов | ${site.title}`, description: 'Поиск, категории, избранное и статусы плагинов After Effects.', body: `
-<section class="subpage-hero"><div class="container"><span class="eyebrow"><i class="fas fa-plug"></i> Каталог</span><h1>Плагины для After Effects</h1><p>Ищи по названию, тегам, категории или описанию.</p></div></section>
-<section class="section catalog-section"><div class="container"><div class="catalog-panel reveal"><div class="search-box"><i class="fas fa-search"></i><input id="pluginSearch" type="text" placeholder="Поиск: Saber, glow, text, script..."><button id="clearSearch" title="Очистить"><i class="fas fa-times"></i></button></div><div class="catalog-row"><div class="filter-tabs" id="categoryFilters">${filters}</div><div class="catalog-controls"><select id="sortPlugins" aria-label="Сортировка"><option value="popular">Сначала популярные</option><option value="new">Сначала новые</option><option value="az">По названию A–Z</option><option value="available">Сначала проверенные</option><option value="size">По размеру файла</option></select><button class="favorites-filter-btn" id="favoritesOnly" type="button"><i class="far fa-heart"></i> Только избранные</button></div></div><div class="catalog-meta"><span id="resultCount">Найдено: ${plugins.length}</span><span id="activeFilterLabel">Все категории</span></div></div><div class="pre-download-notice reveal"><div class="notice-title"><i class="fas fa-triangle-exclamation"></i> Перед установкой</div><ul><li>Проверьте совместимость плагина с вашей версией After Effects.</li><li>Закройте After Effects перед копированием файлов.</li><li>Запускайте After Effects от имени администратора, если плагин не появился.</li></ul></div><div class="plugins-grid" id="pluginsGrid">${sortPlugins(plugins).map(pluginCard).join('')}</div><div class="empty-state" id="emptyState" hidden><i class="fas fa-magnifying-glass"></i><h3>Ничего не найдено</h3><p>Попробуйте другое название, тег или категорию.</p></div></div></section>` });
+  const filters = getCategories().map(([id, label]) => `<button class="filter-btn ${id === 'all' ? 'active' : ''}" data-category="${esc(id)}">${esc(label)}</button>`).join('');
+
+  return layout({
+    active: 'plugins',
+    title: `Каталог плагинов | ${site.title}`,
+    description: 'Поиск, категории, избранное и статусы плагинов After Effects.',
+    body: `<section class="subpage-hero"><div class="container"><span class="eyebrow"><i class="fas fa-plug"></i> Каталог</span><h1>Плагины для After Effects</h1><p>Ищи по названию, тегам, категории или описанию.</p></div></section>
+<section class="section catalog-section"><div class="container"><div class="catalog-panel reveal"><div class="search-box"><i class="fas fa-search"></i><input id="pluginSearch" type="text" placeholder="Поиск: Saber, glow, text, script..."><button id="clearSearch" title="Очистить"><i class="fas fa-times"></i></button></div><div class="catalog-row"><div class="filter-tabs" id="categoryFilters">${filters}</div><div class="catalog-controls"><select id="sortPlugins" aria-label="Сортировка"><option value="popular">Сначала популярные</option><option value="new">Сначала новые</option><option value="az">По названию A–Z</option><option value="available">Сначала проверенные</option><option value="size">По размеру файла</option></select><button class="favorites-filter-btn" id="favoritesOnly" type="button"><i class="far fa-heart"></i> Только избранные</button></div></div><div class="catalog-meta"><span id="resultCount">Найдено: ${plugins.length}</span><span id="activeFilterLabel">Все категории</span></div></div><div class="pre-download-notice reveal"><div class="notice-title"><i class="fas fa-triangle-exclamation"></i> Перед установкой</div><ul><li>Проверьте совместимость плагина с вашей версией After Effects.</li><li>Закройте After Effects перед копированием файлов.</li><li>Запускайте After Effects от имени администратора, если плагин не появился.</li></ul></div><div class="plugins-grid" id="pluginsGrid">${sortPlugins(plugins).map(pluginCard).join('')}</div><div class="empty-state" id="emptyState" hidden><i class="fas fa-magnifying-glass"></i><h3>Ничего не найдено</h3><p>Попробуйте другое название, тег или категорию.</p></div></div></section>`
+  });
 }
 
 function installText(type) {
@@ -154,19 +171,28 @@ function installText(type) {
 
 function pluginPage(id) {
   const plugin = plugins.find((item) => item.id === id);
-  if (!plugin) return layout({ active: 'plugins', title: `Плагин не найден | ${site.title}`, description: site.description, body: '<section class="subpage-hero"><div class="container"><a class="back-link" href="/plugins"><i class="fas fa-arrow-left"></i> Назад в каталог</a><div class="empty-state inline"><h2>Плагин не найден</h2><p>Вернитесь в каталог и выберите карточку заново.</p></div></div></section>' });
+  if (!plugin) return notFoundPage();
+
   const download = plugin.status === 'available'
-    ? `<a class="btn btn-primary" href="/download/${url(plugin.id)}"><i class="fas fa-download"></i> Скачать</a>`
+    ? `<a class="btn btn-primary" href="/download/${url(plugin.id)}" target="_blank" rel="noopener"><i class="fas fa-download"></i> Скачать</a>`
     : '<button class="btn btn-disabled" disabled><i class="fas fa-clock"></i> Ссылка обновляется</button>';
   const related = plugins.filter((item) => item.id !== plugin.id && (item.category === plugin.category || item.package === plugin.package)).slice(0, 3);
-  return layout({ active: 'plugins', title: `${plugin.name} | ${site.title}`, description: plugin.description, body: `
-<section class="subpage-hero plugin-detail-hero"><div class="container"><a class="back-link" href="/plugins"><i class="fas fa-arrow-left"></i> Назад в каталог</a><div class="plugin-detail-grid reveal"><div class="plugin-detail-icon"><i class="${esc(plugin.icon)}"></i></div><div class="plugin-detail-content"><div class="detail-badges"><span class="plugin-badge">${esc(plugin.badge)}</span>${statusBadge(plugin)}</div><h1>${esc(plugin.name)}</h1><p>${esc(plugin.description)}</p><div class="detail-meta"><span><i class="fas fa-folder"></i> ${esc(plugin.categoryLabel)}</span><span><i class="fas fa-box"></i> ${esc(plugin.package)}</span><span><i class="fas fa-hdd"></i> ${esc(plugin.size)}</span><span><i class="fas fa-calendar"></i> ${esc(plugin.version)}</span><span><i class="fas fa-check-circle"></i> ${esc(plugin.compatibility)}</span></div><div class="plugin-tags big">${(plugin.tags || []).map((tag) => `<span>#${esc(tag)}</span>`).join('')}</div><div class="hero-actions">${download}<button class="btn btn-ghost favorite-btn" data-id="${esc(plugin.id)}"><i class="far fa-heart"></i> В избранное</button></div></div></div><div class="detail-panels reveal"><article class="install-card"><h2>Инструкция для этого типа файла</h2><p>${esc(installText(plugin.package))}</p><a href="/install#${plugin.package === 'jsx' ? 'jsx' : esc(plugin.package)}" class="text-link">Открыть подробную инструкцию</a></article><article class="install-card"><h2>Перед скачиванием</h2><ul class="check-list"><li>Закройте After Effects перед установкой.</li><li>Проверьте папку версии AE.</li><li>Если кнопка отключена, файл сейчас обновляется.</li></ul></article></div></div></section>
-<section class="section"><div class="container"><div class="section-head"><span class="eyebrow">Похожие</span><h2>Похожие плагины</h2></div><div class="plugins-grid compact">${related.map(pluginCard).join('')}</div></div></section>` });
+
+  return layout({
+    active: 'plugins',
+    title: `${plugin.name} | ${site.title}`,
+    description: plugin.description,
+    body: `<section class="subpage-hero plugin-detail-hero"><div class="container"><a class="back-link" href="/plugins"><i class="fas fa-arrow-left"></i> Назад в каталог</a><div class="plugin-detail-grid reveal"><div class="plugin-detail-icon"><i class="${esc(plugin.icon)}"></i></div><div class="plugin-detail-content"><div class="detail-badges"><span class="plugin-badge">${esc(plugin.badge)}</span>${statusBadge(plugin)}</div><h1>${esc(plugin.name)}</h1><p>${esc(plugin.description)}</p><div class="detail-meta"><span><i class="fas fa-folder"></i> ${esc(plugin.categoryLabel)}</span><span><i class="fas fa-box"></i> ${esc(plugin.package)}</span><span><i class="fas fa-hdd"></i> ${esc(plugin.size)}</span><span><i class="fas fa-calendar"></i> ${esc(plugin.version)}</span><span><i class="fas fa-check-circle"></i> ${esc(plugin.compatibility)}</span></div><div class="plugin-tags big">${(plugin.tags || []).map((tag) => `<span>#${esc(tag)}</span>`).join('')}</div><div class="hero-actions">${download}<button class="btn btn-ghost favorite-btn" data-id="${esc(plugin.id)}"><i class="far fa-heart"></i> В избранное</button></div></div></div><div class="detail-panels reveal"><article class="install-card"><h2>Инструкция для этого типа файла</h2><p>${esc(installText(plugin.package))}</p><a href="/install#${plugin.package === 'jsx' ? 'jsx' : esc(plugin.package)}" class="text-link">Открыть подробную инструкцию</a></article><article class="install-card"><h2>Перед скачиванием</h2><ul class="check-list"><li>Закройте After Effects перед установкой.</li><li>Проверьте папку версии AE.</li><li>Если кнопка отключена, файл сейчас обновляется.</li></ul></article></div></div></section><section class="section"><div class="container"><div class="section-head"><span class="eyebrow">Похожие</span><h2>Похожие плагины</h2></div><div class="plugins-grid compact">${related.map(pluginCard).join('')}</div></div></section>`
+  });
 }
 
 function installPage() {
-  return layout({ active: 'install', title: `Установка плагинов AE | ${site.title}`, description: 'Инструкции по установке .aex, .jsx, .jsxbin и .ffx для After Effects.', body: `
-<section class="subpage-hero"><div class="container"><span class="eyebrow"><i class="fas fa-download"></i> Установка</span><h1>Как устанавливать плагины, скрипты и пресеты</h1><p>Инструкции разделены по типам файлов.</p></div></section><section class="section"><div class="container install-layout"><aside class="install-nav reveal"><a href="#before">Перед установкой</a><a href="#aex">Установка .aex</a><a href="#jsx">Установка .jsx / .jsxbin</a><a href="#ffx">Установка .ffx</a><a href="#troubleshooting">Если плагин не появился</a></aside><div class="install-content"><article class="install-card reveal" id="before"><h2><i class="fas fa-triangle-exclamation"></i> Перед установкой</h2><ol><li>Закройте After Effects перед копированием файлов.</li><li>Проверьте версию AE. Лучше использовать AE 2022 и новее.</li><li>Распакуйте архив плагина в отдельную папку.</li><li>Сохраните копию исходных файлов, если меняете системные папки.</li></ol></article><article class="install-card reveal" id="aex"><h2><i class="fas fa-cube"></i> Установка .aex</h2><p>.aex — файл плагина After Effects. Его чаще всего нужно копировать в папку Plug-ins.</p><div class="code-block">C:\Program Files\Adobe\Adobe After Effects 2022\Support Files\Plug-ins</div><ol><li>Распакуйте архив.</li><li>Найдите файл с расширением <b>.aex</b>.</li><li>Скопируйте его в папку <b>Plug-ins</b>.</li><li>Откройте After Effects и проверьте меню <b>Effect</b>.</li></ol></article><article class="install-card reveal" id="jsx"><h2><i class="fas fa-code"></i> Установка .jsx / .jsxbin</h2><p>.jsx и .jsxbin — это скрипты. Их кладут в Scripts или ScriptUI Panels.</p><div class="code-block">C:\Program Files\Adobe\Adobe After Effects 2022\Support Files\Scripts</div><div class="code-block">C:\Program Files\Adobe\Adobe After Effects 2022\Support Files\Scripts\ScriptUI Panels</div><ol><li>Обычный скрипт копируйте в <b>Scripts</b>.</li><li>Панель копируйте в <b>ScriptUI Panels</b>.</li><li>В AE откройте <b>File → Scripts</b> или <b>Window</b>.</li><li>Если скрипт не запускается, включите разрешение скриптов в настройках AE.</li></ol></article><article class="install-card reveal" id="ffx"><h2><i class="fas fa-sliders"></i> Установка .ffx</h2><p>.ffx — пресеты эффектов. Их обычно кладут в папку User Presets.</p><div class="code-block">Documents\Adobe\After Effects 2022\User Presets</div><ol><li>Скопируйте файл <b>.ffx</b> в папку <b>User Presets</b>.</li><li>Перезапустите AE.</li><li>Откройте панель <b>Effects & Presets</b>.</li><li>Найдите пресет по названию или через поиск.</li></ol></article><article class="install-card reveal" id="troubleshooting"><h2><i class="fas fa-life-ring"></i> Что делать, если плагин не появился</h2><ul class="check-list"><li>Проверьте, точно ли файл лежит в папке вашей версии After Effects.</li><li>Запустите AE от имени администратора.</li><li>Проверьте совместимость плагина.</li><li>Для скриптов включите доступ в настройках Scripting & Expressions.</li><li>Если это панель, ищите её в меню <b>Window</b>.</li></ul></article></div></div></section>` });
+  return layout({
+    active: 'install',
+    title: `Установка плагинов AE | ${site.title}`,
+    description: 'Инструкции по установке .aex, .jsx, .jsxbin и .ffx для After Effects.',
+    body: `<section class="subpage-hero"><div class="container"><span class="eyebrow"><i class="fas fa-download"></i> Установка</span><h1>Как устанавливать плагины, скрипты и пресеты</h1><p>Инструкции разделены по типам файлов.</p></div></section><section class="section"><div class="container install-layout"><aside class="install-nav reveal"><a href="#before">Перед установкой</a><a href="#aex">Установка .aex</a><a href="#jsx">Установка .jsx / .jsxbin</a><a href="#ffx">Установка .ffx</a><a href="#troubleshooting">Если плагин не появился</a></aside><div class="install-content"><article class="install-card reveal" id="before"><h2><i class="fas fa-triangle-exclamation"></i> Перед установкой</h2><ol><li>Закройте After Effects перед копированием файлов.</li><li>Проверьте версию AE. Лучше использовать AE 2022 и новее.</li><li>Распакуйте архив плагина в отдельную папку.</li><li>Сохраните копию исходных файлов, если меняете системные папки.</li></ol></article><article class="install-card reveal" id="aex"><h2><i class="fas fa-cube"></i> Установка .aex</h2><p>.aex — файл плагина After Effects. Его чаще всего нужно копировать в папку Plug-ins.</p><div class="code-block">C:\\Program Files\\Adobe\\Adobe After Effects 2022\\Support Files\\Plug-ins</div><ol><li>Распакуйте архив.</li><li>Найдите файл с расширением <b>.aex</b>.</li><li>Скопируйте его в папку <b>Plug-ins</b>.</li><li>Откройте After Effects и проверьте меню <b>Effect</b>.</li></ol></article><article class="install-card reveal" id="jsx"><h2><i class="fas fa-code"></i> Установка .jsx / .jsxbin</h2><p>.jsx и .jsxbin — это скрипты. Их кладут в Scripts или ScriptUI Panels.</p><div class="code-block">C:\\Program Files\\Adobe\\Adobe After Effects 2022\\Support Files\\Scripts</div><div class="code-block">C:\\Program Files\\Adobe\\Adobe After Effects 2022\\Support Files\\Scripts\\ScriptUI Panels</div><ol><li>Обычный скрипт копируйте в <b>Scripts</b>.</li><li>Панель копируйте в <b>ScriptUI Panels</b>.</li><li>В AE откройте <b>File → Scripts</b> или <b>Window</b>.</li><li>Если скрипт не запускается, включите разрешение скриптов в настройках AE.</li></ol></article><article class="install-card reveal" id="ffx"><h2><i class="fas fa-sliders"></i> Установка .ffx</h2><p>.ffx — пресеты эффектов. Их обычно кладут в папку User Presets.</p><div class="code-block">Documents\\Adobe\\After Effects 2022\\User Presets</div><ol><li>Скопируйте файл <b>.ffx</b> в папку <b>User Presets</b>.</li><li>Перезапустите AE.</li><li>Откройте панель <b>Effects & Presets</b>.</li><li>Найдите пресет по названию или через поиск.</li></ol></article><article class="install-card reveal" id="troubleshooting"><h2><i class="fas fa-life-ring"></i> Что делать, если плагин не появился</h2><ul class="check-list"><li>Проверьте, точно ли файл лежит в папке вашей версии After Effects.</li><li>Запустите AE от имени администратора.</li><li>Проверьте совместимость плагина.</li><li>Для скриптов включите доступ в настройках Scripting & Expressions.</li><li>Если это панель, ищите её в меню <b>Window</b>.</li></ul></article></div></div></section>`
+  });
 }
 
 function faqPage() {
@@ -179,7 +205,13 @@ function faqPage() {
     ['Куда кидать .ffx?', 'В Documents → Adobe → After Effects → User Presets.'],
     ['Как сообщить о нерабочей ссылке?', 'Можно написать в Telegram-канал проекта.']
   ];
-  return layout({ active: 'faq', title: `FAQ | ${site.title}`, description: 'Ответы на частые вопросы по плагинам After Effects.', body: `<section class="subpage-hero"><div class="container"><span class="eyebrow"><i class="fas fa-circle-question"></i> FAQ</span><h1>Частые вопросы</h1><p>Короткие ответы на самые частые проблемы с плагинами After Effects.</p></div></section><section class="section"><div class="container faq-list">${items.map(([q, a], index) => `<details class="faq-item" ${index === 0 ? 'open' : ''}><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join('')}</div></section>` });
+
+  return layout({
+    active: 'faq',
+    title: `FAQ | ${site.title}`,
+    description: 'Ответы на частые вопросы по плагинам After Effects.',
+    body: `<section class="subpage-hero"><div class="container"><span class="eyebrow"><i class="fas fa-circle-question"></i> FAQ</span><h1>Частые вопросы</h1><p>Короткие ответы на самые частые проблемы с плагинами After Effects.</p></div></section><section class="section"><div class="container faq-list">${items.map(([q, a], index) => `<details class="faq-item" ${index === 0 ? 'open' : ''}><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join('')}</div></section>`
+  });
 }
 
 function platformLabel(platform) {
@@ -198,14 +230,47 @@ function editCard(item) {
 
 function communityPage() {
   const approved = edits.filter((item) => (item.status || 'approved') === 'approved');
-  return layout({ active: 'community', title: `Работы пользователей | ${site.title}`, description: 'Эдиты и видео пользователей, сделанные с After Effects.', body: `<section class="subpage-hero"><div class="container"><span class="eyebrow"><i class="fas fa-film"></i> Комьюнити</span><h1>Работы пользователей</h1><p>Эдиты, шоурилы и ролики, которые люди сделали в After Effects.</p><div class="hero-actions"><a class="btn btn-primary" href="/submit"><i class="fas fa-plus"></i> Поделиться эдитом</a><a class="btn btn-ghost" href="/plugins"><i class="fas fa-plug"></i> Плагины</a></div></div></section><section class="section"><div class="container"><div class="catalog-panel reveal"><div class="search-wrap"><i class="fas fa-search"></i><input id="editSearch" type="search" placeholder="Поиск по названию, автору или платформе..."><button id="clearEditSearch" type="button"><i class="fas fa-xmark"></i></button></div><div class="catalog-row"><div class="filter-tabs" id="editFilters"><button class="filter-btn active" data-platform="all">Все</button><button class="filter-btn" data-platform="youtube">YouTube</button><button class="filter-btn" data-platform="tiktok">TikTok</button></div><div class="catalog-meta"><span id="editCount">Работ: ${approved.length}</span></div></div></div><div class="edits-grid" id="communityGrid">${approved.map(editCard).join('')}</div><div class="empty-state" id="communityEmpty" ${approved.length ? 'hidden' : ''}><i class="fas fa-video"></i><h3>Работ пока нет</h3><p>Пока здесь пусто. Будь первым, кто поделится своей работой.</p><a class="btn btn-primary" href="/submit"><i class="fas fa-plus"></i> Добавить работу</a></div></div></section>` });
+  return layout({
+    active: 'community',
+    title: `Работы пользователей | ${site.title}`,
+    description: 'Эдиты и видео пользователей, сделанные с After Effects.',
+    body: `<section class="subpage-hero"><div class="container"><span class="eyebrow"><i class="fas fa-film"></i> Комьюнити</span><h1>Работы пользователей</h1><p>Эдиты, шоурилы и ролики, которые люди сделали в After Effects.</p><div class="hero-actions"><a class="btn btn-primary" href="/submit"><i class="fas fa-plus"></i> Поделиться эдитом</a><a class="btn btn-ghost" href="/plugins"><i class="fas fa-plug"></i> Плагины</a></div></div></section><section class="section"><div class="container"><div class="catalog-panel reveal"><div class="search-wrap"><i class="fas fa-search"></i><input id="editSearch" type="search" placeholder="Поиск по названию, автору или платформе..."><button id="clearEditSearch" type="button"><i class="fas fa-xmark"></i></button></div><div class="catalog-row"><div class="filter-tabs" id="editFilters"><button class="filter-btn active" data-platform="all">Все</button><button class="filter-btn" data-platform="youtube">YouTube</button><button class="filter-btn" data-platform="tiktok">TikTok</button></div><div class="catalog-meta"><span id="editCount">Работ: ${approved.length}</span></div></div></div><div class="edits-grid" id="communityGrid">${approved.map(editCard).join('')}</div><div class="empty-state" id="communityEmpty" ${approved.length ? 'hidden' : ''}><i class="fas fa-video"></i><h3>Работ пока нет</h3><p>Пока здесь пусто. Будь первым, кто поделится своей работой.</p><a class="btn btn-primary" href="/submit"><i class="fas fa-plus"></i> Добавить работу</a></div></div></section>`
+  });
 }
 
 function submitPage() {
-  return layout({ active: 'submit', title: `Поделиться эдитом | ${site.title}`, description: 'Добавить ссылку на YouTube или TikTok эдит.', body: `<section class="subpage-hero"><div class="container"><span class="eyebrow"><i class="fas fa-paper-plane"></i> Отправка работы</span><h1>Поделиться своим эдитом</h1><p>Форма сохраняет заявку в браузере. Для общей публикации отправьте данные в Telegram-канал проекта.</p></div></section><section class="section"><div class="container submit-layout"><form class="submit-card reveal" id="editSubmitForm"><h2>Данные работы</h2><label>Ссылка на видео<input id="editUrl" name="url" type="url" placeholder="https://youtube.com/watch?v=..." required></label><label>Название<input id="editTitle" name="title" type="text" placeholder="Например: Cinematic AE Edit" maxlength="80" required></label><label>Автор / ник<input id="editAuthor" name="author" type="text" placeholder="Твой ник" maxlength="40" required></label><label>Какие плагины использовал<input id="editPlugins" name="plugins" type="text" placeholder="Saber, Deep Glow, Twitch..." maxlength="120"></label><label>Описание<textarea id="editDescription" name="description" rows="4" placeholder="Коротко опиши работу" maxlength="300"></textarea></label><div class="submit-actions"><button class="btn btn-primary" type="submit"><i class="fas fa-paper-plane"></i> Сохранить заявку</button></div></form><div class="preview-panel reveal"><h2>Мои заявки</h2><div class="edits-grid" id="mySubmissionsGrid"></div><div class="empty-state inline" id="mySubmissionsEmpty"><p>Пока нет отправленных заявок.</p></div></div></div></section>` });
+  return layout({
+    active: 'submit',
+    title: `Поделиться эдитом | ${site.title}`,
+    description: 'Добавить ссылку на YouTube или TikTok эдит.',
+    body: `<section class="subpage-hero"><div class="container"><span class="eyebrow"><i class="fas fa-paper-plane"></i> Отправка работы</span><h1>Поделиться своим эдитом</h1><p>Форма сохраняет заявку в браузере. Для общей публикации отправьте данные в Telegram-канал проекта.</p></div></section><section class="section"><div class="container submit-layout"><form class="submit-card reveal" id="editSubmitForm"><h2>Данные работы</h2><label>Ссылка на видео<input id="editUrl" name="url" type="url" placeholder="https://youtube.com/watch?v=..." required></label><label>Название<input id="editTitle" name="title" type="text" placeholder="Например: Cinematic AE Edit" maxlength="80" required></label><label>Автор / ник<input id="editAuthor" name="author" type="text" placeholder="Твой ник" maxlength="40" required></label><label>Какие плагины использовал<input id="editPlugins" name="plugins" type="text" placeholder="Saber, Deep Glow, Twitch..." maxlength="120"></label><label>Описание<textarea id="editDescription" name="description" rows="4" placeholder="Коротко опиши работу" maxlength="300"></textarea></label><div class="submit-actions"><button class="btn btn-primary" type="submit"><i class="fas fa-paper-plane"></i> Сохранить заявку</button></div></form><div class="preview-panel reveal"><h2>Мои заявки</h2><div class="edits-grid" id="mySubmissionsGrid"></div><div class="empty-state inline" id="mySubmissionsEmpty"><p>Пока нет отправленных заявок.</p></div></div></div></section>`
+  });
 }
 
-app.disable('x-powered-by');
+function notFoundPage() {
+  return layout({
+    active: 'home',
+    title: `Страница не найдена | ${site.title}`,
+    description: site.description,
+    body: '<section class="subpage-hero"><div class="container"><h1>Страница не найдена</h1><p>Проверьте адрес или вернитесь на главную.</p><div class="hero-actions"><a class="btn btn-primary" href="/">На главную</a><a class="btn btn-ghost" href="/plugins">Каталог</a></div></div></section>'
+  });
+}
+
+app.use((req, res, next) => {
+  if (req.path === '/1' || req.path === '/1/') {
+    res.redirect(301, '/');
+    return;
+  }
+
+  if (req.path.startsWith('/1/')) {
+    res.redirect(301, req.originalUrl.replace(/^\/1/, '') || '/');
+    return;
+  }
+
+  next();
+});
+
+app.get('/favicon.ico', (req, res) => res.status(204).end());
 app.use('/style.css', express.static(path.join(ROOT, 'style.css'), { maxAge: '1h' }));
 app.use('/client.js', express.static(path.join(ROOT, 'client.js'), { maxAge: '1h' }));
 
@@ -227,13 +292,16 @@ app.get('/submit.html', (req, res) => res.redirect(301, '/submit'));
 app.get('/download/:id', (req, res) => {
   const plugin = plugins.find((item) => item.id === req.params.id);
   if (!plugin || plugin.status !== 'available' || !plugin.downloadUrl || plugin.downloadUrl === '#') {
-    res.status(404).send('Файл сейчас недоступен.');
+    res.redirect(302, '/plugins');
     return;
   }
-  res.redirect(plugin.downloadUrl);
+
+  res.redirect(302, plugin.downloadUrl);
 });
 
-app.use((req, res) => res.status(404).send(layout({ active: 'home', title: `Страница не найдена | ${site.title}`, description: site.description, body: '<section class="subpage-hero"><div class="container"><h1>Страница не найдена</h1><p>Проверьте адрес или вернитесь на главную.</p><div class="hero-actions"><a class="btn btn-primary" href="/">На главную</a></div></div></section>' })));
+app.use((req, res) => {
+  res.status(404).send(notFoundPage());
+});
 
 app.listen(PORT, () => {
   console.log(`SSR server started: http://localhost:${PORT}`);
