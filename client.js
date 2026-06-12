@@ -7,6 +7,70 @@
   const $ = (sel, root=document) => root.querySelector(sel);
   const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
 
+  function injectHeroVisualFix(){
+    if(document.getElementById('heroVisualFix')) return;
+    const style = document.createElement('style');
+    style.id = 'heroVisualFix';
+    style.textContent = `
+      .hero-grid,
+      .page-hero-home,
+      .page-hero-home .container{
+        overflow: visible !important;
+      }
+
+      .stable-visual{
+        height: 500px !important;
+        min-height: 500px !important;
+        overflow: visible !important;
+        contain: layout !important;
+        padding: 56px !important;
+        margin: -56px !important;
+        isolation: isolate;
+      }
+
+      .visual-float-ae{
+        left: 6% !important;
+        top: 10% !important;
+        z-index: 3;
+      }
+
+      .visual-float-plugin{
+        right: 5% !important;
+        top: 18% !important;
+        z-index: 2;
+      }
+
+      .visual-float-download{
+        left: 43% !important;
+        bottom: 7% !important;
+        z-index: 1;
+      }
+
+      .visual-element{
+        box-shadow: 0 34px 95px rgba(99,102,241,.48) !important;
+      }
+
+      .visual-element:hover{
+        box-shadow: 0 44px 110px rgba(99,102,241,.58) !important;
+      }
+
+      @media (max-width: 900px){
+        .stable-visual{
+          height: 390px !important;
+          min-height: 390px !important;
+          padding: 38px !important;
+          margin: -38px !important;
+        }
+        .visual-float-ae{left: 4% !important;top: 9% !important;}
+        .visual-float-plugin{right: 4% !important;top: 19% !important;}
+        .visual-float-download{left: 40% !important;bottom: 5% !important;}
+        .ae-card{width: 164px !important;height: 164px !important;}
+        .visual-element{width: 122px !important;height: 122px !important;}
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
   function readJson(key, fallback){
     try { return JSON.parse(localStorage.getItem(key)) || fallback; } catch(e){ return fallback; }
   }
@@ -249,6 +313,7 @@
   }
 
   document.addEventListener('DOMContentLoaded', () => {
+    injectHeroVisualFix();
     initTheme();
     initVisits();
     initEvents();
