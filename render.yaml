@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: ae-vault-ssr
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /
+    autoDeployTrigger: commit
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: TELEGRAM_URL
+        value: https://t.me/ae_plugins_vault
