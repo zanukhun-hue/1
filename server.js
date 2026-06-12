@@ -113,6 +113,16 @@ async function notifyTelegram(text, replyMarkup) {
     });
   } catch (error) { console.error('Telegram notify failed:', error.message); }
 }
+function mainKeyboard() {
+  return {
+    keyboard: [
+      [{ text: '📊 Статистика' }, { text: '📋 Pending' }],
+      [{ text: '🌐 Открыть админку' }]
+    ],
+    resize_keyboard: true,
+    persistent: true
+  };
+}
 function subKeyboard(id) {
   return { inline_keyboard: [[
     { text: '✅ Одобрить', callback_data: `sub:approve:${id}` },
@@ -189,6 +199,15 @@ async function getApprovedEdit(id) { const rows = await supabaseRequest(`edit_su
 function editCard(item) { const platform = item.platform || 'video'; const detailUrl = item.id ? `/edit/${enc(item.id)}` : item.url; const thumb = item.thumb ? `<img src="${esc(item.thumb)}" alt="${esc(item.title)}" loading="lazy">` : '<div class="edit-thumb-placeholder"><i class="fas fa-video"></i></div>'; return `<article class="edit-card reveal" data-edit-card data-id="${esc(item.id || item.url)}"><a class="edit-thumb" href="${esc(detailUrl)}">${thumb}<span class="platform-badge"><i class="${platformIcon(platform)}"></i> ${platformLabel(platform)}</span><span class="play-badge"><i class="fas fa-play"></i></span></a><div class="edit-body"><h3>${esc(item.title || 'Без названия')}</h3><p>${esc(item.description || 'Пользовательская работа After Effects.')}</p><div class="edit-meta"><span><i class="fas fa-user"></i> ${esc(item.author || 'Автор')}</span>${item.plugins ? `<span><i class="fas fa-plug"></i> ${esc(item.plugins)}</span>` : ''}</div></div><div class="edit-actions"><button class="edit-favorite-btn" data-edit-id="${esc(item.id || item.url)}" type="button"><i class="far fa-heart"></i> В избранное</button><a class="details-btn" href="${esc(detailUrl)}"><i class="fas fa-info-circle"></i> Подробнее</a></div></article>`; }
 async function logEvent(type, payload = {}, req) { if (!hasSupabase()) return; try { await supabaseRequest('site_events', { method: 'POST', headers: { 'Content-Type': 'application/json', Prefer: 'return=minimal' }, body: JSON.stringify({ event_type: type, plugin_id: payload.plugin_id || null, edit_id: payload.edit_id || null, path: payload.path || null, visitor_hash: String(req?.ip || '').slice(0, 64) }) }); } catch (_) {} }
 async function countEvents(filter) { return countRows('site_events', filter); }
+async function countRows(resource, filter = '', admin = false) {
+  if (!hasSupabase() && !admin) return 0;
+  try {
+    const glue = filter ? `${filter}&` : '';
+    const response = await fetch(`${supabase.url}/rest/v1/${resource}?${glue}select=id`, { method: 'HEAD', headers: supabaseHeaders(admin, { Prefer: 'count=exact' }) });
+    const total = Number((response.headers.get('content-range') || '').split('/')[1]);
+    return Number.isFinite(total) ? total : 0;
+  } catch (_) { return 0; }
+}
 async function topDownloadedPlugins(limit = 4) {
   if (!hasSupabase()) return sortPlugins(plugins).slice(0, limit).map((plugin) => ({ plugin, downloads: 0 }));
   try {
@@ -225,10 +244,12 @@ async function sendPendingToTelegram() {
 async function handleTelegramAction(update) {
   if (!isAllowedTelegramChat(update)) return;
   if (update.message) {
-    const text = String(update.message.text || '').trim().toLowerCase();
-    if (['/start', '/help'].includes(text)) return notifyTelegram('Команды:\n/admin — статистика\n/pending — последние заявки, жалобы и запросы');
-    if (text === '/admin') return notifyTelegram(adminSummaryText(await getAdminDashboardData()), { inline_keyboard: [[{ text: '📋 Показать pending', callback_data: 'dash:pending' }], [{ text: '⚙️ Открыть админку', url: absoluteUrl('/admin') }]] });
-    if (text === '/pending') return sendPendingToTelegram();
+    const raw = String(update.message.text || '').trim();
+    const text = raw.toLowerCase();
+    if (['/start', '/help'].includes(text)) return notifyTelegram('Панель управления включена. Нажимай кнопки снизу или используй команды:\n/admin — статистика\n/pending — последние заявки, жалобы и запросы', mainKeyboard());
+    if (text === '/admin' || raw === '📊 Статистика') return notifyTelegram(adminSummaryText(await getAdminDashboardData()), { inline_keyboard: [[{ text: '📋 Показать pending', callback_data: 'dash:pending' }], [{ text: '⚙️ Открыть админку', url: absoluteUrl('/admin') }]] });
+    if (text === '/pending' || raw === '📋 Pending') return sendPendingToTelegram();
+    if (raw === '🌐 Открыть админку') return notifyTelegram('Открыть админку сайта:', { inline_keyboard: [[{ text: '⚙️ Открыть админку', url: absoluteUrl('/admin') }]] });
     return;
   }
   const cb = update.callback_query;
