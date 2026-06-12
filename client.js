@@ -54,6 +54,54 @@
         box-shadow: 0 44px 110px rgba(99,102,241,.58) !important;
       }
 
+      .plugin-detail-content .hero-actions{
+        align-items: center !important;
+        gap: 14px !important;
+      }
+
+      .plugin-detail-content .hero-actions .btn.favorite-btn,
+      .hero-actions .btn.favorite-btn{
+        width: auto !important;
+        min-width: 168px !important;
+        height: auto !important;
+        min-height: 52px !important;
+        padding: 14px 18px !important;
+        border-radius: 16px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 10px !important;
+        flex: 0 0 auto !important;
+        white-space: nowrap !important;
+        line-height: 1 !important;
+        font-size: .96rem !important;
+        background: var(--surface) !important;
+        color: var(--text) !important;
+        border-color: var(--border) !important;
+        box-shadow: var(--shadow-soft) !important;
+      }
+
+      .plugin-detail-content .hero-actions .btn.favorite-btn i,
+      .hero-actions .btn.favorite-btn i{
+        width: auto !important;
+        height: auto !important;
+        margin: 0 !important;
+        line-height: 1 !important;
+      }
+
+      .plugin-detail-content .hero-actions .btn.favorite-btn.active,
+      .hero-actions .btn.favorite-btn.active{
+        color: #ef4444 !important;
+        background: rgba(239,68,68,.12) !important;
+        border-color: rgba(239,68,68,.28) !important;
+      }
+
+      .plugin-detail-content .hero-actions .btn.favorite-btn:hover,
+      .hero-actions .btn.favorite-btn:hover{
+        transform: translateY(-2px) !important;
+        box-shadow: var(--shadow) !important;
+      }
+
       @media (max-width: 900px){
         .stable-visual{
           height: 390px !important;
@@ -66,6 +114,11 @@
         .visual-float-download{left: 40% !important;bottom: 5% !important;}
         .ae-card{width: 164px !important;height: 164px !important;}
         .visual-element{width: 122px !important;height: 122px !important;}
+        .plugin-detail-content .hero-actions .btn.favorite-btn,
+        .hero-actions .btn.favorite-btn{
+          min-width: 156px !important;
+          min-height: 50px !important;
+        }
       }
     `;
     document.head.appendChild(style);
