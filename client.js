@@ -6,6 +6,10 @@
   const page=document.body.dataset.page||'home';
   const $=(sel,root=document)=>root.querySelector(sel);
   const $$=(sel,root=document)=>Array.from(root.querySelectorAll(sel));
+  const SUPABASE_PUBLIC={
+    url:'https://qfugshwpslhdgrogrcyl.supabase.co',
+    anonKey:['eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9','eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFmdWdzaHdwc2xoZGdyb2dyY3lsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MzY2ODQsImV4cCI6MjA5NDUxMjY4NH0','9mV8XDbkFwBEMtf4IvqgM-tccZrA0_SXO8eXiuRg4i0'].join('.')
+  };
 
   function injectUiFixes(){
     if($('#uiFixes')) return;
@@ -26,6 +30,8 @@
       .version-selector summary::-webkit-details-marker{display:none}.version-selector summary span{display:flex;align-items:center;gap:10px}.version-selector summary .chevron{transition:transform .2s ease}.version-selector[open] summary .chevron{transform:rotate(180deg)}
       .version-selector-body{padding:0 18px 18px}.version-selector-list{display:flex;flex-wrap:wrap;gap:10px}.version-option{border:1px solid var(--border);background:var(--surface-2);color:var(--text);border-radius:14px;padding:12px 14px;font-weight:900;display:inline-flex;align-items:center;gap:8px;transition:var(--transition);text-decoration:none}
       .version-option.active{background:linear-gradient(135deg,var(--primary),#8b5cf6);border-color:transparent;color:#fff}.version-option:hover{transform:translateY(-2px);box-shadow:var(--shadow-soft)}.version-note{margin-top:12px;color:var(--muted);font-size:.9rem;font-weight:700}.version-note.success{color:#22c55e}.version-note.error{color:#ef4444}
+      .cancel-submission-btn{border:1px solid rgba(239,68,68,.28);background:rgba(239,68,68,.12);color:#ef4444;border-radius:14px;padding:10px 13px;font-weight:900;display:inline-flex;align-items:center;gap:8px;cursor:pointer;transition:var(--transition)}
+      .cancel-submission-btn:hover{transform:translateY(-2px);box-shadow:var(--shadow-soft)}.cancel-submission-btn:disabled{opacity:.6;cursor:not-allowed;transform:none}.pending-badge{display:inline-flex;align-items:center;gap:7px;border:1px solid rgba(245,158,11,.28);background:rgba(245,158,11,.12);color:#f59e0b;border-radius:999px;padding:7px 10px;font-size:.82rem;font-weight:900}
       @media(max-width:900px){.stable-visual{height:390px!important;min-height:390px!important;padding:38px!important;margin:-38px!important}.visual-float-ae{left:4%!important;top:9%!important}.visual-float-plugin{right:4%!important;top:19%!important}.visual-float-download{left:40%!important;bottom:5%!important}.ae-card{width:164px!important;height:164px!important}.visual-element{width:122px!important;height:122px!important}.plugin-detail-content .hero-actions .btn.favorite-btn,.hero-actions .btn.favorite-btn{min-width:156px!important;min-height:50px!important}.version-selector-list{flex-direction:column}.version-option{justify-content:center;width:100%}}
     `;
     document.head.appendChild(style);
@@ -147,10 +153,20 @@
 
   function escapeHtml(value){return String(value||'').replace(/[&<>'"]/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]))}
   function readSubmissions(){return readJson(EDIT_SUBMISSIONS_KEY,[])}
+  function saveSubmissions(list){writeJson(EDIT_SUBMISSIONS_KEY,list)}
+
+  function hideSubmitHelp(){
+    if(page!=='submit') return;
+    const title=$('.preview-panel h2');
+    if(title) title.textContent='Мои заявки';
+    const help=$('.preview-panel .notice-card');
+    if(help) help.remove();
+  }
+
   function renderSubmissions(){
     const grid=$('#mySubmissionsGrid');if(!grid)return;
     const list=readSubmissions();
-    grid.innerHTML=list.map(item=>`<article class="edit-card revealed"><div class="edit-body"><div class="badge-stack"><span class="pending-badge"><i class="fas fa-clock"></i> На проверке</span></div><h3>${escapeHtml(item.title)}</h3><p>${escapeHtml(item.description||'Пользовательская работа After Effects.')}</p><div class="edit-meta"><span><i class="fas fa-user"></i> ${escapeHtml(item.author)}</span>${item.plugins?`<span><i class="fas fa-plug"></i> ${escapeHtml(item.plugins)}</span>`:''}</div></div><div class="edit-actions"><a class="details-btn" href="${escapeHtml(item.url)}" target="_blank" rel="noopener"><i class="fas fa-up-right-from-square"></i> Открыть</a></div></article>`).join('');
+    grid.innerHTML=list.map((item,index)=>`<article class="edit-card revealed"><div class="edit-body"><div class="badge-stack"><span class="pending-badge"><i class="fas fa-clock"></i> На проверке</span></div><h3>${escapeHtml(item.title)}</h3><p>${escapeHtml(item.description||'Пользовательская работа After Effects.')}</p><div class="edit-meta"><span><i class="fas fa-user"></i> ${escapeHtml(item.author)}</span>${item.plugins?`<span><i class="fas fa-plug"></i> ${escapeHtml(item.plugins)}</span>`:''}</div></div><div class="edit-actions"><a class="details-btn" href="${escapeHtml(item.url)}" target="_blank" rel="noopener"><i class="fas fa-up-right-from-square"></i> Открыть</a><button class="cancel-submission-btn" data-cancel-index="${index}" type="button"><i class="fas fa-ban"></i> Отменить</button></div></article>`).join('');
     const empty=$('#mySubmissionsEmpty');if(empty)empty.hidden=list.length!==0;
   }
 
@@ -163,8 +179,58 @@
     if(type) status.classList.add(type);
   }
 
+  function inferPlatform(value){
+    const v=String(value||'').toLowerCase();
+    if(v.includes('youtube.com')||v.includes('youtu.be')) return 'youtube';
+    if(v.includes('tiktok.com')) return 'tiktok';
+    return 'video';
+  }
+
+  function supabaseHeaders(extra){
+    return Object.assign({apikey:SUPABASE_PUBLIC.anonKey,Authorization:`Bearer ${SUPABASE_PUBLIC.anonKey}`},extra||{});
+  }
+
+  async function cancelRemoteSubmission(item){
+    const filters=item.serverId
+      ? `id=eq.${encodeURIComponent(item.serverId)}&status=eq.pending`
+      : `url=eq.${encodeURIComponent(item.url)}&title=eq.${encodeURIComponent(item.title)}&author=eq.${encodeURIComponent(item.author)}&status=eq.pending`;
+    const response=await fetch(`${SUPABASE_PUBLIC.url}/rest/v1/edit_submissions?${filters}`,{
+      method:'PATCH',
+      headers:supabaseHeaders({'Content-Type':'application/json',Prefer:'return=minimal'}),
+      body:JSON.stringify({status:'rejected'})
+    });
+    if(!response.ok){
+      const text=await response.text().catch(()=>'');
+      throw new Error(text||'Не удалось отменить заявку в базе');
+    }
+  }
+
+  async function cancelSubmission(index,button){
+    const list=readSubmissions();
+    const item=list[index];
+    if(!item) return;
+    if(!confirm('Отменить эту заявку?')) return;
+    try{
+      if(button) button.disabled=true;
+      await cancelRemoteSubmission(item);
+      list.splice(index,1);
+      saveSubmissions(list);
+      renderSubmissions();
+      setSubmitStatus('Заявка отменена.', 'success');
+    }catch(error){
+      setSubmitStatus(error.message||'Не удалось отменить заявку', 'error');
+      if(button) button.disabled=false;
+    }
+  }
+
   function initSubmit(){
+    hideSubmitHelp();
     renderSubmissions();
+    document.addEventListener('click',event=>{
+      const button=event.target.closest('.cancel-submission-btn');
+      if(!button) return;
+      cancelSubmission(Number(button.dataset.cancelIndex),button);
+    });
     $('#editSubmitForm')?.addEventListener('submit',async event=>{
       event.preventDefault();
       const form=event.target;
@@ -174,7 +240,8 @@
         title:$('#editTitle')?.value||'Без названия',
         author:$('#editAuthor')?.value||'Автор',
         plugins:$('#editPlugins')?.value||'',
-        description:$('#editDescription')?.value||''
+        description:$('#editDescription')?.value||'',
+        platform:inferPlatform($('#editUrl')?.value||'')
       };
       try{
         if(button) button.disabled=true;
@@ -182,12 +249,13 @@
         const response=await fetch('/api/edit-submissions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(item)});
         const data=await response.json().catch(()=>({}));
         if(!response.ok) throw new Error(data.error||'Не удалось отправить заявку');
+        const row=Array.isArray(data)?data[0]:data;
         const list=readSubmissions();
-        list.unshift({id:'local-'+Date.now(),...item,created:new Date().toISOString()});
-        writeJson(EDIT_SUBMISSIONS_KEY,list);
+        list.unshift({id:'local-'+Date.now(),serverId:row&&row.id?row.id:null,...item,created:new Date().toISOString()});
+        saveSubmissions(list);
         form.reset();
         renderSubmissions();
-        setSubmitStatus('Заявка отправлена на проверку. После approved она появится в работах.', 'success');
+        setSubmitStatus('Заявка отправлена на проверку. Её можно отменить в блоке «Мои заявки».', 'success');
       }catch(error){
         setSubmitStatus(error.message||'Ошибка отправки заявки', 'error');
       }finally{
