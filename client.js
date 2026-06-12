@@ -160,10 +160,11 @@
     const actions=$('.plugin-detail-content .hero-actions');
     const downloadBtn=$('.plugin-detail-content .hero-actions .btn-primary');
     if(!actions||!downloadBtn||$('#flowVersionSelector')) return;
+    const flow141=['https://drive.google.com/file/d/','1tyKN0vTzWbjKpd_eziVGAR-jKLqG9PPb','/view?usp=drive_link'].join('');
     const box=document.createElement('details');
     box.id='flowVersionSelector';
     box.className='version-selector reveal revealed';
-    box.innerHTML=`<summary><span><i class="fas fa-code-branch"></i> Выбрать версию Flow</span><i class="fas fa-chevron-down chevron"></i></summary><div class="version-selector-body"><div class="version-selector-list"><a class="version-option" href="/download/flow?version=v141" target="_blank" rel="noopener"><i class="fas fa-download"></i> Скачать v1.4.1</a><a class="version-option active" href="/download/flow" target="_blank" rel="noopener"><i class="fas fa-check-circle"></i> Скачать v1.5.2</a></div><div class="version-note">Нажми на нужную версию. Основная кнопка скачивания ведёт на Flow v1.5.2.</div></div>`;
+    box.innerHTML=`<summary><span><i class="fas fa-code-branch"></i> Выбрать версию Flow</span><i class="fas fa-chevron-down chevron"></i></summary><div class="version-selector-body"><div class="version-selector-list"><a class="version-option" href="${flow141}" target="_blank" rel="noopener"><i class="fas fa-download"></i> Скачать v1.4.1</a><a class="version-option active" href="/download/flow" target="_blank" rel="noopener"><i class="fas fa-check-circle"></i> Скачать v1.5.2</a></div><div class="version-note">Нажми на нужную версию. Основная кнопка скачивания ведёт на Flow v1.5.2.</div></div>`;
     actions.parentNode.insertBefore(box,actions);
     downloadBtn.innerHTML='<i class="fas fa-download"></i> Скачать v1.5.2';
   }
