@@ -139,11 +139,7 @@ function header(active = 'home') {
     ['install', '/install', 'fas fa-download', 'Установка'],
     ['faq', '/faq', 'fas fa-circle-question', 'FAQ']
   ];
-  return `<header class="header"><div class="container nav-container">
-<a class="logo" href="/" aria-label="${esc(site.title)}"><span class="logo-icon">🎬</span><span class="logo-text">${esc(site.title)}</span></a>
-<nav class="nav-links" id="navLinks">${links.map(([id, href, icon, label]) => `<a class="nav-link ${id === active ? 'active' : ''}" href="${href}"><i class="${icon}"></i> ${label}</a>`).join('')}</nav>
-<div class="header-actions"><a class="favorite-pill" href="/plugins?favorites=1" title="Избранное"><i class="fas fa-heart"></i><span id="favoriteCount">0</span></a><a class="telegram-link" href="${esc(site.telegramUrl)}" target="_blank" rel="noopener" aria-label="Telegram"><i class="fab fa-telegram"></i></a><button class="theme-toggle" id="themeToggle" aria-label="Переключить тему"><i class="fas fa-moon"></i></button><button class="menu-toggle" id="menuToggle" aria-label="Открыть меню"><i class="fas fa-bars"></i></button></div>
-</div></header>`;
+  return `<header class="header"><div class="container nav-container"><a class="logo" href="/" aria-label="${esc(site.title)}"><span class="logo-icon">🎬</span><span class="logo-text">${esc(site.title)}</span></a><nav class="nav-links" id="navLinks">${links.map(([id, href, icon, label]) => `<a class="nav-link ${id === active ? 'active' : ''}" href="${href}"><i class="${icon}"></i> ${label}</a>`).join('')}</nav><div class="header-actions"><a class="favorite-pill" href="/plugins?favorites=1" title="Избранное"><i class="fas fa-heart"></i><span id="favoriteCount">0</span></a><a class="telegram-link" href="${esc(site.telegramUrl)}" target="_blank" rel="noopener" aria-label="Telegram"><i class="fab fa-telegram"></i></a><button class="theme-toggle" id="themeToggle" aria-label="Переключить тему"><i class="fas fa-moon"></i></button><button class="menu-toggle" id="menuToggle" aria-label="Открыть меню"><i class="fas fa-bars"></i></button></div></div></header>`;
 }
 
 function footer() {
@@ -290,6 +286,9 @@ app.use((req, res, next) => {
 
 app.get('/google3dda0bd7c0af07a0.html', (req, res) => {
   res.type('text/html').send('google-site-verification: google3dda0bd7c0af07a0.html');
+});
+app.get('/yandex_4c9bf369d0611ade.html', (req, res) => {
+  res.type('text/html').send('<html>\n    <head>\n        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">\n    </head>\n    <body>Verification: 4c9bf369d0611ade</body>\n</html>');
 });
 app.get('/robots.txt', (req, res) => res.type('text/plain').send(robotsTxt()));
 app.get('/sitemap.xml', (req, res) => res.type('application/xml').send(sitemapXml()));
