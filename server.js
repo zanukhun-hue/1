@@ -20,7 +20,8 @@ const site = {
   telegramUrl: process.env.TELEGRAM_URL || 'https://t.me/ae_plugins_vault',
   adminPin: process.env.ADMIN_PIN || '',
   tgBotToken: process.env.TELEGRAM_BOT_TOKEN || '',
-  tgChatId: process.env.TELEGRAM_CHAT_ID || ''
+  tgChatId: process.env.TELEGRAM_CHAT_ID || '',
+  tgSecret: process.env.TELEGRAM_WEBHOOK_SECRET || ''
 };
 const supabase = {
   url: (process.env.SUPABASE_URL || '').replace(/\/rest\/v1\/?$/, '').replace(/\/$/, ''),
@@ -91,14 +92,45 @@ function requireAdmin(req, res, next) {
   if (String(req.headers['x-admin-pin'] || '') !== site.adminPin) return res.status(401).json({ error: 'Неверный админ-код.' });
   next();
 }
-async function notifyTelegram(text) {
+
+async function telegramApi(method, payload) {
+  if (!site.tgBotToken) return null;
+  const response = await fetch(`https://api.telegram.org/bot${site.tgBotToken}/${method}`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+  });
+  const data = await response.json().catch(() => null);
+  if (!response.ok || !data?.ok) throw new Error(data?.description || `Telegram ${method} failed`);
+  return data.result;
+}
+async function notifyTelegram(text, replyMarkup) {
   if (!site.tgBotToken || !site.tgChatId) return;
   try {
-    await fetch(`https://api.telegram.org/bot${site.tgBotToken}/sendMessage`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: site.tgChatId, text, disable_web_page_preview: true })
+    await telegramApi('sendMessage', {
+      chat_id: site.tgChatId,
+      text,
+      disable_web_page_preview: true,
+      reply_markup: replyMarkup || undefined
     });
-  } catch (_) {}
+  } catch (error) { console.error('Telegram notify failed:', error.message); }
+}
+function subKeyboard(id) {
+  return { inline_keyboard: [[
+    { text: '✅ Одобрить', callback_data: `sub:approve:${id}` },
+    { text: '❌ Отклонить', callback_data: `sub:reject:${id}` }
+  ], [{ text: '⚙️ Открыть админку', url: absoluteUrl('/admin') }]] };
+}
+function closeKeyboard(type, id) {
+  return { inline_keyboard: [[{ text: '✅ Закрыть', callback_data: `${type}:done:${id}` }], [{ text: '⚙️ Открыть админку', url: absoluteUrl('/admin') }]] };
+}
+async function answerCallback(id, text) {
+  try { await telegramApi('answerCallbackQuery', { callback_query_id: id, text, show_alert: false }); } catch (_) {}
+}
+async function editTelegramMessage(chatId, messageId, text) {
+  try { await telegramApi('editMessageText', { chat_id: chatId, message_id: messageId, text, disable_web_page_preview: true }); } catch (_) {}
+}
+function isAllowedTelegramChat(update) {
+  const chatId = update?.message?.chat?.id || update?.callback_query?.message?.chat?.id || update?.callback_query?.from?.id;
+  return String(chatId) === String(site.tgChatId);
 }
 
 function parseImageDataUrl(dataUrl) {
@@ -110,15 +142,13 @@ function parseImageDataUrl(dataUrl) {
   const ext = mime === 'image/png' ? 'png' : mime === 'image/webp' ? 'webp' : 'jpg';
   return { mime, buffer, ext };
 }
-async function uploadPreview(dataUrl, req) {
+async function uploadPreview(dataUrl) {
   if (!supabase.url || !supabase.adminKey) throw new Error('Загрузка превью не настроена: нужен секретный ключ Supabase в Render.');
   const img = parseImageDataUrl(dataUrl);
   const name = `thumb-${Date.now()}-${Math.random().toString(16).slice(2)}.${img.ext}`;
   const objectPath = `community/${name}`;
   const response = await fetch(`${supabase.url}/storage/v1/object/thumbs/${objectPath}?upsert=true`, {
-    method: 'POST',
-    headers: supabaseHeaders(true, { 'Content-Type': img.mime, 'x-upsert': 'true' }),
-    body: img.buffer
+    method: 'POST', headers: supabaseHeaders(true, { 'Content-Type': img.mime, 'x-upsert': 'true' }), body: img.buffer
   });
   const text = await response.text();
   if (!response.ok) throw new Error(text || 'Не удалось загрузить превью в Storage.');
@@ -168,6 +198,69 @@ async function topDownloadedPlugins(limit = 4) {
     return plugins.map((plugin) => ({ plugin, downloads: counts.get(plugin.id) || 0 })).sort((a, b) => b.downloads - a.downloads || a.plugin.name.localeCompare(b.plugin.name, 'ru')).slice(0, limit);
   } catch (_) { return sortPlugins(plugins).slice(0, limit).map((plugin) => ({ plugin, downloads: 0 })); }
 }
+async function getAdminDashboardData() {
+  const [submissions, reports, requests, topDownloads, pendingSubmissions, pendingReports, pendingRequests, approvedWorks] = await Promise.all([
+    supabaseRequest('edit_submissions?select=*&status=eq.pending&order=created_at.desc&limit=100', {}, true),
+    supabaseRequest('plugin_reports?select=*&status=eq.pending&order=created_at.desc&limit=100', {}, true),
+    supabaseRequest('plugin_requests?select=*&status=eq.pending&order=created_at.desc&limit=100', {}, true),
+    topDownloadedPlugins(8),
+    countRows('edit_submissions', 'status=eq.pending', true),
+    countRows('plugin_reports', 'status=eq.pending', true),
+    countRows('plugin_requests', 'status=eq.pending', true),
+    countRows('edit_submissions', 'status=eq.approved', true)
+  ]);
+  return { submissions, reports, requests, topDownloads: topDownloads.map((x) => ({ id: x.plugin.id, name: x.plugin.name, downloads: x.downloads })), stats: { pendingSubmissions, pendingReports, pendingRequests, approvedWorks, plugins: plugins.length } };
+}
+function adminSummaryText(data) {
+  const s = data.stats || {};
+  return `Админ-панель Null-Object-AE\n\nЗаявки: ${s.pendingSubmissions || 0}\nЖалобы: ${s.pendingReports || 0}\nЗапросы плагинов: ${s.pendingRequests || 0}\nОпубликовано работ: ${s.approvedWorks || 0}\nПлагинов в каталоге: ${s.plugins || 0}`;
+}
+async function sendPendingToTelegram() {
+  const data = await getAdminDashboardData();
+  await notifyTelegram(adminSummaryText(data), { inline_keyboard: [[{ text: '⚙️ Открыть админку', url: absoluteUrl('/admin') }]] });
+  for (const row of data.submissions.slice(0, 5)) await notifyTelegram(`Заявка на работу\n${row.title || 'Без названия'}\nАвтор: ${row.author || ''}\n${row.url || ''}`, subKeyboard(row.id));
+  for (const row of data.reports.slice(0, 5)) await notifyTelegram(`Жалоба на ссылку\n${row.plugin_name || row.plugin_id || 'Плагин'}\n${row.message || 'Без комментария'}`, closeKeyboard('report', row.id));
+  for (const row of data.requests.slice(0, 5)) await notifyTelegram(`Запрос плагина\n${row.name || 'Без названия'}\n${row.comment || ''}`, closeKeyboard('request', row.id));
+}
+async function handleTelegramAction(update) {
+  if (!isAllowedTelegramChat(update)) return;
+  if (update.message) {
+    const text = String(update.message.text || '').trim().toLowerCase();
+    if (['/start', '/help'].includes(text)) return notifyTelegram('Команды:\n/admin — статистика\n/pending — последние заявки, жалобы и запросы');
+    if (text === '/admin') return notifyTelegram(adminSummaryText(await getAdminDashboardData()), { inline_keyboard: [[{ text: '📋 Показать pending', callback_data: 'dash:pending' }], [{ text: '⚙️ Открыть админку', url: absoluteUrl('/admin') }]] });
+    if (text === '/pending') return sendPendingToTelegram();
+    return;
+  }
+  const cb = update.callback_query;
+  if (!cb) return;
+  const [type, action, id] = String(cb.data || '').split(':');
+  const chatId = cb.message?.chat?.id;
+  const messageId = cb.message?.message_id;
+  if (type === 'dash' && action === 'pending') {
+    await answerCallback(cb.id, 'Загружаю pending...');
+    return sendPendingToTelegram();
+  }
+  if (!id) return answerCallback(cb.id, 'Нет ID записи');
+  if (type === 'sub') {
+    const status = action === 'approve' ? 'approved' : action === 'reject' ? 'rejected' : null;
+    if (!status) return answerCallback(cb.id, 'Неизвестное действие');
+    await supabaseRequest(`edit_submissions?id=eq.${enc(id)}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', Prefer: 'return=minimal' }, body: JSON.stringify({ status }) }, true);
+    await answerCallback(cb.id, status === 'approved' ? 'Одобрено' : 'Отклонено');
+    if (chatId && messageId) await editTelegramMessage(chatId, messageId, `${cb.message.text || ''}\n\nСтатус: ${status === 'approved' ? 'одобрено ✅' : 'отклонено ❌'}`);
+    return;
+  }
+  if (type === 'report') {
+    await supabaseRequest(`plugin_reports?id=eq.${enc(id)}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', Prefer: 'return=minimal' }, body: JSON.stringify({ status: 'done' }) }, true);
+    await answerCallback(cb.id, 'Жалоба закрыта');
+    if (chatId && messageId) await editTelegramMessage(chatId, messageId, `${cb.message.text || ''}\n\nСтатус: закрыто ✅`);
+    return;
+  }
+  if (type === 'request') {
+    await supabaseRequest(`plugin_requests?id=eq.${enc(id)}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', Prefer: 'return=minimal' }, body: JSON.stringify({ status: 'done' }) }, true);
+    await answerCallback(cb.id, 'Запрос закрыт');
+    if (chatId && messageId) await editTelegramMessage(chatId, messageId, `${cb.message.text || ''}\n\nСтатус: закрыто ✅`);
+  }
+}
 
 async function homePage() { const available = plugins.filter((plugin) => plugin.status === 'available').length; const categoryCount = new Set(plugins.map((plugin) => plugin.category)).size; const featured = sortPlugins(plugins).filter((plugin) => /популяр/i.test(plugin.badge || '') && plugin.status === 'available').slice(0, 3); const top = await topDownloadedPlugins(4); return layout({ active: 'home', route: '/', title: 'Null-Object-AE — плагины, скрипты и пресеты для After Effects', description: site.description, schema: collectionSchema('Null-Object-AE', site.description, '/'), body: `<section class="hero page-hero-home"><div class="container hero-grid"><div class="hero-content reveal"><span class="eyebrow"><i class="fas fa-sparkles"></i> AE 2022 и новее</span><h1>Профессиональные плагины для <span class="highlight">After Effects</span></h1><p>Каталог эффектов, скриптов, пресетов, пользовательских работ и инструкций.</p><div class="hero-actions"><a class="btn btn-primary" href="/plugins"><i class="fas fa-plug"></i> Открыть каталог</a><a class="btn btn-ghost" href="/community"><i class="fas fa-film"></i> Работы пользователей</a></div><div class="hero-stats"><div class="stat"><span>${plugins.length}</span><small>плагинов</small></div><div class="stat"><span>${available}</span><small>ссылок проверено</small></div><div class="stat"><span>${categoryCount}</span><small>категорий</small></div></div></div><div class="hero-visual stable-visual"><div class="visual-float visual-float-ae"><div class="visual-element ae-card"><span>Ae</span></div></div><div class="visual-float visual-float-plugin"><div class="visual-element"><i class="fas fa-puzzle-piece"></i></div></div><div class="visual-float visual-float-download"><div class="visual-element"><i class="fas fa-cloud-arrow-down"></i></div></div></div></div></section><section class="section soft-section"><div class="container"><div class="section-head reveal"><span class="eyebrow">Топ скачиваний</span><h2>Что чаще всего скачивают</h2><p>Блок обновляется по событиям скачивания.</p></div><div class="plugins-grid compact">${top.map(({ plugin, downloads }) => pluginCard({ ...plugin, badge: downloads ? `${downloads} скачиваний` : plugin.badge })).join('')}</div></div></section><section class="section"><div class="container"><div class="section-head reveal"><span class="eyebrow">Популярное</span><h2>Плагины, с которых стоит начать</h2></div><div class="plugins-grid compact">${featured.map(pluginCard).join('')}</div></div></section>` }); }
 function pluginsPage() { const filters = getCategories().map(([id, label]) => `<button class="filter-btn ${id === 'all' ? 'active' : ''}" data-category="${esc(id)}">${esc(label)}</button>`).join(''); const categoryLinks = getCategories().filter(([id]) => id !== 'all').map(([id, label]) => `<a class="filter-btn" href="/category/${enc(id)}">${esc(label)}</a>`).join(''); return layout({ active: 'plugins', route: '/plugins', title: 'Каталог плагинов After Effects', description: 'Плагины, скрипты и пресеты для After Effects.', schema: collectionSchema('Каталог плагинов After Effects', 'Плагины, скрипты и пресеты для Adobe After Effects.', '/plugins'), body: `<section class="subpage-hero"><div class="container"><span class="eyebrow"><i class="fas fa-plug"></i> Каталог</span><h1>Плагины для After Effects</h1><p>Ищи по названию, тегам, категории или описанию.</p><div class="filter-tabs">${categoryLinks}</div></div></section><section class="section catalog-section"><div class="container"><div class="catalog-panel reveal"><div class="search-box"><i class="fas fa-search"></i><input id="pluginSearch" type="text" placeholder="Поиск: Saber, glow, text..."><button id="clearSearch"><i class="fas fa-times"></i></button></div><div class="catalog-row"><div class="filter-tabs" id="categoryFilters">${filters}</div><div class="catalog-controls"><select id="sortPlugins"><option value="popular">Сначала популярные</option><option value="new">Сначала новые</option><option value="az">По названию A–Z</option><option value="available">Сначала проверенные</option><option value="size">По размеру файла</option></select><button class="favorites-filter-btn" id="favoritesOnly" type="button"><i class="far fa-heart"></i> Только избранные</button></div></div><div class="catalog-meta"><span id="resultCount">Найдено: ${plugins.length}</span><span id="activeFilterLabel">Все категории</span></div></div><div class="plugins-grid" id="pluginsGrid">${sortPlugins(plugins).map(pluginCard).join('')}</div><div class="empty-state" id="emptyState" hidden><i class="fas fa-magnifying-glass"></i><h3>Ничего не найдено</h3></div></div></section>` }); }
@@ -195,12 +288,20 @@ app.get('/favicon.ico', (req, res) => res.status(204).end());
 app.use('/style.css', express.static(path.join(ROOT, 'style.css'), { maxAge: '1h' }));
 app.use('/client.js', express.static(path.join(ROOT, 'client.js'), { maxAge: '1h' }));
 
-app.post('/api/upload-preview', limit('upload', 4), async (req, res) => { try { const publicUrl = await uploadPreview(req.body && req.body.image, req); res.json({ url: publicUrl }); } catch (error) { res.status(error.status || 500).json({ error: error.message }); } });
-app.post('/api/edit-submissions', limit('submit', 6), async (req, res) => { if (!hasSupabase()) return res.status(500).json({ error: 'Supabase is not configured' }); try { const body = req.body || {}; const clean = { url: String(body.url || '').trim(), platform: ['youtube', 'tiktok', 'video'].includes(body.platform) ? body.platform : inferPlatform(body.url), thumb: String(body.thumb || '').trim() || null, title: String(body.title || '').trim(), author: String(body.author || '').trim(), plugins: String(body.plugins || '').trim() || null, description: String(body.description || '').trim() || null, status: 'pending' }; if (!clean.url || !clean.title || !clean.author) return res.status(400).json({ error: 'Заполните ссылку, название и автора.' }); const data = await supabaseRequest('edit_submissions', { method: 'POST', headers: { 'Content-Type': 'application/json', Prefer: 'return=representation' }, body: JSON.stringify(clean) }); notifyTelegram(`Новая заявка на работу\n${clean.title}\n${clean.url}`); return res.status(201).json(data); } catch (error) { return res.status(error.status || 500).json({ error: error.message, details: error.data || null }); } });
+app.post('/api/telegram/webhook', async (req, res) => {
+  try {
+    if (!site.tgSecret) return res.status(403).json({ error: 'Telegram webhook secret is not configured' });
+    if (String(req.headers['x-telegram-bot-api-secret-token'] || '') !== site.tgSecret) return res.status(401).json({ error: 'Bad Telegram secret' });
+    res.json({ ok: true });
+    handleTelegramAction(req.body).catch((error) => console.error('Telegram action failed:', error.message));
+  } catch (error) { res.status(500).json({ error: error.message }); }
+});
+app.post('/api/upload-preview', limit('upload', 4), async (req, res) => { try { const publicUrl = await uploadPreview(req.body && req.body.image); res.json({ url: publicUrl }); } catch (error) { res.status(error.status || 500).json({ error: error.message }); } });
+app.post('/api/edit-submissions', limit('submit', 6), async (req, res) => { if (!hasSupabase()) return res.status(500).json({ error: 'Supabase is not configured' }); try { const body = req.body || {}; const clean = { url: String(body.url || '').trim(), platform: ['youtube', 'tiktok', 'video'].includes(body.platform) ? body.platform : inferPlatform(body.url), thumb: String(body.thumb || '').trim() || null, title: String(body.title || '').trim(), author: String(body.author || '').trim(), plugins: String(body.plugins || '').trim() || null, description: String(body.description || '').trim() || null, status: 'pending' }; if (!clean.url || !clean.title || !clean.author) return res.status(400).json({ error: 'Заполните ссылку, название и автора.' }); const data = await supabaseRequest('edit_submissions', { method: 'POST', headers: { 'Content-Type': 'application/json', Prefer: 'return=representation' }, body: JSON.stringify(clean) }); const row = Array.isArray(data) ? data[0] : null; notifyTelegram(`Новая заявка на работу\n${clean.title}\nАвтор: ${clean.author}\n${clean.url}`, row?.id ? subKeyboard(row.id) : undefined); return res.status(201).json(data); } catch (error) { return res.status(error.status || 500).json({ error: error.message, details: error.data || null }); } });
 app.post('/api/edit-submissions/cancel', limit('cancel', 10), async (req, res) => { try { const body = req.body || {}; const id = String(body.id || '').trim(); const filter = id ? `id=eq.${enc(id)}&status=eq.pending` : `url=eq.${enc(body.url)}&title=eq.${enc(body.title)}&author=eq.${enc(body.author)}&status=eq.pending`; await supabaseRequest(`edit_submissions?${filter}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', Prefer: 'return=minimal' }, body: JSON.stringify({ status: 'rejected' }) }); res.json({ ok: true }); } catch (error) { res.status(error.status || 500).json({ error: error.message, details: error.data || null }); } });
-app.post('/api/plugin-reports', limit('report', 5), async (req, res) => { try { const body = req.body || {}; const clean = { plugin_id: String(body.plugin_id || '').trim(), plugin_name: String(body.plugin_name || '').trim(), message: String(body.message || '').trim() || null, status: 'pending' }; if (!clean.plugin_id) return res.status(400).json({ error: 'Не найден плагин.' }); await supabaseRequest('plugin_reports', { method: 'POST', headers: { 'Content-Type': 'application/json', Prefer: 'return=minimal' }, body: JSON.stringify(clean) }); notifyTelegram(`Жалоба на ссылку\n${clean.plugin_name}\n${clean.message || 'Без комментария'}`); res.json({ ok: true }); } catch (error) { res.status(error.status || 500).json({ error: error.message, details: error.data || null }); } });
-app.post('/api/plugin-requests', limit('request', 5), async (req, res) => { try { const body = req.body || {}; const clean = { name: String(body.name || '').trim(), source_url: String(body.source_url || '').trim() || null, comment: String(body.comment || '').trim() || null, status: 'pending' }; if (!clean.name) return res.status(400).json({ error: 'Введите название плагина.' }); await supabaseRequest('plugin_requests', { method: 'POST', headers: { 'Content-Type': 'application/json', Prefer: 'return=minimal' }, body: JSON.stringify(clean) }); notifyTelegram(`Новый запрос плагина\n${clean.name}\n${clean.comment || ''}`); res.json({ ok: true }); } catch (error) { res.status(error.status || 500).json({ error: error.message, details: error.data || null }); } });
-app.get('/api/admin/dashboard', requireAdmin, async (req, res) => { try { const [submissions, reports, requests, topDownloads, pendingSubmissions, pendingReports, pendingRequests, approvedWorks] = await Promise.all([supabaseRequest('edit_submissions?select=*&status=eq.pending&order=created_at.desc&limit=100', {}, true), supabaseRequest('plugin_reports?select=*&status=eq.pending&order=created_at.desc&limit=100', {}, true), supabaseRequest('plugin_requests?select=*&status=eq.pending&order=created_at.desc&limit=100', {}, true), topDownloadedPlugins(8), countRows('edit_submissions', 'status=eq.pending', true), countRows('plugin_reports', 'status=eq.pending', true), countRows('plugin_requests', 'status=eq.pending', true), countRows('edit_submissions', 'status=eq.approved', true)]); res.json({ submissions, reports, requests, topDownloads: topDownloads.map((x) => ({ id: x.plugin.id, name: x.plugin.name, downloads: x.downloads })), stats: { pendingSubmissions, pendingReports, pendingRequests, approvedWorks, plugins: plugins.length } }); } catch (error) { res.status(error.status || 500).json({ error: error.message }); } });
+app.post('/api/plugin-reports', limit('report', 5), async (req, res) => { try { const body = req.body || {}; const clean = { plugin_id: String(body.plugin_id || '').trim(), plugin_name: String(body.plugin_name || '').trim(), message: String(body.message || '').trim() || null, status: 'pending' }; if (!clean.plugin_id) return res.status(400).json({ error: 'Не найден плагин.' }); const data = await supabaseRequest('plugin_reports', { method: 'POST', headers: { 'Content-Type': 'application/json', Prefer: 'return=representation' }, body: JSON.stringify(clean) }); const row = Array.isArray(data) ? data[0] : null; notifyTelegram(`Жалоба на ссылку\n${clean.plugin_name}\n${clean.message || 'Без комментария'}`, row?.id ? closeKeyboard('report', row.id) : undefined); res.json({ ok: true }); } catch (error) { res.status(error.status || 500).json({ error: error.message, details: error.data || null }); } });
+app.post('/api/plugin-requests', limit('request', 5), async (req, res) => { try { const body = req.body || {}; const clean = { name: String(body.name || '').trim(), source_url: String(body.source_url || '').trim() || null, comment: String(body.comment || '').trim() || null, status: 'pending' }; if (!clean.name) return res.status(400).json({ error: 'Введите название плагина.' }); const data = await supabaseRequest('plugin_requests', { method: 'POST', headers: { 'Content-Type': 'application/json', Prefer: 'return=representation' }, body: JSON.stringify(clean) }); const row = Array.isArray(data) ? data[0] : null; notifyTelegram(`Новый запрос плагина\n${clean.name}\n${clean.comment || ''}`, row?.id ? closeKeyboard('request', row.id) : undefined); res.json({ ok: true }); } catch (error) { res.status(error.status || 500).json({ error: error.message, details: error.data || null }); } });
+app.get('/api/admin/dashboard', requireAdmin, async (req, res) => { try { res.json(await getAdminDashboardData()); } catch (error) { res.status(error.status || 500).json({ error: error.message }); } });
 app.patch('/api/admin/submissions/:id', requireAdmin, async (req, res) => { try { const body = req.body || {}; const update = {}; ['url', 'platform', 'thumb', 'title', 'author', 'plugins', 'description'].forEach((key) => { if (Object.prototype.hasOwnProperty.call(body, key)) update[key] = String(body[key] || '').trim() || null; }); if (['approved', 'rejected', 'pending'].includes(body.status)) update.status = body.status; if (!Object.keys(update).length) return res.status(400).json({ error: 'Нет данных для обновления.' }); await supabaseRequest(`edit_submissions?id=eq.${enc(req.params.id)}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', Prefer: 'return=minimal' }, body: JSON.stringify(update) }, true); res.json({ ok: true }); } catch (error) { res.status(error.status || 500).json({ error: error.message }); } });
 app.delete('/api/admin/submissions/:id', requireAdmin, async (req, res) => { try { await supabaseRequest(`edit_submissions?id=eq.${enc(req.params.id)}`, { method: 'DELETE', headers: { Prefer: 'return=minimal' } }, true); res.json({ ok: true }); } catch (error) { res.status(error.status || 500).json({ error: error.message }); } });
 app.patch('/api/admin/plugin-reports/:id', requireAdmin, async (req, res) => { try { await supabaseRequest(`plugin_reports?id=eq.${enc(req.params.id)}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', Prefer: 'return=minimal' }, body: JSON.stringify({ status: req.body.status || 'done' }) }, true); res.json({ ok: true }); } catch (error) { res.status(error.status || 500).json({ error: error.message }); } });
