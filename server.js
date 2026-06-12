@@ -9,12 +9,18 @@ const ROOT = __dirname;
 
 app.disable('x-powered-by');
 app.set('trust proxy', 1);
+app.use(express.json({ limit: '50kb' }));
 
 const site = {
   title: 'Null-Object-AE',
   description: 'Каталог плагинов, скриптов и пресетов для Adobe After Effects.',
   url: (process.env.SITE_URL || 'https://null-object-ae.onrender.com').replace(/\/$/, ''),
   telegramUrl: process.env.TELEGRAM_URL || 'https://t.me/ae_plugins_vault'
+};
+
+const supabase = {
+  url: (process.env.SUPABASE_URL || '').replace(/\/rest\/v1\/?$/, '').replace(/\/$/, ''),
+  anonKey: process.env.SUPABASE_ANON_KEY || ''
 };
 
 function loadWindowArray(fileName, propertyName) {
@@ -28,7 +34,7 @@ function loadWindowArray(fileName, propertyName) {
 }
 
 const plugins = loadWindowArray('plugins.js', 'AE_PLUGINS');
-const edits = loadWindowArray('edits.js', 'AE_EDITS');
+const fallbackEdits = loadWindowArray('edits.js', 'AE_EDITS');
 
 function esc(value) {
   return String(value ?? '').replace(/[&<>'"]/g, (char) => ({
@@ -56,43 +62,19 @@ function jsonLd(data) {
 }
 
 function websiteSchema() {
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'WebSite',
-    name: site.title,
-    url: site.url,
-    description: site.description,
-    inLanguage: 'ru-RU'
-  };
+  return { '@context': 'https://schema.org', '@type': 'WebSite', name: site.title, url: site.url, description: site.description, inLanguage: 'ru-RU' };
 }
 
 function collectionSchema(name, description, route) {
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'CollectionPage',
-    name,
-    description,
-    url: absoluteUrl(route),
-    isPartOf: { '@type': 'WebSite', name: site.title, url: site.url }
-  };
+  return { '@context': 'https://schema.org', '@type': 'CollectionPage', name, description, url: absoluteUrl(route), isPartOf: { '@type': 'WebSite', name: site.title, url: site.url } };
 }
 
 function softwareSchema(plugin) {
   return {
-    '@context': 'https://schema.org',
-    '@type': 'SoftwareApplication',
-    name: plugin.name,
-    description: plugin.description,
-    applicationCategory: 'MultimediaApplication',
-    operatingSystem: 'Windows, macOS',
-    softwareVersion: plugin.version,
-    url: absoluteUrl(`/plugin/${url(plugin.id)}`),
-    offers: {
-      '@type': 'Offer',
-      price: '0',
-      priceCurrency: 'RUB',
-      availability: plugin.status === 'available' ? 'https://schema.org/InStock' : 'https://schema.org/PreOrder'
-    }
+    '@context': 'https://schema.org', '@type': 'SoftwareApplication', name: plugin.name,
+    description: plugin.description, applicationCategory: 'MultimediaApplication', operatingSystem: 'Windows, macOS',
+    softwareVersion: plugin.version, url: absoluteUrl(`/plugin/${url(plugin.id)}`),
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'RUB', availability: plugin.status === 'available' ? 'https://schema.org/InStock' : 'https://schema.org/PreOrder' }
   };
 }
 
@@ -151,9 +133,7 @@ function layout({ active, title, description, route, robots, schema, body }) {
 }
 
 function statusBadge(plugin) {
-  return plugin.status === 'available'
-    ? '<span class="status-badge available"><i class="fas fa-check-circle"></i> Проверено</span>'
-    : '<span class="status-badge updating"><i class="fas fa-clock"></i> Обновляется</span>';
+  return plugin.status === 'available' ? '<span class="status-badge available"><i class="fas fa-check-circle"></i> Проверено</span>' : '<span class="status-badge updating"><i class="fas fa-clock"></i> Обновляется</span>';
 }
 
 function pluginSizeMB(plugin) {
@@ -195,8 +175,7 @@ function homePage() {
   const featured = sortPlugins(plugins).filter((plugin) => /популяр/i.test(plugin.badge || '') && plugin.status === 'available').slice(0, 3);
   const updates = plugins.slice(0, 6).map((plugin) => `<a href="/plugin/${url(plugin.id)}" class="update-row"><span>${statusBadge(plugin)}</span><b>${esc(plugin.name)}</b><small>${esc(plugin.updated)}</small></a>`).join('');
   return layout({
-    active: 'home',
-    route: '/',
+    active: 'home', route: '/',
     title: 'Null-Object-AE — плагины, скрипты и пресеты для After Effects',
     description: 'Null-Object-AE — каталог плагинов, скриптов и пресетов для Adobe After Effects с инструкциями по установке и страницами плагинов.',
     schema: collectionSchema('Null-Object-AE', site.description, '/'),
@@ -207,8 +186,7 @@ function homePage() {
 function pluginsPage() {
   const filters = getCategories().map(([id, label]) => `<button class="filter-btn ${id === 'all' ? 'active' : ''}" data-category="${esc(id)}">${esc(label)}</button>`).join('');
   return layout({
-    active: 'plugins',
-    route: '/plugins',
+    active: 'plugins', route: '/plugins',
     title: 'Каталог плагинов After Effects — Saber, Twixtor, RSMB, Sapphire',
     description: 'Каталог Null-Object-AE: плагины, скрипты и пресеты для After Effects, фильтры по категориям, статусы и страницы с инструкциями.',
     schema: collectionSchema('Каталог плагинов After Effects', 'Плагины, скрипты и пресеты для Adobe After Effects.', '/plugins'),
@@ -228,13 +206,10 @@ function installText(type) {
 function pluginPage(id) {
   const plugin = plugins.find((item) => item.id === id);
   if (!plugin) return notFoundPage();
-  const download = plugin.status === 'available'
-    ? `<a class="btn btn-primary" href="/download/${url(plugin.id)}" target="_blank" rel="noopener"><i class="fas fa-download"></i> Скачать</a>`
-    : '<button class="btn btn-disabled" disabled><i class="fas fa-clock"></i> Ссылка обновляется</button>';
+  const download = plugin.status === 'available' ? `<a class="btn btn-primary" href="/download/${url(plugin.id)}" target="_blank" rel="noopener"><i class="fas fa-download"></i> Скачать</a>` : '<button class="btn btn-disabled" disabled><i class="fas fa-clock"></i> Ссылка обновляется</button>';
   const related = plugins.filter((item) => item.id !== plugin.id && (item.category === plugin.category || item.package === plugin.package)).slice(0, 3);
   return layout({
-    active: 'plugins',
-    route: `/plugin/${url(plugin.id)}`,
+    active: 'plugins', route: `/plugin/${url(plugin.id)}`,
     title: `${plugin.name} для After Effects — описание, установка и скачивание`,
     description: `${plugin.name} для Adobe After Effects: описание, версия ${plugin.version}, размер ${plugin.size}, совместимость ${plugin.compatibility}.`,
     schema: softwareSchema(plugin),
@@ -255,46 +230,70 @@ function platformLabel(platform) { return platform === 'tiktok' ? 'TikTok' : pla
 function platformIcon(platform) { return platform === 'tiktok' ? 'fab fa-tiktok' : platform === 'youtube' ? 'fab fa-youtube' : 'fas fa-video'; }
 function editCard(item) { const platform = item.platform || 'video'; const thumb = item.thumb || ''; return `<article class="edit-card reveal"><a class="edit-thumb" href="${esc(item.url)}" target="_blank" rel="noopener">${thumb ? `<img src="${esc(thumb)}" alt="${esc(item.title)}" loading="lazy">` : '<div class="edit-thumb-placeholder"><i class="fas fa-video"></i></div>'}<span class="platform-badge"><i class="${platformIcon(platform)}"></i> ${platformLabel(platform)}</span><span class="play-badge"><i class="fas fa-play"></i></span></a><div class="edit-body"><h3>${esc(item.title || 'Без названия')}</h3><p>${esc(item.description || 'Пользовательская работа After Effects.')}</p><div class="edit-meta"><span><i class="fas fa-user"></i> ${esc(item.author || 'Автор')}</span>${item.plugins ? `<span><i class="fas fa-plug"></i> ${esc(item.plugins)}</span>` : ''}</div></div><div class="edit-actions"><a class="details-btn" href="${esc(item.url)}" target="_blank" rel="noopener"><i class="fas fa-up-right-from-square"></i> Открыть</a></div></article>`; }
 
-function communityPage() {
-  const approved = edits.filter((item) => (item.status || 'approved') === 'approved');
-  return layout({ active: 'community', route: '/community', title: 'Работы пользователей After Effects — эдиты и видео', description: 'Раздел Null-Object-AE с работами пользователей, эдитами, шоурилами и видео, сделанными в Adobe After Effects.', schema: collectionSchema('Работы пользователей After Effects', 'Эдиты и видео пользователей, сделанные с After Effects.', '/community'), body: `<section class="subpage-hero"><div class="container"><span class="eyebrow"><i class="fas fa-film"></i> Комьюнити</span><h1>Работы пользователей</h1><p>Эдиты, шоурилы и ролики, которые люди сделали в After Effects.</p><div class="hero-actions"><a class="btn btn-primary" href="/submit"><i class="fas fa-plus"></i> Поделиться эдитом</a><a class="btn btn-ghost" href="/plugins"><i class="fas fa-plug"></i> Плагины</a></div></div></section><section class="section"><div class="container"><div class="catalog-panel reveal"><div class="search-wrap"><i class="fas fa-search"></i><input id="editSearch" type="search" placeholder="Поиск по названию, автору или платформе..."><button id="clearEditSearch" type="button"><i class="fas fa-xmark"></i></button></div><div class="catalog-row"><div class="filter-tabs" id="editFilters"><button class="filter-btn active" data-platform="all">Все</button><button class="filter-btn" data-platform="youtube">YouTube</button><button class="filter-btn" data-platform="tiktok">TikTok</button></div><div class="catalog-meta"><span id="editCount">Работ: ${approved.length}</span></div></div></div><div class="edits-grid" id="communityGrid">${approved.map(editCard).join('')}</div><div class="empty-state" id="communityEmpty" ${approved.length ? 'hidden' : ''}><i class="fas fa-video"></i><h3>Работ пока нет</h3><p>Пока здесь пусто. Будь первым, кто поделится своей работой.</p><a class="btn btn-primary" href="/submit"><i class="fas fa-plus"></i> Добавить работу</a></div></div></section>` });
+function hasSupabase() { return Boolean(supabase.url && supabase.anonKey); }
+function supabaseHeaders(extra = {}) { return { apikey: supabase.anonKey, Authorization: `Bearer ${supabase.anonKey}`, ...extra }; }
+function normalizeEdit(row) { return { url: row.url, platform: row.platform || inferPlatform(row.url), thumb: row.thumb || '', title: row.title, author: row.author, plugins: row.plugins || '', description: row.description || '', status: row.status || 'approved', created_at: row.created_at }; }
+function inferPlatform(value) { const v = String(value || '').toLowerCase(); if (v.includes('youtube.com') || v.includes('youtu.be')) return 'youtube'; if (v.includes('tiktok.com')) return 'tiktok'; return 'video'; }
+
+async function getApprovedEdits() {
+  if (!hasSupabase()) return fallbackEdits.filter((item) => (item.status || 'approved') === 'approved');
+  try {
+    const endpoint = `${supabase.url}/rest/v1/edit_submissions?select=url,platform,thumb,title,author,plugins,description,status,created_at&status=eq.approved&order=created_at.desc`;
+    const response = await fetch(endpoint, { headers: supabaseHeaders() });
+    if (!response.ok) throw new Error(`Supabase read failed: ${response.status}`);
+    const rows = await response.json();
+    return Array.isArray(rows) ? rows.map(normalizeEdit) : [];
+  } catch (error) {
+    console.error(error.message);
+    return fallbackEdits.filter((item) => (item.status || 'approved') === 'approved');
+  }
+}
+
+function communityPage(approved) {
+  return layout({ active: 'community', route: '/community', title: 'Работы пользователей After Effects — эдиты и видео', description: 'Раздел Null-Object-AE с работами пользователей, эдитами, шоурилами и видео, сделанными в Adobe After Effects.', schema: collectionSchema('Работы пользователей After Effects', 'Эдиты и видео пользователей, сделанные с After Effects.', '/community'), body: `<section class="subpage-hero"><div class="container"><span class="eyebrow"><i class="fas fa-film"></i> Комьюнити</span><h1>Работы пользователей</h1><p>Эдиты, шоурилы и ролики, которые люди сделали в After Effects.</p><div class="hero-actions"><a class="btn btn-primary" href="/submit"><i class="fas fa-plus"></i> Поделиться эдитом</a><a class="btn btn-ghost" href="/plugins"><i class="fas fa-plug"></i> Плагины</a></div></div></section><section class="section"><div class="container"><div class="catalog-panel reveal"><div class="search-wrap"><i class="fas fa-search"></i><input id="editSearch" type="search" placeholder="Поиск по названию, автору или платформе..."><button id="clearEditSearch" type="button"><i class="fas fa-xmark"></i></button></div><div class="catalog-row"><div class="filter-tabs" id="editFilters"><button class="filter-btn active" data-platform="all">Все</button><button class="filter-btn" data-platform="youtube">YouTube</button><button class="filter-btn" data-platform="tiktok">TikTok</button></div><div class="catalog-meta"><span id="editCount">Работ: ${approved.length}</span></div></div></div><div class="edits-grid" id="communityGrid">${approved.map(editCard).join('')}</div><div class="empty-state" id="communityEmpty" ${approved.length ? 'hidden' : ''}><i class="fas fa-video"></i><h3>Работ пока нет</h3><p>Пока здесь пусто. Одобренные заявки появятся в этом разделе.</p><a class="btn btn-primary" href="/submit"><i class="fas fa-plus"></i> Добавить работу</a></div></div></section>` });
 }
 
 function submitPage() {
-  return layout({ active: 'submit', route: '/submit', robots: 'noindex,follow', title: 'Поделиться эдитом', description: 'Форма добавления пользовательской работы для Null-Object-AE.', body: `<section class="subpage-hero"><div class="container"><span class="eyebrow"><i class="fas fa-paper-plane"></i> Отправка работы</span><h1>Поделиться своим эдитом</h1><p>Форма сохраняет заявку в браузере. Для общей публикации отправьте данные в Telegram-канал проекта.</p></div></section><section class="section"><div class="container submit-layout"><form class="submit-card reveal" id="editSubmitForm"><h2>Данные работы</h2><label>Ссылка на видео<input id="editUrl" name="url" type="url" placeholder="https://youtube.com/watch?v=..." required></label><label>Название<input id="editTitle" name="title" type="text" placeholder="Например: Cinematic AE Edit" maxlength="80" required></label><label>Автор / ник<input id="editAuthor" name="author" type="text" placeholder="Твой ник" maxlength="40" required></label><label>Какие плагины использовал<input id="editPlugins" name="plugins" type="text" placeholder="Saber, Deep Glow, Twitch..." maxlength="120"></label><label>Описание<textarea id="editDescription" name="description" rows="4" placeholder="Коротко опиши работу" maxlength="300"></textarea></label><div class="submit-actions"><button class="btn btn-primary" type="submit"><i class="fas fa-paper-plane"></i> Сохранить заявку</button></div></form><div class="preview-panel reveal"><h2>Мои заявки</h2><div class="edits-grid" id="mySubmissionsGrid"></div><div class="empty-state inline" id="mySubmissionsEmpty"><p>Пока нет отправленных заявок.</p></div></div></div></section>` });
+  return layout({ active: 'submit', route: '/submit', robots: 'noindex,follow', title: 'Поделиться эдитом', description: 'Форма добавления пользовательской работы для Null-Object-AE.', body: `<section class="subpage-hero"><div class="container"><span class="eyebrow"><i class="fas fa-paper-plane"></i> Отправка работы</span><h1>Поделиться своим эдитом</h1><p>Заявка отправляется на проверку. После одобрения она появится в разделе работ.</p></div></section><section class="section"><div class="container submit-layout"><form class="submit-card reveal" id="editSubmitForm"><h2>Данные работы</h2><label>Ссылка на видео<input id="editUrl" name="url" type="url" placeholder="https://youtube.com/watch?v=..." required></label><label>Название<input id="editTitle" name="title" type="text" placeholder="Например: Cinematic AE Edit" maxlength="80" required></label><label>Автор / ник<input id="editAuthor" name="author" type="text" placeholder="Твой ник" maxlength="40" required></label><label>Какие плагины использовал<input id="editPlugins" name="plugins" type="text" placeholder="Saber, Deep Glow, Twitch..." maxlength="120"></label><label>Описание<textarea id="editDescription" name="description" rows="4" placeholder="Коротко опиши работу" maxlength="300"></textarea></label><div class="submit-actions"><button class="btn btn-primary" type="submit"><i class="fas fa-paper-plane"></i> Отправить на проверку</button></div><p id="submitStatus" class="version-note" hidden></p></form><div class="preview-panel reveal"><h2>Как это работает</h2><div class="notice-card"><p>После отправки запись попадёт в базу со статусом <b>pending</b>. Когда статус меняется на <b>approved</b>, работа появляется на странице.</p></div><div class="edits-grid" id="mySubmissionsGrid"></div><div class="empty-state inline" id="mySubmissionsEmpty"><p>Локальных заявок пока нет.</p></div></div></div></section>` });
 }
 
-function notFoundPage() {
-  return layout({ active: 'home', route: '/404', robots: 'noindex,follow', title: 'Страница не найдена', description: 'Страница не найдена. Вернитесь на главную или в каталог Null-Object-AE.', body: '<section class="subpage-hero"><div class="container"><h1>Страница не найдена</h1><p>Проверьте адрес или вернитесь на главную.</p><div class="hero-actions"><a class="btn btn-primary" href="/">На главную</a><a class="btn btn-ghost" href="/plugins">Каталог</a></div></div></section>' });
-}
+function notFoundPage() { return layout({ active: 'home', route: '/404', robots: 'noindex,follow', title: 'Страница не найдена', description: 'Страница не найдена. Вернитесь на главную или в каталог Null-Object-AE.', body: '<section class="subpage-hero"><div class="container"><h1>Страница не найдена</h1><p>Проверьте адрес или вернитесь на главную.</p><div class="hero-actions"><a class="btn btn-primary" href="/">На главную</a><a class="btn btn-ghost" href="/plugins">Каталог</a></div></div></section>' }); }
 
-function sitemapXml() {
-  const now = new Date().toISOString();
-  const pages = [['/', 'daily', '1.0'], ['/plugins', 'daily', '0.95'], ['/install', 'monthly', '0.75'], ['/faq', 'monthly', '0.7'], ['/community', 'weekly', '0.65'], ...plugins.map((plugin) => [`/plugin/${url(plugin.id)}`, 'weekly', plugin.status === 'available' ? '0.9' : '0.65'])];
-  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${pages.map(([route, changefreq, priority]) => `  <url>\n    <loc>${escXml(absoluteUrl(route))}</loc>\n    <lastmod>${now}</lastmod>\n    <changefreq>${changefreq}</changefreq>\n    <priority>${priority}</priority>\n  </url>`).join('\n')}\n</urlset>`;
-}
+function sitemapXml() { const now = new Date().toISOString(); const pages = [['/', 'daily', '1.0'], ['/plugins', 'daily', '0.95'], ['/install', 'monthly', '0.75'], ['/faq', 'monthly', '0.7'], ['/community', 'weekly', '0.65'], ...plugins.map((plugin) => [`/plugin/${url(plugin.id)}`, 'weekly', plugin.status === 'available' ? '0.9' : '0.65'])]; return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${pages.map(([route, changefreq, priority]) => `  <url>\n    <loc>${escXml(absoluteUrl(route))}</loc>\n    <lastmod>${now}</lastmod>\n    <changefreq>${changefreq}</changefreq>\n    <priority>${priority}</priority>\n  </url>`).join('\n')}\n</urlset>`; }
+function robotsTxt() { return `User-agent: *\nAllow: /\n\nSitemap: ${absoluteUrl('/sitemap.xml')}\n`; }
 
-function robotsTxt() {
-  return `User-agent: *\nAllow: /\n\nSitemap: ${absoluteUrl('/sitemap.xml')}\n`;
-}
-
-app.use((req, res, next) => {
-  if (req.path === '/1' || req.path === '/1/') return res.redirect(301, '/');
-  if (req.path.startsWith('/1/')) return res.redirect(301, req.originalUrl.replace(/^\/1/, '') || '/');
-  next();
-});
-
-app.get('/google3dda0bd7c0af07a0.html', (req, res) => {
-  res.type('text/html').send('google-site-verification: google3dda0bd7c0af07a0.html');
-});
-app.get('/yandex_4c9bf369d0611ade.html', (req, res) => {
-  res.type('text/html').send('<html>\n    <head>\n        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">\n    </head>\n    <body>Verification: 4c9bf369d0611ade</body>\n</html>');
-});
+app.use((req, res, next) => { if (req.path === '/1' || req.path === '/1/') return res.redirect(301, '/'); if (req.path.startsWith('/1/')) return res.redirect(301, req.originalUrl.replace(/^\/1/, '') || '/'); next(); });
+app.get('/google3dda0bd7c0af07a0.html', (req, res) => res.type('text/html').send('google-site-verification: google3dda0bd7c0af07a0.html'));
+app.get('/yandex_4c9bf369d0611ade.html', (req, res) => res.type('text/html').send('<html>\n    <head>\n        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">\n    </head>\n    <body>Verification: 4c9bf369d0611ade</body>\n</html>'));
 app.get('/robots.txt', (req, res) => res.type('text/plain').send(robotsTxt()));
 app.get('/sitemap.xml', (req, res) => res.type('application/xml').send(sitemapXml()));
 app.get('/favicon.ico', (req, res) => res.status(204).end());
 app.use('/style.css', express.static(path.join(ROOT, 'style.css'), { maxAge: '1h' }));
 app.use('/client.js', express.static(path.join(ROOT, 'client.js'), { maxAge: '1h' }));
+
+app.post('/api/edit-submissions', async (req, res) => {
+  if (!hasSupabase()) return res.status(500).json({ error: 'Supabase is not configured' });
+  try {
+    const body = req.body || {};
+    const clean = {
+      url: String(body.url || '').trim(),
+      platform: ['youtube', 'tiktok', 'video'].includes(body.platform) ? body.platform : inferPlatform(body.url),
+      thumb: String(body.thumb || '').trim() || null,
+      title: String(body.title || '').trim(),
+      author: String(body.author || '').trim(),
+      plugins: String(body.plugins || '').trim() || null,
+      description: String(body.description || '').trim() || null,
+      status: 'pending'
+    };
+    if (!clean.url || !clean.title || !clean.author) return res.status(400).json({ error: 'Заполните ссылку, название и автора.' });
+    const response = await fetch(`${supabase.url}/rest/v1/edit_submissions`, { method: 'POST', headers: supabaseHeaders({ 'Content-Type': 'application/json', Prefer: 'return=representation' }), body: JSON.stringify(clean) });
+    const data = await response.text();
+    if (!response.ok) return res.status(response.status).json({ error: data || 'Supabase insert failed' });
+    return res.status(201).type('application/json').send(data || '{}');
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
 
 app.get('/', (req, res) => res.send(homePage()));
 app.get('/index.html', (req, res) => res.redirect(301, '/'));
@@ -306,19 +305,22 @@ app.get('/install', (req, res) => res.send(installPage()));
 app.get('/install.html', (req, res) => res.redirect(301, '/install'));
 app.get('/faq', (req, res) => res.send(faqPage()));
 app.get('/faq.html', (req, res) => res.redirect(301, '/faq'));
-app.get('/community', (req, res) => res.send(communityPage()));
+app.get('/community', async (req, res) => res.send(communityPage(await getApprovedEdits())));
 app.get('/community.html', (req, res) => res.redirect(301, '/community'));
 app.get('/submit', (req, res) => res.send(submitPage()));
 app.get('/submit.html', (req, res) => res.redirect(301, '/submit'));
 
 app.get('/download/:id', (req, res) => {
   const plugin = plugins.find((item) => item.id === req.params.id);
-  if (!plugin || plugin.status !== 'available' || !plugin.downloadUrl || plugin.downloadUrl === '#') return res.redirect(302, '/plugins');
+  if (!plugin || plugin.status !== 'available') return res.redirect(302, '/plugins');
+  if (req.query.version && Array.isArray(plugin.versions)) {
+    const version = plugin.versions.find((item) => String(item.label || '').toLowerCase().replace(/[^a-z0-9]/g, '').includes(String(req.query.version).toLowerCase().replace(/[^a-z0-9]/g, '')));
+    if (version && version.status === 'available' && version.downloadUrl && version.downloadUrl !== '#') return res.redirect(302, version.downloadUrl);
+  }
+  if (!plugin.downloadUrl || plugin.downloadUrl === '#') return res.redirect(302, '/plugins');
   res.redirect(302, plugin.downloadUrl);
 });
 
 app.use((req, res) => res.status(404).send(notFoundPage()));
 
-app.listen(PORT, () => {
-  console.log(`SSR server started: http://localhost:${PORT}`);
-});
+app.listen(PORT, () => console.log(`SSR server started: http://localhost:${PORT}`));
