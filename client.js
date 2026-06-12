@@ -32,6 +32,7 @@
       .catalog-panel .search-wrap input::placeholder{color:var(--muted)!important;opacity:.76!important;font-weight:700!important}
       .catalog-panel .search-wrap button,#clearEditSearch{position:absolute!important;right:10px!important;top:50%!important;transform:translateY(-50%)!important;width:38px!important;height:38px!important;border:1px solid var(--border)!important;background:var(--surface)!important;color:var(--muted)!important;border-radius:13px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;cursor:pointer!important;font-size:.95rem!important;transition:var(--transition)!important;box-shadow:0 8px 18px rgba(0,0,0,.12)!important;z-index:3!important}
       .catalog-panel .search-wrap button:hover,#clearEditSearch:hover{color:#fff!important;background:var(--primary)!important;border-color:var(--primary)!important;box-shadow:0 12px 24px rgba(99,102,241,.28)!important}
+      .field-hint{display:block;margin:6px 0 0;color:var(--muted);font-size:.84rem;font-weight:700;line-height:1.35}.field-hint b{color:var(--primary)}
       .version-selector{margin:22px 0 4px;border:1px solid var(--border);border-radius:20px;background:var(--surface);box-shadow:var(--shadow-soft);max-width:560px;overflow:hidden}
       .version-selector summary{list-style:none;cursor:pointer;padding:16px 18px;display:flex;align-items:center;justify-content:space-between;gap:14px;font-weight:900;color:var(--text)}
       .version-selector summary::-webkit-details-marker{display:none}.version-selector summary span{display:flex;align-items:center;gap:10px}.version-selector summary .chevron{transition:transform .2s ease}.version-selector[open] summary .chevron{transform:rotate(180deg)}
@@ -39,7 +40,7 @@
       .version-option.active{background:linear-gradient(135deg,var(--primary),#8b5cf6);border-color:transparent;color:#fff}.version-option:hover{transform:translateY(-2px);box-shadow:var(--shadow-soft)}.version-note{margin-top:12px;color:var(--muted);font-size:.9rem;font-weight:700}.version-note.success{color:#22c55e}.version-note.error{color:#ef4444}
       .cancel-submission-btn{border:1px solid rgba(239,68,68,.28);background:rgba(239,68,68,.12);color:#ef4444;border-radius:14px;padding:10px 13px;font-weight:900;display:inline-flex;align-items:center;gap:8px;cursor:pointer;transition:var(--transition)}
       .cancel-submission-btn:hover{transform:translateY(-2px);box-shadow:var(--shadow-soft)}.cancel-submission-btn:disabled{opacity:.6;cursor:not-allowed;transform:none}.pending-badge{display:inline-flex;align-items:center;gap:7px;border:1px solid rgba(245,158,11,.28);background:rgba(245,158,11,.12);color:#f59e0b;border-radius:999px;padding:7px 10px;font-size:.82rem;font-weight:900}
-      @media(max-width:900px){.stable-visual{height:390px!important;min-height:390px!important;padding:38px!important;margin:-38px!important}.visual-float-ae{left:4%!important;top:9%!important}.visual-float-plugin{right:4%!important;top:19%!important}.visual-float-download{left:40%!important;bottom:5%!important}.ae-card{width:164px!important;height:164px!important}.visual-element{width:122px!important;height:122px!important}.plugin-detail-content .hero-actions .btn.favorite-btn,.hero-actions .btn.favorite-btn{min-width:156px!important;min-height:50px!important}.version-selector-list{flex-direction:column}.version-option{justify-content:center;width:100%}.catalog-panel .search-wrap{min-height:54px!important;padding:0 50px 0 46px!important}.catalog-panel .search-wrap input{height:54px!important;line-height:54px!important;font-size:.94rem!important}.catalog-panel .search-wrap>i{left:16px!important}.catalog-panel .search-wrap button,#clearEditSearch{width:34px!important;height:34px!important;right:9px!important}}
+      @media(max-width:900px){.stable-visual{height:390px!important;min-height:390px!important;padding:38px!important;margin:-38px!important}.visual-float-ae{left:4%!important;top:9%!important}.visual-float-plugin{right:4%!important;top:19%!important}.visual-float-download{left:40%!important;bottom:5%!important}.ae-card{width:164px!important;height:164px!important}.visual-element{width:122px!important}.plugin-detail-content .hero-actions .btn.favorite-btn,.hero-actions .btn.favorite-btn{min-width:156px!important;min-height:50px!important}.version-selector-list{flex-direction:column}.version-option{justify-content:center;width:100%}.catalog-panel .search-wrap{min-height:54px!important;padding:0 50px 0 46px!important}.catalog-panel .search-wrap input{height:54px!important;line-height:54px!important;font-size:.94rem!important}.catalog-panel .search-wrap>i{left:16px!important}.catalog-panel .search-wrap button,#clearEditSearch{width:34px!important;height:34px!important;right:9px!important}}
     `;
     document.head.appendChild(style);
   }
@@ -170,6 +171,16 @@
     if(help) help.remove();
   }
 
+  function ensureThumbField(){
+    if(page!=='submit'||$('#editThumb')) return;
+    const urlInput=$('#editUrl');
+    const urlLabel=urlInput?urlInput.closest('label'):null;
+    if(!urlLabel) return;
+    const label=document.createElement('label');
+    label.innerHTML=`Ссылка на превью <small class="field-hint">Необязательно. Лучше вставлять постоянную ссылку на <b>.jpg/.png/.webp</b>, например из Supabase Storage. Временные TikTok CDN-ссылки могут пропасть.</small><input id="editThumb" name="thumb" type="url" placeholder="https://.../preview.jpg">`;
+    urlLabel.after(label);
+  }
+
   function renderSubmissions(){
     const grid=$('#mySubmissionsGrid');if(!grid)return;
     const list=readSubmissions();
@@ -232,6 +243,7 @@
 
   function initSubmit(){
     hideSubmitHelp();
+    ensureThumbField();
     renderSubmissions();
     document.addEventListener('click',event=>{
       const button=event.target.closest('.cancel-submission-btn');
@@ -244,6 +256,7 @@
       const button=form.querySelector('button[type="submit"]');
       const item={
         url:$('#editUrl')?.value||'',
+        thumb:$('#editThumb')?.value||'',
         title:$('#editTitle')?.value||'Без названия',
         author:$('#editAuthor')?.value||'Автор',
         plugins:$('#editPlugins')?.value||'',
