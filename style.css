@@ -30,3 +30,32 @@ body[data-page="home"] main:before,body[data-page="home"] main:after{display:non
 .footer-author-link i{color:#2ea6ff;margin-right:4px}
 .footer-author-link strong{color:var(--text);font-weight:900}
 .footer-author-link:hover{color:var(--primary)!important}
+
+/* Shared spacing for every plugin detail page and catalogue card. */
+.plugin-detail-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:24px}
+.plugin-detail-content{min-width:0}
+.plugin-detail-content .detail-badges{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px}
+.plugin-detail-content h1{overflow-wrap:anywhere}
+.plugin-detail-content>p{line-height:1.7;margin-bottom:24px}
+.detail-meta{display:flex;flex-wrap:wrap;gap:12px 24px;margin:20px 0;color:var(--muted)}
+.detail-meta>span,.plugin-meta>span{display:inline-flex;align-items:center;gap:8px;line-height:1.6}
+.plugin-detail-content .plugin-tags{gap:10px;margin:20px 0}
+.plugin-detail-content .hero-actions{margin-top:28px}
+.detail-panels{display:grid;gap:24px;margin-top:36px}
+.detail-panels .install-card{padding:28px}
+.detail-panels .install-card h2{margin-bottom:18px}
+.detail-panels .install-card p{margin-bottom:20px;line-height:1.7}
+.plugin-meta{gap:12px 18px}
+.catalog-panel .catalog-panel-toggle{display:block;width:100%;min-height:40px;padding:8px 12px;margin:0 0 14px;text-align:left;border:1px solid var(--border);border-radius:12px;background:var(--surface-2);color:var(--text);font:inherit;font-weight:700;cursor:pointer}
+.catalog-panel .catalog-panel-toggle:focus-visible{outline:2px solid var(--primary);outline-offset:3px}
+.catalog-panel.catalog-collapsible{padding:12px;max-height:calc(100dvh - 110px);overflow-y:auto!important}
+.catalog-panel.catalog-collapsed .catalog-panel-toggle{margin-bottom:0}
+.catalog-panel .catalog-panel-body[hidden]{display:none!important}
+.catalog-panel.catalog-collapsible.reveal{opacity:1;transform:none;filter:none;animation:none}
+@media(max-width:640px){
+ .detail-meta{gap:12px 18px}
+ .detail-panels{margin-top:28px}
+ .detail-panels .install-card{padding:22px}
+ .plugin-detail-content .hero-actions{align-items:stretch!important}
+ .catalog-panel.catalog-collapsible{max-height:calc(100dvh - 92px)}
+}
