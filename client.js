@@ -187,19 +187,25 @@
     if(document.querySelector('.site-toys'))return;
     const layer=document.createElement('div');
     layer.className='site-toys';
-    layer.innerHTML='<div class="site-toy-arena" role="group" aria-label="Перетаскиваемые иконки. Их можно бросать по всему экрану. Для клавиатуры используйте стрелки."><button type="button" class="site-toy site-toy-ae" aria-label="Ae: перетащите или нажмите пять раз">Ae</button><button type="button" class="site-toy site-toy-plugin" aria-label="Плагин: перетащите по экрану"><i class="fas fa-puzzle-piece" aria-hidden="true"></i></button><button type="button" class="site-toy site-toy-download" aria-label="Загрузка: перетащите по экрану"><i class="fas fa-cloud-arrow-down" aria-hidden="true"></i></button></div><div class="site-toy-tools"><button type="button" class="site-toy-reset">Вернуть</button><button type="button" class="site-toy-toggle" aria-expanded="true">Скрыть</button></div><div class="site-toy-render" role="status" aria-live="polite"></div>';
+    layer.innerHTML='<div class="site-toy-arena" role="group" aria-label="Перетаскиваемые иконки. Их можно бросать по странице. Для клавиатуры используйте стрелки."><button type="button" class="site-toy site-toy-ae" aria-label="Ae: перетащите по странице"><span>Ae</span></button><button type="button" class="site-toy site-toy-plugin" aria-label="Плагин: перетащите по странице"><i class="fas fa-puzzle-piece" aria-hidden="true"></i></button><button type="button" class="site-toy site-toy-download" aria-label="Загрузка: перетащите по странице"><i class="fas fa-cloud-arrow-down" aria-hidden="true"></i></button></div><div class="site-toy-tools" aria-label="Управление иконками"><button type="button" class="site-toy-reset"><i class="fas fa-rotate-left" aria-hidden="true"></i><span>Вернуть</span></button><button type="button" class="site-toy-toggle" aria-expanded="true"><i class="fas fa-eye-slash" aria-hidden="true"></i><span>Скрыть</span></button></div>';
     document.body.appendChild(layer);
     const arena=layer.querySelector('.site-toy-arena');
-    const message=layer.querySelector('.site-toy-render');
     const toggle=layer.querySelector('.site-toy-toggle');
     const icons=Array.from(layer.querySelectorAll('.site-toy'));
     const reduced=window.matchMedia('(prefers-reduced-motion: reduce)');
-    const bodies=icons.map((el,i)=>({el,x:0,y:0,vx:0,vy:0,size:0,index:i}));
-    let frame=0,previous=0,drag=null,taps=0,lastTap=0,renderTimer=0,rendering=false,width=0,height=0;
+    const bodies=icons.map((el,index)=>({el,x:0,y:0,vx:0,vy:0,size:0,index}));
+    let frame=0,previous=0,drag=null,pageWidth=window.innerWidth,pageHeight=window.innerHeight;
     const clamp=(value,min,max)=>Math.max(min,Math.min(max,value));
+    function syncLayout(){
+      pageWidth=Math.max(document.documentElement?.scrollWidth||0,document.body?.scrollWidth||0,window.innerWidth);
+      pageHeight=Math.max(document.documentElement?.scrollHeight||0,document.body?.scrollHeight||0,window.innerHeight);
+      layer.style.width=pageWidth+'px';
+      layer.style.height=pageHeight+'px';
+      bodies.forEach(body=>{body.size=body.el.offsetWidth||body.size;bounds(body)});
+    }
     function bounds(body){
-      const maxX=Math.max(0,window.innerWidth-body.size-12);
-      const maxY=Math.max(0,window.innerHeight-body.size-12);
+      const maxX=Math.max(12,pageWidth-body.size-12);
+      const maxY=Math.max(12,pageHeight-body.size-12);
       if(body.x<12||body.x>maxX){body.x=clamp(body.x,12,maxX);body.vx*=-.65}
       if(body.y<12||body.y>maxY){body.y=clamp(body.y,12,maxY);body.vy*=-.65}
     }
@@ -220,34 +226,35 @@
       if(current.body.el.hasPointerCapture?.(current.id))current.body.el.releasePointerCapture(current.id);
     }
     function save(){
-      if(arena.hidden||!window.innerWidth||!window.innerHeight)return;
-      try{sessionStorage.setItem('site-toy-positions',JSON.stringify(bodies.map(body=>({x:body.x/window.innerWidth,y:body.y/window.innerHeight}))));}catch{}
+      if(arena.hidden)return;
+      try{sessionStorage.setItem('site-toy-positions',JSON.stringify(bodies.map(body=>({x:Math.round(body.x),y:Math.round(body.y)}))));}catch{}
     }
     function place(){
       stop();
       release();
+      syncLayout();
       const mobile=window.innerWidth<640;
       const positions=mobile
-        ? [[.06,.23],[.57,.3],[.32,.59]]
-        : [[.58,.24],[.79,.3],[.69,.61]];
+        ? [[.08,.23],[.58,.3],[.34,.58]]
+        : [[.58,.25],[.79,.31],[.69,.62]];
       bodies.forEach((body,i)=>{
         body.size=body.el.offsetWidth||120;
         body.x=window.innerWidth*positions[i][0]-body.size/2;
-        body.y=window.innerHeight*positions[i][1]-body.size/2;
+        body.y=window.scrollY+window.innerHeight*positions[i][1]-body.size/2;
         bounds(body);
       });
-      width=window.innerWidth;height=window.innerHeight;
       paint();
     }
     function restore(){
       try{
         const positions=JSON.parse(sessionStorage.getItem('site-toy-positions'));
         if(!Array.isArray(positions)||positions.length!==bodies.length)return;
-        bodies.forEach((body,i)=>{
-          if(!positions[i]||!Number.isFinite(positions[i].x)||!Number.isFinite(positions[i].y))return;
+        positions.forEach((position,i)=>{
+          const body=bodies[i];
+          if(!position||!Number.isFinite(position.x)||!Number.isFinite(position.y))return;
           body.size=body.el.offsetWidth||120;
-          body.x=clamp(positions[i].x*window.innerWidth,12,window.innerWidth-body.size-12);
-          body.y=clamp(positions[i].y*window.innerHeight,12,window.innerHeight-body.size-12);
+          body.x=position.x;
+          body.y=position.y;
           bounds(body);
         });
         paint();
@@ -322,56 +329,31 @@
         body.x+=x;body.y+=y;bounds(body);paint();save();start();
       });
     });
-    function cancelRender(){
-      clearInterval(renderTimer);
-      renderTimer=0;
-      rendering=false;
-      taps=0;
-      message.classList.remove('is-complete');
-    }
-    bodies[0].el.addEventListener('click',()=>{
-      if(performance.now()<(bodies[0].suppressUntil||0)||rendering)return;
-      const now=performance.now();
-      taps=now-lastTap<3000?taps+1:1;
-      lastTap=now;
-      if(taps<5){message.textContent='Секретный рендер: '+taps+' / 5';return}
-      cancelRender();
-      rendering=true;
-      let progress=0;
-      message.textContent='Рендерим шедевр… 0%';
-      renderTimer=setInterval(()=>{
-        progress+=20;
-        if(progress>=100){cancelRender();message.textContent='Готово. 0 ключевых кадров, 100% таланта.';message.classList.add('is-complete')}
-        else message.textContent='Рендерим шедевр… '+progress+'%';
-      },180);
-    });
     layer.querySelector('.site-toy-reset').addEventListener('click',()=>{
       arena.hidden=false;
-      toggle.textContent='Скрыть';
+      toggle.innerHTML='<i class="fas fa-eye-slash" aria-hidden="true"></i><span>Скрыть</span>';
       toggle.setAttribute('aria-expanded','true');
-      cancelRender();
       place();
       save();
-      message.textContent='';
     });
     toggle.addEventListener('click',()=>{
-      release();stop();cancelRender();
+      release();
+      stop();
       arena.hidden=!arena.hidden;
-      toggle.textContent=arena.hidden?'Показать':'Скрыть';
+      toggle.innerHTML=arena.hidden?'<i class="fas fa-eye" aria-hidden="true"></i><span>Показать</span>':'<i class="fas fa-eye-slash" aria-hidden="true"></i><span>Скрыть</span>';
       toggle.setAttribute('aria-expanded',String(!arena.hidden));
-      message.textContent='';
     });
     const resize=()=>{
       if(arena.hidden)return;
-      bodies.forEach(body=>{body.size=body.el.offsetWidth||body.size;body.x*=window.innerWidth/Math.max(1,width);body.y*=window.innerHeight/Math.max(1,height);bounds(body)});
-      width=window.innerWidth;height=window.innerHeight;paint();
+      syncLayout();
+      bodies.forEach(body=>bounds(body));
+      paint();
     };
     window.addEventListener('resize',resize);
     reduced.addEventListener?.('change',()=>{release();stop()});
-    document.addEventListener('visibilitychange',()=>{
-      if(document.hidden){release();stop();cancelRender();save();}
-    });
-    window.addEventListener('pagehide',()=>{release();stop();cancelRender();save()});
+    document.addEventListener('visibilitychange',()=>{if(document.hidden){release();stop();save()}});
+    window.addEventListener('pagehide',()=>{release();stop();save()});
+    syncLayout();
     place();
     restore();
   }
