@@ -127,88 +127,150 @@
   function initHeroPlayground(){
     const hero=document.querySelector('.page-hero-home');
     const title=hero?.querySelector('h1 .highlight');
-    if(!title||hero.querySelector('.hero-fx'))return;
-    const text=title.textContent;
+    if(!title||title.dataset.playgroundReady)return;
+    const text=title.textContent.trim();
     const accessible=document.createElement('span');
-    accessible.className='hero-fx-sr';accessible.textContent=text;
+    accessible.className='hero-fx-sr';
+    accessible.textContent=text;
     const visual=document.createElement('span');
-    visual.className='hero-fx-visual';visual.setAttribute('aria-hidden','true');
+    visual.className='hero-fx-visual';
+    visual.setAttribute('aria-hidden','true');
     text.split(' ').forEach((word,index)=>{
       if(index)visual.appendChild(document.createTextNode(' '));
-      const group=document.createElement('span');group.className='hero-fx-word';
+      const group=document.createElement('span');
+      group.className='hero-fx-word';
       Array.from(word).forEach((letter,i)=>{
-        const char=document.createElement('span');char.className='hero-fx-char';
-        char.style.setProperty('--fx-delay',(i*35)+'ms');char.textContent=letter;group.appendChild(char);
+        const char=document.createElement('span');
+        char.className='hero-fx-char';
+        char.style.setProperty('--fx-delay',(i*35)+'ms');
+        char.textContent=letter;
+        group.appendChild(char);
       });
       visual.appendChild(group);
     });
-    title.replaceChildren(accessible,visual);title.classList.add('hero-fx-title');
-    const panel=document.createElement('div');panel.className='hero-fx';
-    panel.innerHTML='<span class="hero-fx-label">Попробуй эффект</span><div class="hero-fx-controls" role="group" aria-label="Эффекты заголовка"><button type="button" data-hero-fx="glitch" aria-pressed="false">Глитч</button><button type="button" data-hero-fx="blur" aria-pressed="false">Размытие</button><button type="button" data-hero-fx="wave" aria-pressed="false">Волна</button><button type="button" data-hero-fx="reset" aria-label="Сбросить эффект заголовка">Сброс</button></div><span class="hero-fx-sr" role="status" aria-live="polite"></span>';
-    hero.querySelector('.hero-actions').before(panel);
-    const buttons=panel.querySelectorAll('[data-hero-fx]');
-    const status=panel.querySelector('[role="status"]');
+    title.replaceChildren(accessible,visual);
+    title.classList.add('hero-fx-title');
+    title.dataset.playgroundReady='true';
     const reduced=window.matchMedia('(prefers-reduced-motion: reduce)');
-    let timer;
-    function reset(){
-      clearTimeout(timer);delete title.dataset.effect;
-      buttons.forEach(b=>{if(b.dataset.heroFx!=='reset')b.setAttribute('aria-pressed','false')});
+    const effects=['wave','glitch','blur'];
+    let timer=0,index=0,visible=true;
+    function clearEffect(){
+      clearTimeout(timer);
+      timer=0;
+      delete title.dataset.effect;
     }
-    panel.addEventListener('click',event=>{
-      const button=event.target.closest('[data-hero-fx]');
-      if(!button||!panel.contains(button))return;
-      reset();
-      if(button.dataset.heroFx==='reset'){status.textContent='Эффект сброшен';return}
-      if(reduced.matches){status.textContent='Анимации отключены в настройках устройства';return}
-      // Restart on repeat taps without accumulating animations or timers.
+    function cycle(){
+      clearEffect();
+      if(!visible||document.hidden||reduced.matches)return;
       void title.offsetWidth;
-      title.dataset.effect=button.dataset.heroFx;
-      button.setAttribute('aria-pressed','true');
-      status.textContent='Эффект: '+button.textContent;
-      timer=setTimeout(reset,1600);
-    });
-    window.addEventListener('pagehide',reset);
-    reduced.addEventListener('change',()=>{if(reduced.matches)reset()});
+      title.dataset.effect=effects[index++%effects.length];
+      timer=setTimeout(()=>{
+        delete title.dataset.effect;
+        if(visible&&!document.hidden&&!reduced.matches)timer=setTimeout(cycle,2300);
+      },1500);
+    }
+    if('IntersectionObserver' in window){
+      const observer=new IntersectionObserver(entries=>{
+        visible=Boolean(entries[0]?.isIntersecting);
+        if(visible)cycle();else clearEffect();
+      },{threshold:.12});
+      observer.observe(title);
+    }
+    reduced.addEventListener?.('change',cycle);
+    document.addEventListener('visibilitychange',cycle);
+    window.addEventListener('pagehide',clearEffect);
+    window.addEventListener('pageshow',cycle);
+    cycle();
   }
 
-
   function initHeroToys(){
-    const hero=document.querySelector('.page-hero-home');
-    const stage=hero?.querySelector('.hero-visual');
-    const title=hero?.querySelector('.hero-fx-visual');
-    if(!stage||!title)return;
-    stage.classList.add('hero-toy');
-    stage.innerHTML='<div class="toy-heading"><span>Поиграй с движением</span><button type="button" class="toy-reset">Сбросить всё</button></div><div class="toy-arena" role="group" aria-label="Перетаскиваемые иконки. С клавиатуры используйте стрелки."><button type="button" class="toy-icon toy-ae" aria-label="Ae: перетащите или нажмите пять раз">Ae</button><button type="button" class="toy-icon" aria-label="Плагин: перетащите или двигайте стрелками"><i class="fas fa-puzzle-piece" aria-hidden="true"></i></button><button type="button" class="toy-icon" aria-label="Загрузка: перетащите или двигайте стрелками"><i class="fas fa-cloud-arrow-down" aria-hidden="true"></i></button></div><div class="toy-hint">Перетаскивай и бросай · Ae скрывает пасхалку</div><div class="toy-timeline"><label for="heroScrubber">Анимация заголовка <output for="heroScrubber">0 / 100</output></label><input id="heroScrubber" type="range" min="0" max="100" value="0" aria-label="Кадр анимации заголовка"><div class="toy-ticks" aria-hidden="true"><span>00:00</span><span>00:01</span><span>00:02</span></div></div><div class="toy-render" role="status" aria-live="polite">Подсказка: нажми на Ae пять раз</div>';
-    const arena=stage.querySelector('.toy-arena');
-    const slider=stage.querySelector('input');
-    const output=stage.querySelector('output');
-    const message=stage.querySelector('.toy-render');
+    if(document.querySelector('.site-toys'))return;
+    const layer=document.createElement('div');
+    layer.className='site-toys';
+    layer.innerHTML='<div class="site-toy-arena" role="group" aria-label="Перетаскиваемые иконки. Их можно бросать по всему экрану. Для клавиатуры используйте стрелки."><button type="button" class="site-toy site-toy-ae" aria-label="Ae: перетащите или нажмите пять раз">Ae</button><button type="button" class="site-toy site-toy-plugin" aria-label="Плагин: перетащите по экрану"><i class="fas fa-puzzle-piece" aria-hidden="true"></i></button><button type="button" class="site-toy site-toy-download" aria-label="Загрузка: перетащите по экрану"><i class="fas fa-cloud-arrow-down" aria-hidden="true"></i></button></div><div class="site-toy-tools"><button type="button" class="site-toy-reset">Вернуть</button><button type="button" class="site-toy-toggle" aria-expanded="true">Скрыть</button></div><div class="site-toy-render" role="status" aria-live="polite"></div>';
+    document.body.appendChild(layer);
+    const arena=layer.querySelector('.site-toy-arena');
+    const message=layer.querySelector('.site-toy-render');
+    const toggle=layer.querySelector('.site-toy-toggle');
+    const icons=Array.from(layer.querySelectorAll('.site-toy'));
     const reduced=window.matchMedia('(prefers-reduced-motion: reduce)');
-    const bodies=Array.from(stage.querySelectorAll('.toy-icon'),el=>({el,x:0,y:0,vx:0,vy:0,size:72}));
-    let frame=0,previous=0,drag=null,taps=0,lastTap=0,renderTimer=0,rendering=false;
-    const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
-    function bounds(b){
-      const maxX=Math.max(0,arena.clientWidth-b.size),maxY=Math.max(0,arena.clientHeight-b.size);
-      if(b.x<0||b.x>maxX){b.x=clamp(b.x,0,maxX);b.vx*=-.65}
-      if(b.y<0||b.y>maxY){b.y=clamp(b.y,0,maxY);b.vy*=-.65}
+    const bodies=icons.map((el,i)=>({el,x:0,y:0,vx:0,vy:0,size:0,index:i}));
+    let frame=0,previous=0,drag=null,taps=0,lastTap=0,renderTimer=0,rendering=false,width=0,height=0;
+    const clamp=(value,min,max)=>Math.max(min,Math.min(max,value));
+    function bounds(body){
+      const maxX=Math.max(0,window.innerWidth-body.size-12);
+      const maxY=Math.max(0,window.innerHeight-body.size-12);
+      if(body.x<12||body.x>maxX){body.x=clamp(body.x,12,maxX);body.vx*=-.65}
+      if(body.y<12||body.y>maxY){body.y=clamp(body.y,12,maxY);body.vy*=-.65}
     }
-    function paint(){bodies.forEach(b=>{b.el.style.transform='translate('+b.x+'px,'+b.y+'px)'})}
-    function stop(){cancelAnimationFrame(frame);frame=0;previous=0;bodies.forEach(b=>{b.vx=0;b.vy=0})}
-    function release(){if(!drag)return;const d=drag;drag=null;d.b.el.classList.remove('is-dragging');if(d.b.el.hasPointerCapture(d.id))d.b.el.releasePointerCapture(d.id)}
+    function paint(){
+      bodies.forEach(body=>{body.el.style.transform='translate3d('+body.x+'px,'+body.y+'px,0)'});
+    }
+    function stop(){
+      cancelAnimationFrame(frame);
+      frame=0;
+      previous=0;
+      bodies.forEach(body=>{body.vx=0;body.vy=0});
+    }
+    function release(){
+      if(!drag)return;
+      const current=drag;
+      drag=null;
+      current.body.el.classList.remove('is-dragging');
+      if(current.body.el.hasPointerCapture?.(current.id))current.body.el.releasePointerCapture(current.id);
+    }
+    function save(){
+      if(arena.hidden||!window.innerWidth||!window.innerHeight)return;
+      try{sessionStorage.setItem('site-toy-positions',JSON.stringify(bodies.map(body=>({x:body.x/window.innerWidth,y:body.y/window.innerHeight}))));}catch{}
+    }
     function place(){
-      stop();release();
-      bodies.forEach((b,i)=>{b.size=b.el.offsetWidth;b.x=(arena.clientWidth-b.size)*[.12,.76,.44][i];b.y=(arena.clientHeight-b.size)*[.16,.28,.85][i];bounds(b)});paint();
+      stop();
+      release();
+      const mobile=window.innerWidth<640;
+      const positions=mobile
+        ? [[.06,.23],[.57,.3],[.32,.59]]
+        : [[.58,.24],[.79,.3],[.69,.61]];
+      bodies.forEach((body,i)=>{
+        body.size=body.el.offsetWidth||120;
+        body.x=window.innerWidth*positions[i][0]-body.size/2;
+        body.y=window.innerHeight*positions[i][1]-body.size/2;
+        bounds(body);
+      });
+      width=window.innerWidth;height=window.innerHeight;
+      paint();
+    }
+    function restore(){
+      try{
+        const positions=JSON.parse(sessionStorage.getItem('site-toy-positions'));
+        if(!Array.isArray(positions)||positions.length!==bodies.length)return;
+        bodies.forEach((body,i)=>{
+          if(!positions[i]||!Number.isFinite(positions[i].x)||!Number.isFinite(positions[i].y))return;
+          body.size=body.el.offsetWidth||120;
+          body.x=clamp(positions[i].x*window.innerWidth,12,window.innerWidth-body.size-12);
+          body.y=clamp(positions[i].y*window.innerHeight,12,window.innerHeight-body.size-12);
+          bounds(body);
+        });
+        paint();
+      }catch{}
     }
     function tick(now){
-      const dt=Math.min(previous?(now-previous)/16.67:1,2);previous=now;
-      bodies.forEach(b=>{if(drag?.b===b)return;b.x+=b.vx*dt;b.y+=b.vy*dt;b.vx*=Math.pow(.96,dt);b.vy*=Math.pow(.96,dt);bounds(b)});
+      const dt=Math.min(previous?(now-previous)/16.67:1,2);
+      previous=now;
+      bodies.forEach(body=>{
+        if(drag?.body===body)return;
+        body.x+=body.vx*dt;
+        body.y+=body.vy*dt;
+        body.vx*=Math.pow(.96,dt);
+        body.vy*=Math.pow(.96,dt);
+        bounds(body);
+      });
       for(let i=0;i<bodies.length;i++)for(let j=i+1;j<bodies.length;j++){
         const a=bodies[i],b=bodies[j],dx=b.x-a.x,dy=b.y-a.y;
         const overlapX=(a.size+b.size)/2-Math.abs(dx),overlapY=(a.size+b.size)/2-Math.abs(dy);
         if(overlapX>0&&overlapY>0){
           const axis=overlapX<overlapY?'x':'y',velocity=axis==='x'?'vx':'vy';
           const sign=(axis==='x'?dx:dy)>=0?1:-1,overlap=axis==='x'?overlapX:overlapY;
-          const heldA=drag?.b===a,heldB=drag?.b===b;
+          const heldA=drag?.body===a,heldB=drag?.body===b;
           if(!heldA)a[axis]-=sign*overlap*(heldB?1:.5);
           if(!heldB)b[axis]+=sign*overlap*(heldA?1:.5);
           const av=a[velocity],bv=b[velocity];
@@ -218,66 +280,100 @@
         }
       }
       paint();
-      if(drag||bodies.some(b=>Math.abs(b.vx)+Math.abs(b.vy)>.08))frame=requestAnimationFrame(tick);
-      else{frame=0;previous=0}
+      if(drag||bodies.some(body=>Math.abs(body.vx)+Math.abs(body.vy)>.08))frame=requestAnimationFrame(tick);
+      else{frame=0;previous=0;save()}
     }
     function start(){if(!frame&&!reduced.matches)frame=requestAnimationFrame(tick)}
-    bodies.forEach(b=>{
-      b.el.addEventListener('pointerdown',e=>{
-        if(e.button!==0||drag)return;
-        stop();drag={b,id:e.pointerId,x:e.clientX,y:e.clientY,lastX:e.clientX,lastY:e.clientY,time:performance.now(),moved:false};
-        b.el.setPointerCapture(e.pointerId);b.el.classList.add('is-dragging');start();
+    bodies.forEach(body=>{
+      body.el.addEventListener('pointerdown',event=>{
+        if(event.button!==0||drag)return;
+        stop();
+        drag={body,id:event.pointerId,x:event.clientX,y:event.clientY,lastX:event.clientX,lastY:event.clientY,time:performance.now(),moved:false};
+        body.el.setPointerCapture(event.pointerId);
+        body.el.classList.add('is-dragging');
+        start();
       });
-      b.el.addEventListener('pointermove',e=>{
-        if(!drag||drag.b!==b||drag.id!==e.pointerId)return;
-        const now=performance.now(),dt=Math.max(8,now-drag.time);
-        const dx=e.clientX-drag.lastX,dy=e.clientY-drag.lastY;
-        if(Math.hypot(e.clientX-drag.x,e.clientY-drag.y)>5)drag.moved=true;
-        b.x+=dx;b.y+=dy;b.vx=clamp(dx*16.67/dt,-18,18);b.vy=clamp(dy*16.67/dt,-18,18);
-        drag.lastX=e.clientX;drag.lastY=e.clientY;drag.time=now;bounds(b);paint();
+      body.el.addEventListener('pointermove',event=>{
+        if(!drag||drag.body!==body||drag.id!==event.pointerId)return;
+        const now=performance.now(),delta=Math.max(8,now-drag.time);
+        const dx=event.clientX-drag.lastX,dy=event.clientY-drag.lastY;
+        if(Math.hypot(event.clientX-drag.x,event.clientY-drag.y)>5)drag.moved=true;
+        body.x+=dx;body.y+=dy;
+        body.vx=clamp(dx*16.67/delta,-18,18);
+        body.vy=clamp(dy*16.67/delta,-18,18);
+        drag.lastX=event.clientX;drag.lastY=event.clientY;drag.time=now;
+        bounds(body);paint();
       });
-      function end(e){
-        if(!drag||drag.b!==b||drag.id!==e.pointerId)return;
-        if(drag.moved)b.suppressUntil=performance.now()+350;
-        if(e.type!=='pointerup'||performance.now()-drag.time>100||reduced.matches){b.vx=0;b.vy=0}
-        release();start();
+      function end(event){
+        if(!drag||drag.body!==body||drag.id!==event.pointerId)return;
+        if(drag.moved)body.suppressUntil=performance.now()+350;
+        if(event.type!=='pointerup'||performance.now()-drag.time>100||reduced.matches){body.vx=0;body.vy=0}
+        release();
+        start();
       }
-      b.el.addEventListener('pointerup',end);b.el.addEventListener('pointercancel',end);b.el.addEventListener('lostpointercapture',end);
-      b.el.addEventListener('keydown',e=>{
+      body.el.addEventListener('pointerup',end);
+      body.el.addEventListener('pointercancel',end);
+      body.el.addEventListener('lostpointercapture',end);
+      body.el.addEventListener('keydown',event=>{
         const moves={ArrowLeft:[-16,0],ArrowRight:[16,0],ArrowUp:[0,-16],ArrowDown:[0,16]};
-        if(!moves[e.key])return;e.preventDefault();const [x,y]=moves[e.key];b.x+=x;b.y+=y;bounds(b);paint();start();
+        if(!moves[event.key])return;
+        event.preventDefault();
+        const [x,y]=moves[event.key];
+        body.x+=x;body.y+=y;bounds(body);paint();save();start();
       });
     });
-    function scrub(){
-      const p=Number(slider.value)/100,wave=Math.sin(p*Math.PI);
-      title.style.transform=reduced.matches?'none':'translateY('+(-8*wave)+'px) scale('+(1+.035*wave)+') rotate('+(Math.sin(p*Math.PI*2)*1.5)+'deg)';
-      title.style.color=p===0?'':'color-mix(in srgb, var(--primary), var(--text) '+Math.round(wave*45)+'%)';
-      output.textContent=slider.value+' / 100';
-      slider.setAttribute('aria-valuetext','Кадр '+slider.value+' из 100');
+    function cancelRender(){
+      clearInterval(renderTimer);
+      renderTimer=0;
+      rendering=false;
+      taps=0;
+      message.classList.remove('is-complete');
     }
-    slider.addEventListener('input',scrub);
-    function cancelRender(){clearInterval(renderTimer);renderTimer=0;rendering=false;taps=0;message.classList.remove('is-complete')}
     bodies[0].el.addEventListener('click',()=>{
       if(performance.now()<(bodies[0].suppressUntil||0)||rendering)return;
-      const now=performance.now();taps=now-lastTap<3000?taps+1:1;lastTap=now;
+      const now=performance.now();
+      taps=now-lastTap<3000?taps+1:1;
+      lastTap=now;
       if(taps<5){message.textContent='Секретный рендер: '+taps+' / 5';return}
-      cancelRender();rendering=true;let progress=0;message.textContent='Рендерим шедевр… 0%';
+      cancelRender();
+      rendering=true;
+      let progress=0;
+      message.textContent='Рендерим шедевр… 0%';
       renderTimer=setInterval(()=>{
         progress+=20;
         if(progress>=100){cancelRender();message.textContent='Готово. 0 ключевых кадров, 100% таланта.';message.classList.add('is-complete')}
         else message.textContent='Рендерим шедевр… '+progress+'%';
       },180);
     });
-    function reset(){cancelRender();place();slider.value='0';scrub();message.textContent='Подсказка: нажми на Ae пять раз'}
-    stage.querySelector('.toy-reset').addEventListener('click',()=>{
-      hero.querySelector('[data-hero-fx="reset"]')?.click();reset();
+    layer.querySelector('.site-toy-reset').addEventListener('click',()=>{
+      arena.hidden=false;
+      toggle.textContent='Скрыть';
+      toggle.setAttribute('aria-expanded','true');
+      cancelRender();
+      place();
+      save();
+      message.textContent='';
     });
-    hero.querySelector('[data-hero-fx="reset"]')?.addEventListener('click',()=>{slider.value='0';scrub()});
-    const resize=new ResizeObserver(place);resize.observe(arena);
-    reduced.addEventListener('change',()=>{stop();scrub()});
-    document.addEventListener('visibilitychange',()=>{if(document.hidden){release();stop();if(rendering){cancelRender();message.textContent='Рендер на паузе. Нажми на Ae пять раз'}}});
-    window.addEventListener('pagehide',()=>{release();stop();cancelRender()});
-    place();scrub();
+    toggle.addEventListener('click',()=>{
+      release();stop();cancelRender();
+      arena.hidden=!arena.hidden;
+      toggle.textContent=arena.hidden?'Показать':'Скрыть';
+      toggle.setAttribute('aria-expanded',String(!arena.hidden));
+      message.textContent='';
+    });
+    const resize=()=>{
+      if(arena.hidden)return;
+      bodies.forEach(body=>{body.size=body.el.offsetWidth||body.size;body.x*=window.innerWidth/Math.max(1,width);body.y*=window.innerHeight/Math.max(1,height);bounds(body)});
+      width=window.innerWidth;height=window.innerHeight;paint();
+    };
+    window.addEventListener('resize',resize);
+    reduced.addEventListener?.('change',()=>{release();stop()});
+    document.addEventListener('visibilitychange',()=>{
+      if(document.hidden){release();stop();cancelRender();save();}
+    });
+    window.addEventListener('pagehide',()=>{release();stop();cancelRender();save()});
+    place();
+    restore();
   }
 
   function initEvents(){
