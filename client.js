@@ -1,4 +1,12 @@
 (function(){
+  // Keep ordinary links, downloads, modifier clicks and browser history intact.
+  if(!('CSSViewTransitionRule' in window)&&!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    document.documentElement.classList.add('motion-entry');
+    window.addEventListener('pageshow',e=>{
+      if(e.persisted)document.documentElement.classList.remove('motion-entry');
+    });
+  }
+
   const FAVORITES_KEY='aePluginFavorites', EDIT_FAVORITES_KEY='aeEditFavorites', THEME_KEY='theme', VISITS_KEY='aeSiteVisits', VISITOR_ID_KEY='aeVisitorId', IGNORE_ANALYTICS_KEY='aeIgnoreAnalytics', EDIT_SUBMISSIONS_KEY='aeEditSubmissions', RATE_KEY='aeLastSubmitTimes';
   const page=document.body.dataset.page||'home';
   const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
