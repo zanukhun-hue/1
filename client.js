@@ -171,11 +171,120 @@
     reduced.addEventListener('change',()=>{if(reduced.matches)reset()});
   }
 
+
+  function initHeroToys(){
+    const hero=document.querySelector('.page-hero-home');
+    const stage=hero?.querySelector('.hero-visual');
+    const title=hero?.querySelector('.hero-fx-visual');
+    if(!stage||!title)return;
+    stage.classList.add('hero-toy');
+    stage.innerHTML='<div class="toy-heading"><span>Поиграй с движением</span><button type="button" class="toy-reset">Сбросить всё</button></div><div class="toy-arena" role="group" aria-label="Перетаскиваемые иконки. С клавиатуры используйте стрелки."><button type="button" class="toy-icon toy-ae" aria-label="Ae: перетащите или нажмите пять раз">Ae</button><button type="button" class="toy-icon" aria-label="Плагин: перетащите или двигайте стрелками"><i class="fas fa-puzzle-piece" aria-hidden="true"></i></button><button type="button" class="toy-icon" aria-label="Загрузка: перетащите или двигайте стрелками"><i class="fas fa-cloud-arrow-down" aria-hidden="true"></i></button></div><div class="toy-hint">Перетаскивай и бросай · Ae скрывает пасхалку</div><div class="toy-timeline"><label for="heroScrubber">Анимация заголовка <output for="heroScrubber">0 / 100</output></label><input id="heroScrubber" type="range" min="0" max="100" value="0" aria-label="Кадр анимации заголовка"><div class="toy-ticks" aria-hidden="true"><span>00:00</span><span>00:01</span><span>00:02</span></div></div><div class="toy-render" role="status" aria-live="polite">Подсказка: нажми на Ae пять раз</div>';
+    const arena=stage.querySelector('.toy-arena');
+    const slider=stage.querySelector('input');
+    const output=stage.querySelector('output');
+    const message=stage.querySelector('.toy-render');
+    const reduced=window.matchMedia('(prefers-reduced-motion: reduce)');
+    const bodies=Array.from(stage.querySelectorAll('.toy-icon'),el=>({el,x:0,y:0,vx:0,vy:0,size:72}));
+    let frame=0,previous=0,drag=null,taps=0,lastTap=0,renderTimer=0,rendering=false;
+    const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+    function bounds(b){
+      const maxX=Math.max(0,arena.clientWidth-b.size),maxY=Math.max(0,arena.clientHeight-b.size);
+      if(b.x<0||b.x>maxX){b.x=clamp(b.x,0,maxX);b.vx*=-.65}
+      if(b.y<0||b.y>maxY){b.y=clamp(b.y,0,maxY);b.vy*=-.65}
+    }
+    function paint(){bodies.forEach(b=>{b.el.style.transform='translate('+b.x+'px,'+b.y+'px)'})}
+    function stop(){cancelAnimationFrame(frame);frame=0;previous=0;bodies.forEach(b=>{b.vx=0;b.vy=0})}
+    function release(){if(!drag)return;const d=drag;drag=null;d.b.el.classList.remove('is-dragging');if(d.b.el.hasPointerCapture(d.id))d.b.el.releasePointerCapture(d.id)}
+    function place(){
+      stop();release();
+      bodies.forEach((b,i)=>{b.size=b.el.offsetWidth;b.x=(arena.clientWidth-b.size)*[.12,.76,.44][i];b.y=(arena.clientHeight-b.size)*[.16,.28,.85][i];bounds(b)});paint();
+    }
+    function tick(now){
+      const dt=Math.min(previous?(now-previous)/16.67:1,2);previous=now;
+      bodies.forEach(b=>{if(drag?.b===b)return;b.x+=b.vx*dt;b.y+=b.vy*dt;b.vx*=Math.pow(.96,dt);b.vy*=Math.pow(.96,dt);bounds(b)});
+      for(let i=0;i<bodies.length;i++)for(let j=i+1;j<bodies.length;j++){
+        const a=bodies[i],b=bodies[j],dx=b.x-a.x,dy=b.y-a.y;
+        const overlapX=(a.size+b.size)/2-Math.abs(dx),overlapY=(a.size+b.size)/2-Math.abs(dy);
+        if(overlapX>0&&overlapY>0){
+          const axis=overlapX<overlapY?'x':'y',velocity=axis==='x'?'vx':'vy';
+          const sign=(axis==='x'?dx:dy)>=0?1:-1,overlap=axis==='x'?overlapX:overlapY;
+          const heldA=drag?.b===a,heldB=drag?.b===b;
+          if(!heldA)a[axis]-=sign*overlap*(heldB?1:.5);
+          if(!heldB)b[axis]+=sign*overlap*(heldA?1:.5);
+          const av=a[velocity],bv=b[velocity];
+          if(!heldA)a[velocity]=bv*.75-sign*.5;
+          if(!heldB)b[velocity]=av*.75+sign*.5;
+          bounds(a);bounds(b);
+        }
+      }
+      paint();
+      if(drag||bodies.some(b=>Math.abs(b.vx)+Math.abs(b.vy)>.08))frame=requestAnimationFrame(tick);
+      else{frame=0;previous=0}
+    }
+    function start(){if(!frame&&!reduced.matches)frame=requestAnimationFrame(tick)}
+    bodies.forEach(b=>{
+      b.el.addEventListener('pointerdown',e=>{
+        if(e.button!==0||drag)return;
+        stop();drag={b,id:e.pointerId,x:e.clientX,y:e.clientY,lastX:e.clientX,lastY:e.clientY,time:performance.now(),moved:false};
+        b.el.setPointerCapture(e.pointerId);b.el.classList.add('is-dragging');start();
+      });
+      b.el.addEventListener('pointermove',e=>{
+        if(!drag||drag.b!==b||drag.id!==e.pointerId)return;
+        const now=performance.now(),dt=Math.max(8,now-drag.time);
+        const dx=e.clientX-drag.lastX,dy=e.clientY-drag.lastY;
+        if(Math.hypot(e.clientX-drag.x,e.clientY-drag.y)>5)drag.moved=true;
+        b.x+=dx;b.y+=dy;b.vx=clamp(dx*16.67/dt,-18,18);b.vy=clamp(dy*16.67/dt,-18,18);
+        drag.lastX=e.clientX;drag.lastY=e.clientY;drag.time=now;bounds(b);paint();
+      });
+      function end(e){
+        if(!drag||drag.b!==b||drag.id!==e.pointerId)return;
+        if(drag.moved)b.suppressUntil=performance.now()+350;
+        if(e.type!=='pointerup'||performance.now()-drag.time>100||reduced.matches){b.vx=0;b.vy=0}
+        release();start();
+      }
+      b.el.addEventListener('pointerup',end);b.el.addEventListener('pointercancel',end);b.el.addEventListener('lostpointercapture',end);
+      b.el.addEventListener('keydown',e=>{
+        const moves={ArrowLeft:[-16,0],ArrowRight:[16,0],ArrowUp:[0,-16],ArrowDown:[0,16]};
+        if(!moves[e.key])return;e.preventDefault();const [x,y]=moves[e.key];b.x+=x;b.y+=y;bounds(b);paint();start();
+      });
+    });
+    function scrub(){
+      const p=Number(slider.value)/100,wave=Math.sin(p*Math.PI);
+      title.style.transform=reduced.matches?'none':'translateY('+(-8*wave)+'px) scale('+(1+.035*wave)+') rotate('+(Math.sin(p*Math.PI*2)*1.5)+'deg)';
+      title.style.color=p===0?'':'color-mix(in srgb, var(--primary), var(--text) '+Math.round(wave*45)+'%)';
+      output.textContent=slider.value+' / 100';
+      slider.setAttribute('aria-valuetext','Кадр '+slider.value+' из 100');
+    }
+    slider.addEventListener('input',scrub);
+    function cancelRender(){clearInterval(renderTimer);renderTimer=0;rendering=false;taps=0;message.classList.remove('is-complete')}
+    bodies[0].el.addEventListener('click',()=>{
+      if(performance.now()<(bodies[0].suppressUntil||0)||rendering)return;
+      const now=performance.now();taps=now-lastTap<3000?taps+1:1;lastTap=now;
+      if(taps<5){message.textContent='Секретный рендер: '+taps+' / 5';return}
+      cancelRender();rendering=true;let progress=0;message.textContent='Рендерим шедевр… 0%';
+      renderTimer=setInterval(()=>{
+        progress+=20;
+        if(progress>=100){cancelRender();message.textContent='Готово. 0 ключевых кадров, 100% таланта.';message.classList.add('is-complete')}
+        else message.textContent='Рендерим шедевр… '+progress+'%';
+      },180);
+    });
+    function reset(){cancelRender();place();slider.value='0';scrub();message.textContent='Подсказка: нажми на Ae пять раз'}
+    stage.querySelector('.toy-reset').addEventListener('click',()=>{
+      hero.querySelector('[data-hero-fx="reset"]')?.click();reset();
+    });
+    hero.querySelector('[data-hero-fx="reset"]')?.addEventListener('click',()=>{slider.value='0';scrub()});
+    const resize=new ResizeObserver(place);resize.observe(arena);
+    reduced.addEventListener('change',()=>{stop();scrub()});
+    document.addEventListener('visibilitychange',()=>{if(document.hidden){release();stop();if(rendering){cancelRender();message.textContent='Рендер на паузе. Нажми на Ae пять раз'}}});
+    window.addEventListener('pagehide',()=>{release();stop();cancelRender()});
+    place();scrub();
+  }
+
   function initEvents(){
     $('#themeToggle')?.addEventListener('click',()=>{const d=!document.documentElement.classList.contains('dark-mode');applyTheme(d);localStorage.setItem(THEME_KEY,d?'dark':'light')});
     $('#menuToggle')?.addEventListener('click',()=>$('#navLinks')?.classList.toggle('open'));
     document.addEventListener('click',e=>{const b=e.target.closest('.favorite-btn[data-id]');if(b){e.preventDefault();toggleFavorite(b.dataset.id)}const eb=e.target.closest('.edit-favorite-btn[data-edit-id]');if(eb){e.preventDefault();toggleEditFavorite(eb.dataset.editId)}});
     const top=$('#backToTop');window.addEventListener('scroll',()=>top?.classList.toggle('show',window.scrollY>500));top?.addEventListener('click',()=>scrollTo({top:0,behavior:'smooth'}));
   }
-  document.addEventListener('DOMContentLoaded',()=>{injectUiFixes();initTheme();initHeroPlayground();initVisits();initEvents();syncFavoriteUI();initFlowVersionSelector();initBrokenThumbFallback();initPluginReport();initPluginRequest();initAdminPanel();if(page==='plugins')initCatalog();if(page==='community')initCommunity();if(page==='submit')initSubmit();setupReveals()});
+  document.addEventListener('DOMContentLoaded',()=>{injectUiFixes();initTheme();initHeroPlayground();initHeroToys();initVisits();initEvents();syncFavoriteUI();initFlowVersionSelector();initBrokenThumbFallback();initPluginReport();initPluginRequest();initAdminPanel();if(page==='plugins')initCatalog();if(page==='community')initCommunity();if(page==='submit')initSubmit();setupReveals()});
 })();
