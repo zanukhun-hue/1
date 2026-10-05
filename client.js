@@ -227,7 +227,7 @@
     }
     function save(){
       if(arena.hidden)return;
-      try{sessionStorage.setItem('site-toy-positions',JSON.stringify(bodies.map(body=>({x:Math.round(body.x),y:Math.round(body.y)}))));}catch{}
+      try{sessionStorage.setItem('site-toy-page-positions',JSON.stringify(bodies.map(body=>({x:Math.round(body.x),y:Math.round(body.y)}))));}catch{}
     }
     function place(){
       stop();
@@ -247,7 +247,7 @@
     }
     function restore(){
       try{
-        const positions=JSON.parse(sessionStorage.getItem('site-toy-positions'));
+        const positions=JSON.parse(sessionStorage.getItem('site-toy-page-positions'));
         if(!Array.isArray(positions)||positions.length!==bodies.length)return;
         positions.forEach((position,i)=>{
           const body=bodies[i];
