@@ -123,11 +123,59 @@
   function initAdminPanel(){if(page!=='admin')return;addAnalyticsToggle();$('#adminLoadBtn')?.addEventListener('click',loadAdmin);document.addEventListener('click',e=>{const b=e.target.closest('[data-admin-action]');if(b)adminAction(b)});$('#adminPin')?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();loadAdmin()}})}
 
 
+
+  function initHeroPlayground(){
+    const hero=document.querySelector('.page-hero-home');
+    const title=hero?.querySelector('h1 .highlight');
+    if(!title||hero.querySelector('.hero-fx'))return;
+    const text=title.textContent;
+    const accessible=document.createElement('span');
+    accessible.className='hero-fx-sr';accessible.textContent=text;
+    const visual=document.createElement('span');
+    visual.className='hero-fx-visual';visual.setAttribute('aria-hidden','true');
+    text.split(' ').forEach((word,index)=>{
+      if(index)visual.appendChild(document.createTextNode(' '));
+      const group=document.createElement('span');group.className='hero-fx-word';
+      Array.from(word).forEach((letter,i)=>{
+        const char=document.createElement('span');char.className='hero-fx-char';
+        char.style.setProperty('--fx-delay',(i*35)+'ms');char.textContent=letter;group.appendChild(char);
+      });
+      visual.appendChild(group);
+    });
+    title.replaceChildren(accessible,visual);title.classList.add('hero-fx-title');
+    const panel=document.createElement('div');panel.className='hero-fx';
+    panel.innerHTML='<span class="hero-fx-label">Попробуй эффект</span><div class="hero-fx-controls" role="group" aria-label="Эффекты заголовка"><button type="button" data-hero-fx="glitch" aria-pressed="false">Глитч</button><button type="button" data-hero-fx="blur" aria-pressed="false">Размытие</button><button type="button" data-hero-fx="wave" aria-pressed="false">Волна</button><button type="button" data-hero-fx="reset" aria-label="Сбросить эффект заголовка">Сброс</button></div><span class="hero-fx-sr" role="status" aria-live="polite"></span>';
+    hero.querySelector('.hero-actions').before(panel);
+    const buttons=panel.querySelectorAll('[data-hero-fx]');
+    const status=panel.querySelector('[role="status"]');
+    const reduced=window.matchMedia('(prefers-reduced-motion: reduce)');
+    let timer;
+    function reset(){
+      clearTimeout(timer);delete title.dataset.effect;
+      buttons.forEach(b=>{if(b.dataset.heroFx!=='reset')b.setAttribute('aria-pressed','false')});
+    }
+    panel.addEventListener('click',event=>{
+      const button=event.target.closest('[data-hero-fx]');
+      if(!button||!panel.contains(button))return;
+      reset();
+      if(button.dataset.heroFx==='reset'){status.textContent='Эффект сброшен';return}
+      if(reduced.matches){status.textContent='Анимации отключены в настройках устройства';return}
+      // Restart on repeat taps without accumulating animations or timers.
+      void title.offsetWidth;
+      title.dataset.effect=button.dataset.heroFx;
+      button.setAttribute('aria-pressed','true');
+      status.textContent='Эффект: '+button.textContent;
+      timer=setTimeout(reset,1600);
+    });
+    window.addEventListener('pagehide',reset);
+    reduced.addEventListener('change',()=>{if(reduced.matches)reset()});
+  }
+
   function initEvents(){
     $('#themeToggle')?.addEventListener('click',()=>{const d=!document.documentElement.classList.contains('dark-mode');applyTheme(d);localStorage.setItem(THEME_KEY,d?'dark':'light')});
     $('#menuToggle')?.addEventListener('click',()=>$('#navLinks')?.classList.toggle('open'));
     document.addEventListener('click',e=>{const b=e.target.closest('.favorite-btn[data-id]');if(b){e.preventDefault();toggleFavorite(b.dataset.id)}const eb=e.target.closest('.edit-favorite-btn[data-edit-id]');if(eb){e.preventDefault();toggleEditFavorite(eb.dataset.editId)}});
     const top=$('#backToTop');window.addEventListener('scroll',()=>top?.classList.toggle('show',window.scrollY>500));top?.addEventListener('click',()=>scrollTo({top:0,behavior:'smooth'}));
   }
-  document.addEventListener('DOMContentLoaded',()=>{injectUiFixes();initTheme();initVisits();initEvents();syncFavoriteUI();initFlowVersionSelector();initBrokenThumbFallback();initPluginReport();initPluginRequest();initAdminPanel();if(page==='plugins')initCatalog();if(page==='community')initCommunity();if(page==='submit')initSubmit();setupReveals()});
+  document.addEventListener('DOMContentLoaded',()=>{injectUiFixes();initTheme();initHeroPlayground();initVisits();initEvents();syncFavoriteUI();initFlowVersionSelector();initBrokenThumbFallback();initPluginReport();initPluginRequest();initAdminPanel();if(page==='plugins')initCatalog();if(page==='community')initCommunity();if(page==='submit')initSubmit();setupReveals()});
 })();
