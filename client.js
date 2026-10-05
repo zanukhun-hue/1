@@ -52,7 +52,33 @@
   function cardText(c){return[c.dataset.name||'',c.textContent||''].join(' ').toLowerCase()}
   function sortCards(cards,sort){return cards.sort((a,b)=>{const an=a.dataset.name||'',bn=b.dataset.name||'';if(sort==='az')return an.localeCompare(bn,'ru');if(sort==='available')return Number(b.dataset.status==='available')-Number(a.dataset.status==='available')||an.localeCompare(bn,'ru');if(sort==='size')return Number(a.dataset.size||0)-Number(b.dataset.size||0);if(sort==='new')return Number(/нов/i.test(b.textContent))-Number(/нов/i.test(a.textContent))||an.localeCompare(bn,'ru');return Number(/популяр/i.test(b.textContent))-Number(/популяр/i.test(a.textContent))||Number(b.dataset.status==='available')-Number(a.dataset.status==='available')||an.localeCompare(bn,'ru')})}
   function filterCatalog(){const g=$('#pluginsGrid');if(!g)return;const cards=$$('[data-plugin-card]',g),q=($('#pluginSearch')?.value||'').trim().toLowerCase(),cat=$('#categoryFilters .filter-btn.active')?.dataset.category||'all',fo=$('#favoritesOnly')?.classList.contains('active'),fav=getFavorites();let n=0;cards.forEach(c=>{const show=(cat==='all'||c.dataset.category===cat)&&(!q||cardText(c).includes(q))&&(!fo||fav.includes(c.dataset.id));c.style.display=show?'':'none';c.hidden=!show;if(show)n++});sortCards(cards,$('#sortPlugins')?.value||'popular').forEach(c=>g.appendChild(c));if($('#resultCount'))$('#resultCount').textContent=`Найдено: ${n}`;if($('#activeFilterLabel'))$('#activeFilterLabel').textContent=($('#categoryFilters .filter-btn.active')?.textContent||'Все категории')+(fo?' · избранное':'');if($('#emptyState'))$('#emptyState').hidden=n!==0}
-  function initCatalog(){const p=new URLSearchParams(location.search);if(p.get('favorites')==='1')$('#favoritesOnly')?.classList.add('active');document.addEventListener('input',e=>{if(e.target&&e.target.id==='pluginSearch')filterCatalog()});$('#pluginSearch')?.addEventListener('keyup',filterCatalog);$('#clearSearch')?.addEventListener('click',()=>{const i=$('#pluginSearch');if(i){i.value='';i.focus()}filterCatalog()});$('#sortPlugins')?.addEventListener('change',filterCatalog);$('#favoritesOnly')?.addEventListener('click',()=>{$('#favoritesOnly')?.classList.toggle('active');filterCatalog()});$('#categoryFilters')?.addEventListener('click',e=>{const b=e.target.closest('.filter-btn');if(!b)return;$$('.filter-btn',$('#categoryFilters')).forEach(x=>x.classList.remove('active'));b.classList.add('active');filterCatalog()});filterCatalog()}
+
+  function initCatalogCollapse(){
+    const search=$('#pluginSearch');
+    const panel=search?.closest('.catalog-panel');
+    if(!panel||panel.querySelector('.catalog-panel-toggle'))return;
+    const body=document.createElement('div');
+    body.id='catalogPanelBody';
+    body.className='catalog-panel-body';
+    while(panel.firstChild)body.appendChild(panel.firstChild);
+    const toggle=document.createElement('button');
+    toggle.type='button';
+    toggle.className='catalog-panel-toggle';
+    toggle.setAttribute('aria-controls',body.id);
+    panel.classList.add('catalog-collapsible');
+    panel.appendChild(toggle);
+    panel.appendChild(body);
+    function setCollapsed(collapsed){
+      body.hidden=collapsed;
+      panel.classList.toggle('catalog-collapsed',collapsed);
+      toggle.setAttribute('aria-expanded',String(!collapsed));
+      toggle.textContent=collapsed?'Показать поиск и фильтры':'Скрыть поиск и фильтры';
+    }
+    setCollapsed(false);
+    toggle.addEventListener('click',()=>setCollapsed(!body.hidden));
+  }
+
+  function initCatalog(){initCatalogCollapse();const p=new URLSearchParams(location.search);if(p.get('favorites')==='1')$('#favoritesOnly')?.classList.add('active');document.addEventListener('input',e=>{if(e.target&&e.target.id==='pluginSearch')filterCatalog()});$('#pluginSearch')?.addEventListener('keyup',filterCatalog);$('#clearSearch')?.addEventListener('click',()=>{const i=$('#pluginSearch');if(i){i.value='';i.focus()}filterCatalog()});$('#sortPlugins')?.addEventListener('change',filterCatalog);$('#favoritesOnly')?.addEventListener('click',()=>{$('#favoritesOnly')?.classList.toggle('active');filterCatalog()});$('#categoryFilters')?.addEventListener('click',e=>{const b=e.target.closest('.filter-btn');if(!b)return;$$('.filter-btn',$('#categoryFilters')).forEach(x=>x.classList.remove('active'));b.classList.add('active');filterCatalog()});filterCatalog()}
 
   function filterCommunity(){const g=$('#communityGrid');if(!g)return;const q=($('#editSearch')?.value||'').trim().toLowerCase(),a=$('#editFilters .filter-btn.active')?.dataset.platform||'all',fo=$('#editFavoritesOnly')?.classList.contains('active'),fav=getEditFavorites();let n=0;$$('.edit-card',g).forEach(c=>{const t=c.textContent.toLowerCase(),p=t.includes('tiktok')?'tiktok':t.includes('youtube')?'youtube':'video',id=c.dataset.id||c.querySelector('.edit-favorite-btn')?.dataset.editId;const show=(a==='all'||p===a)&&(!q||t.includes(q))&&(!fo||fav.includes(id));c.hidden=!show;if(show)n++});if($('#editCount'))$('#editCount').textContent=`Работ: ${n}`;if($('#communityEmpty'))$('#communityEmpty').hidden=n!==0}
   function initCommunity(){syncEditFavorites();document.addEventListener('input',e=>{if(e.target&&e.target.id==='editSearch')filterCommunity()});$('#clearEditSearch')?.addEventListener('click',()=>{const i=$('#editSearch');if(i){i.value='';i.focus()}filterCommunity()});$('#editFilters')?.addEventListener('click',e=>{const b=e.target.closest('.filter-btn');if(!b)return;$$('.filter-btn',$('#editFilters')).forEach(x=>x.classList.remove('active'));b.classList.add('active');filterCommunity()});$('#editFavoritesOnly')?.addEventListener('click',()=>{$('#editFavoritesOnly')?.classList.toggle('active');filterCommunity()});filterCommunity()}
