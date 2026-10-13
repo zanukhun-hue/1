@@ -190,7 +190,18 @@
     layer.innerHTML='<div class="site-toy-arena" role="group" aria-label="Перетаскиваемые иконки. Их можно бросать по странице. Для клавиатуры используйте стрелки."><button type="button" class="site-toy site-toy-ae" aria-label="Ae: перетащите по странице"><span>Ae</span></button><button type="button" class="site-toy site-toy-plugin" aria-label="Плагин: перетащите по странице"><i class="fas fa-puzzle-piece" aria-hidden="true"></i></button><button type="button" class="site-toy site-toy-download" aria-label="Загрузка: перетащите по странице"><i class="fas fa-cloud-arrow-down" aria-hidden="true"></i></button></div><div class="site-toy-tools" aria-label="Управление иконками"><button type="button" class="site-toy-reset"><i class="fas fa-rotate-left" aria-hidden="true"></i><span>Вернуть</span></button><button type="button" class="site-toy-toggle" aria-expanded="true"><i class="fas fa-eye-slash" aria-hidden="true"></i><span>Скрыть</span></button></div>';
     document.body.appendChild(layer);
     const arena=layer.querySelector('.site-toy-arena');
+    arena.hidden=true;
     const toggle=layer.querySelector('.site-toy-toggle');
+    const reset=layer.querySelector('.site-toy-reset');
+    const visibilityKey='site-toys-visible';
+    const mobile=window.matchMedia('(max-width: 640px)');
+    function preferredVisibility(){
+      try{
+        const saved=localStorage.getItem(visibilityKey);
+        if(saved==='true'||saved==='false')return saved==='true';
+      }catch{}
+      return !mobile.matches;
+    }
     const icons=Array.from(layer.querySelectorAll('.site-toy'));
     const reduced=window.matchMedia('(prefers-reduced-motion: reduce)');
     const bodies=icons.map((el,index)=>({el,x:0,y:0,vx:0,vy:0,size:0,index}));
@@ -233,9 +244,8 @@
       stop();
       release();
       syncLayout();
-      const mobile=window.innerWidth<640;
-      const positions=mobile
-        ? [[.08,.23],[.58,.3],[.34,.58]]
+      const positions=mobile.matches
+        ? [[.22,.78],[.5,.78],[.78,.78]]
         : [[.58,.25],[.79,.31],[.69,.62]];
       bodies.forEach((body,i)=>{
         body.size=body.el.offsetWidth||120;
@@ -329,20 +339,24 @@
         body.x+=x;body.y+=y;bounds(body);paint();save();start();
       });
     });
-    layer.querySelector('.site-toy-reset').addEventListener('click',()=>{
-      arena.hidden=false;
-      toggle.innerHTML='<i class="fas fa-eye-slash" aria-hidden="true"></i><span>Скрыть</span>';
-      toggle.setAttribute('aria-expanded','true');
-      place();
-      save();
-    });
-    toggle.addEventListener('click',()=>{
+    function setVisible(visible,persist=false){
+      if(!arena.hidden&&!visible)save();
       release();
       stop();
-      arena.hidden=!arena.hidden;
-      toggle.innerHTML=arena.hidden?'<i class="fas fa-eye" aria-hidden="true"></i><span>Показать</span>':'<i class="fas fa-eye-slash" aria-hidden="true"></i><span>Скрыть</span>';
-      toggle.setAttribute('aria-expanded',String(!arena.hidden));
+      arena.hidden=!visible;
+      reset.hidden=!visible;
+      toggle.innerHTML=visible?'<i class="fas fa-eye-slash" aria-hidden="true"></i><span>Скрыть</span>':'<i class="fas fa-eye" aria-hidden="true"></i><span>Показать</span>';
+      toggle.setAttribute('aria-expanded',String(visible));
+      toggle.setAttribute('aria-label',visible?'Скрыть перетаскиваемые иконки':'Показать перетаскиваемые иконки');
+      if(visible){place();restore()}
+      if(persist){try{localStorage.setItem(visibilityKey,String(visible))}catch{}}
+    }
+    reset.addEventListener('click',()=>{place();save()});
+    toggle.addEventListener('click',()=>setVisible(arena.hidden,true));
+    window.addEventListener('storage',event=>{
+      if(event.key===visibilityKey||event.key===null)setVisible(preferredVisibility());
     });
+    mobile.addEventListener?.('change',()=>setVisible(preferredVisibility()));
     const resize=()=>{
       if(arena.hidden)return;
       syncLayout();
@@ -353,9 +367,7 @@
     reduced.addEventListener?.('change',()=>{release();stop()});
     document.addEventListener('visibilitychange',()=>{if(document.hidden){release();stop();save()}});
     window.addEventListener('pagehide',()=>{release();stop();save()});
-    syncLayout();
-    place();
-    restore();
+    setVisible(preferredVisibility());
   }
 
   function initEvents(){
