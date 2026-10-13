@@ -1,0 +1,98 @@
+{
+  "autosway": {
+    "sourcePage": "https://aescripts.com/autosway/",
+    "image": "/assets/plugins/autosway.webp"
+  },
+  "aftercodecs": {
+    "sourcePage": "https://aescripts.com/aftercodecs/",
+    "image": "/assets/plugins/aftercodecs.webp"
+  },
+  "flow": {
+    "sourcePage": "https://aescripts.com/flow/",
+    "image": "/assets/plugins/flow.webp"
+  },
+  "clearplus": {
+    "sourcePage": "https://aescripts.com/clearplus/",
+    "image": "/assets/plugins/clearplus.webp"
+  },
+  "bevelizer": {
+    "sourcePage": "https://aescripts.com/bevelizer/",
+    "image": "/assets/plugins/bevelizer.webp"
+  },
+  "ballpoint": {
+    "sourcePage": "https://aescripts.com/ballpoint/",
+    "image": "/assets/plugins/ballpoint.webp"
+  },
+  "fxaa": {
+    "sourcePage": "https://aescripts.com/fxaa/",
+    "image": "/assets/plugins/fxaa.webp"
+  },
+  "jpeg-glitch": {
+    "sourcePage": "https://aescripts.com/jpeg-glitch/",
+    "image": "/assets/plugins/jpeg-glitch.webp"
+  },
+  "mask-prompter": {
+    "sourcePage": "https://aescripts.com/mask-prompter/",
+    "image": "/assets/plugins/mask-prompter.webp"
+  },
+  "newton": {
+    "sourcePage": "https://aescripts.com/newton/",
+    "image": "/assets/plugins/newton.webp"
+  },
+  "optical-flares": {
+    "sourcePage": "https://www.videocopilot.net/products/opticalflares/",
+    "image": "/assets/plugins/optical-flares.webp"
+  },
+  "deep-glow-v2": {
+    "sourcePage": "https://aescripts.com/deep-glow/",
+    "sourceImage": "https://aescripts.com/media/catalog/product/cache/b7bdf9dce07928a6c34f72fb33f91f39/t/h/thumb_1920x1080_text_1_2.jpg",
+    "image": "/assets/plugins/deep-glow-v2.webp",
+    "width": 265,
+    "height": 265
+  },
+  "bcc-sapphire": {
+    "image": "/assets/plugins/bcc-sapphire.webp",
+    "sourcePage": "https://borisfx.com/products/sapphire/",
+    "sourceImage": "https://borisfx-com-res.cloudinary.com/image/upload/q_auto,f_auto,fl_lossy/v1772150946/Marketing/2026%20Logos/Sapphire/Horizontal/Light/SVG/Sapphire_Horizontal.png"
+  },
+  "bcc-continuum": {
+    "sourcePage": "https://borisfx.com/products/continuum/",
+    "sourceImage": "https://borisfx-com-res.cloudinary.com/image/upload/q_auto,f_auto,fl_lossy/v1772150791/Marketing/2026%20Logos/Continuum/Horizontal/Light/SVG/Continuum_Horizontal.png",
+    "image": "/assets/plugins/bcc-continuum.webp",
+    "width": 600,
+    "height": 137
+  },
+  "signal": {
+    "sourcePage": "https://aescripts.com/signal/",
+    "image": "/assets/plugins/signal.webp"
+  },
+  "tracery": {
+    "sourcePage": "https://aescripts.com/tracery/",
+    "image": "/assets/plugins/tracery.webp"
+  },
+  "twitch": {
+    "sourcePage": "https://www.videocopilot.net/products/twitch/",
+    "image": "/assets/plugins/twitch.webp"
+  },
+  "vc-color-vibrance": {
+    "sourcePage": "https://www.videocopilot.net/blog/2014/05/new-plug-in-color-vibrance/",
+    "image": "/assets/plugins/vc-color-vibrance.webp"
+  },
+  "shadow-studio-3": {
+    "sourcePage": "https://aescripts.com/shadow-studio/",
+    "sourceImage": "https://aescripts.com/media/catalog/product/cache/b7bdf9dce07928a6c34f72fb33f91f39/a/e/aes_social_1.jpg",
+    "image": "/assets/plugins/shadow-studio-3.webp",
+    "width": 265,
+    "height": 265
+  },
+  "element-3d": {
+    "image": "/assets/plugins/element-3d.webp",
+    "sourcePage": "https://www.videocopilot.net/products/element2/",
+    "sourceImage": "https://d3jddrml5mymee.cloudfront.net/assets/public/images/v7/products/73/header-dropdown/320x133.jpg"
+  },
+  "saber": {
+    "image": "/assets/plugins/saber.webp",
+    "sourcePage": "https://www.videocopilot.net/blog/2016/03/new-plug-in-saber-now-available-100-free/",
+    "sourceImage": "https://img.youtube.com/vi/reSXGxkyr0k/hqdefault.jpg"
+  }
+}

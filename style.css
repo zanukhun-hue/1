@@ -235,3 +235,17 @@ body[data-page="gallery"] .footer,body[data-page="gallery"] .back-to-top{display
 .gallery-page .gallery-card-art .cover-title{font-size:var(--cover-title-size,26px);line-height:1.1;letter-spacing:-.035em}
 .gallery-preview-icon .gallery-card-art{height:auto;min-height:190px;gap:16px}.gallery-preview-icon .cover-title{font-size:32px}
 @media(max-width:640px){.gallery-page-heading>div{padding:9px 12px}.gallery-page-heading .text-link{padding:9px 10px}}
+
+/* Real product artwork replaces the invented book covers. */
+.gallery-page .gallery-world{grid-template-columns:repeat(8,200px);gap:58px 64px}
+.gallery-page .gallery-card{width:200px;height:192px;padding:10px;border-radius:16px;rotate:-1.5deg;gap:6px;background:var(--surface)}
+.gallery-page .gallery-card:nth-child(3n){rotate:1.5deg;translate:0 36px}.gallery-page .gallery-card:nth-child(4n+2){rotate:0deg;translate:0 -24px}.gallery-page .gallery-card:nth-child(4n+4){rotate:-1deg;translate:0 10px}
+.gallery-page .gallery-card-art{height:132px;width:100%;padding:0;display:block;border-radius:8px;border:0;background:var(--surface-2);overflow:hidden;color:var(--text)}
+.gallery-card-art img{display:block;width:100%;height:100%;object-fit:contain;pointer-events:none;user-select:none;-webkit-user-drag:none}
+.gallery-page .gallery-card strong{font-size:.78rem;line-height:1.3;padding:0 2px}.gallery-page .gallery-card small{font-size:.64rem;padding:0 2px}
+.gallery-image-placeholder{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:16px;text-align:center}.gallery-image-placeholder i{position:static;font-size:1.8rem;color:var(--primary);opacity:1}.gallery-image-placeholder>span{position:static;opacity:1;font-size:.9rem;color:var(--muted);text-transform:none}
+.gallery-preview-icon .gallery-card-art{display:block;height:220px;min-height:0;padding:0;background:var(--surface-2);border-radius:14px;overflow:hidden}
+.gallery-dialog[open]{animation:none}
+.gallery-page .gallery-card:focus-visible{outline:3px solid var(--primary);outline-offset:5px}
+@media(max-width:640px){.gallery-page .gallery-world{grid-template-columns:repeat(8,200px)}.gallery-page .gallery-card{width:200px;height:192px}.gallery-navigation>span{max-width:270px;white-space:normal;text-align:center;line-height:1.4}}
+@media(hover:hover) and (pointer:fine){.gallery-page .gallery-card:hover{scale:1.05;rotate:0deg}}
