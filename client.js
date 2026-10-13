@@ -100,6 +100,65 @@
   async function cancelSubmission(i,b){const list=readSubmissions(),it=list[i];if(!it||!confirm('Отменить эту заявку?'))return;try{if(b)b.disabled=true;const r=await fetch('/api/edit-submissions/cancel',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:it.serverId,url:it.url,title:it.title,author:it.author})});const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'Не удалось отменить заявку');list.splice(i,1);saveSubmissions(list);renderSubmissions();setStatus('#submitStatus','Заявка отменена.','success')}catch(e){setStatus('#submitStatus',e.message,'error');if(b)b.disabled=false}}
   function initSubmit(){renderSubmissions();document.addEventListener('click',e=>{const b=e.target.closest('.cancel-submission-btn');if(b)cancelSubmission(Number(b.dataset.cancelIndex),b)});$('#editSubmitForm')?.addEventListener('submit',async e=>{e.preventDefault();const wait=canSubmit('edit',30000);if(wait)return setStatus('#submitStatus',`Подожди ${wait} сек. перед новой отправкой.`,'error');const f=e.target,btn=f.querySelector('button[type="submit"]');try{if(btn)btn.disabled=true;setStatus('#submitStatus','Готовлю превью...',null);const thumb=await uploadPreviewIfNeeded();const item={url:$('#editUrl')?.value||'',thumb,title:$('#editTitle')?.value||'Без названия',author:$('#editAuthor')?.value||'Автор',plugins:$('#editPlugins')?.value||'',description:$('#editDescription')?.value||'',platform:inferPlatform($('#editUrl')?.value||'')};setStatus('#submitStatus','Отправляю заявку...',null);const r=await fetch('/api/edit-submissions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(item)}),d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'Не удалось отправить заявку');const row=Array.isArray(d)?d[0]:d,list=readSubmissions();list.unshift({id:'local-'+Date.now(),serverId:row&&row.id?row.id:null,...item,created:new Date().toISOString()});saveSubmissions(list);f.reset();renderSubmissions();setStatus('#submitStatus','Заявка отправлена на проверку.','success')}catch(err){setStatus('#submitStatus',err.message,'error')}finally{if(btn)btn.disabled=false}})}
 
+  function initButtonGlow(){
+    const selector='.btn,.download-btn,.details-btn,.version-option,.filter-btn,.favorite-btn,.edit-favorite-btn';
+    const reduced=window.matchMedia('(prefers-reduced-motion: reduce)');
+    let frame=0,pending=null;
+    const timers=new Map();
+    function buttonFor(event){
+      const button=event.target.closest?.(selector);
+      if(!button||button.disabled||button.matches('.disabled,.btn-disabled,[aria-disabled="true"]'))return null;
+      button.classList.add('cursor-button');
+      return button;
+    }
+    function position(button,event){
+      const rect=button.getBoundingClientRect();
+      button.style.setProperty('--cursor-x',Math.max(0,Math.min(rect.width,event.clientX-rect.left))+'px');
+      button.style.setProperty('--cursor-y',Math.max(0,Math.min(rect.height,event.clientY-rect.top))+'px');
+    }
+    function clear(button){
+      button.classList.remove('glow-active');
+      clearTimeout(timers.get(button));
+      timers.delete(button);
+      if(pending?.button===button){cancelAnimationFrame(frame);frame=0;pending=null}
+    }
+    function clearAll(){
+      document.querySelectorAll('.glow-active').forEach(clear);
+      cancelAnimationFrame(frame);frame=0;pending=null;
+    }
+    document.querySelectorAll(selector).forEach(button=>{
+      if(!button.disabled&&!button.matches('.disabled,.btn-disabled,[aria-disabled="true"]'))button.classList.add('cursor-button');
+    });
+    document.addEventListener('pointerover',event=>{
+      if(reduced.matches||event.pointerType==='touch')return;
+      const button=buttonFor(event);if(!button)return;
+      position(button,event);button.classList.add('glow-active');
+    });
+    document.addEventListener('pointermove',event=>{
+      if(reduced.matches||event.pointerType==='touch')return;
+      const button=buttonFor(event);if(!button)return;
+      pending={button,x:event.clientX,y:event.clientY};
+      if(!frame)frame=requestAnimationFrame(()=>{
+        frame=0;
+        if(pending){position(pending.button,{clientX:pending.x,clientY:pending.y});pending=null}
+      });
+    });
+    document.addEventListener('pointerout',event=>{
+      const button=buttonFor(event);
+      if(button&&!button.contains(event.relatedTarget))clear(button);
+    });
+    document.addEventListener('pointerdown',event=>{
+      if(reduced.matches||event.pointerType!=='touch')return;
+      const button=buttonFor(event);if(!button)return;
+      clear(button);position(button,event);button.classList.add('glow-active');
+      timers.set(button,setTimeout(()=>clear(button),450));
+    });
+    document.addEventListener('pointercancel',event=>{const button=buttonFor(event);if(button)clear(button)});
+    window.addEventListener('blur',clearAll);
+    window.addEventListener('pagehide',clearAll);
+    reduced.addEventListener?.('change',clearAll);
+  }
+
   function initDownloads(){
     document.addEventListener('click',event=>{
       if(event.defaultPrevented||event.button!==0||event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;
@@ -412,5 +471,5 @@
     document.addEventListener('click',e=>{const b=e.target.closest('.favorite-btn[data-id]');if(b){e.preventDefault();toggleFavorite(b.dataset.id)}const eb=e.target.closest('.edit-favorite-btn[data-edit-id]');if(eb){e.preventDefault();toggleEditFavorite(eb.dataset.editId)}});
     const top=$('#backToTop');window.addEventListener('scroll',()=>top?.classList.toggle('show',window.scrollY>500));top?.addEventListener('click',()=>scrollTo({top:0,behavior:'smooth'}));
   }
-  document.addEventListener('DOMContentLoaded',()=>{injectUiFixes();initTheme();initHeroPlayground();initHeroToys();initVisits();initEvents();syncFavoriteUI();initFlowVersionSelector();initDownloads();initBrokenThumbFallback();initPluginReport();initPluginRequest();initAdminPanel();if(page==='plugins')initCatalog();if(page==='community')initCommunity();if(page==='submit')initSubmit();setupReveals()});
+  document.addEventListener('DOMContentLoaded',()=>{injectUiFixes();initTheme();initHeroPlayground();initHeroToys();initVisits();initEvents();syncFavoriteUI();initFlowVersionSelector();initDownloads();initButtonGlow();initBrokenThumbFallback();initPluginReport();initPluginRequest();initAdminPanel();if(page==='plugins')initCatalog();if(page==='community')initCommunity();if(page==='submit')initSubmit();setupReveals()});
 })();

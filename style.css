@@ -142,3 +142,17 @@ html.motion-entry main{animation:vaultPageIn .38s ease-out both}
 .download-notice{margin:12px 0 0;font-size:.8rem;line-height:1.5;color:var(--muted);overflow-wrap:anywhere}
 .plugin-card>.download-notice{margin:0;padding:0 20px 18px}
 .download-notice a{color:var(--primary);text-decoration:underline;text-underline-offset:3px}
+
+/* Luma-inspired light follows the pointer while the label stays still. */
+.cursor-button{--button-glow:139,92,246;--cursor-x:50%;--cursor-y:50%;position:relative;isolation:isolate;overflow:hidden}
+.cursor-button:before,.cursor-button:after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:-1;opacity:0;transition:opacity .22s ease}
+.cursor-button:before{background:radial-gradient(110px circle at var(--cursor-x) var(--cursor-y),rgba(var(--button-glow),.24),rgba(var(--button-glow),.08) 48%,transparent 78%)}
+.cursor-button:after{padding:1px;background:radial-gradient(140px circle at var(--cursor-x) var(--cursor-y),rgba(var(--button-glow),.85),transparent 80%);-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+.cursor-button.glow-active:before,.cursor-button.glow-active:after{opacity:1}
+.cursor-button:focus-visible{outline:2px solid var(--primary);outline-offset:3px}
+.cursor-button.btn-primary,.cursor-button.download-btn{--button-glow:255,255,255}
+.cursor-button.details-btn{--button-glow:56,189,248}
+.cursor-button.favorite-btn,.cursor-button.edit-favorite-btn{--button-glow:244,114,182}
+.cursor-button.filter-btn{--button-glow:167,139,250}
+@media(hover:hover) and (pointer:fine){.cursor-button:hover{transform:none}}
+@media(prefers-reduced-motion:reduce){.cursor-button:before,.cursor-button:after{display:none}}
