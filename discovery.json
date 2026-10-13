@@ -1,0 +1,158 @@
+{
+  "tasks": [
+    {
+      "id": "glow",
+      "label": "Свечение",
+      "keywords": "свечение светящийся светится неон glow огонь свет",
+      "plugins": [
+        "deep-glow-v1",
+        "deep-glow-v2",
+        "saber",
+        "bcc-sapphire",
+        "optical-flares"
+      ]
+    },
+    {
+      "id": "slow",
+      "label": "Замедление",
+      "keywords": "замедление замедлить ускорить скорость slowmo slow motion ретайм",
+      "plugins": [
+        "twixtor"
+      ]
+    },
+    {
+      "id": "text",
+      "label": "Анимация текста",
+      "keywords": "анимация текста текст титры движение анимировать буквы typography text",
+      "plugins": [
+        "motion-tools-3",
+        "flow",
+        "autosway"
+      ]
+    },
+    {
+      "id": "denoise",
+      "label": "Убрать шум",
+      "keywords": "убрать шум шумоподавление очистить denoise шум шумы улучшить качество",
+      "plugins": [
+        "topaz-video-enhance"
+      ]
+    },
+    {
+      "id": "glitch",
+      "label": "Глитч",
+      "keywords": "глитч glitch помехи искажения vhs crt переходы тряска",
+      "plugins": [
+        "twitch",
+        "jpeg-glitch",
+        "glitchify",
+        "ezco-crt-emulator",
+        "signal"
+      ]
+    },
+    {
+      "id": "color",
+      "label": "Цветокоррекция",
+      "keywords": "цвет цветокоррекция плёнка пленка color grade тонировка",
+      "plugins": [
+        "film-convert-nitrate",
+        "maxon-looks-trapcode",
+        "red-giant",
+        "vc-color-vibrance"
+      ]
+    },
+    {
+      "id": "blur",
+      "label": "Размытие",
+      "keywords": "размытие размыть motion blur смаз боке bokeh",
+      "plugins": [
+        "rsmb",
+        "bokeh"
+      ]
+    },
+    {
+      "id": "track",
+      "label": "Трекинг",
+      "keywords": "трекинг tracking отслеживание отследить движение маска",
+      "plugins": [
+        "mocha-pro",
+        "mask-prompter"
+      ]
+    }
+  ],
+  "collections": [
+    {
+      "id": "edits",
+      "title": "Для эдитов",
+      "description": "Замедление, смаз движения, свечение и плавные ключи. Выбирай инструменты под нужный кадр.",
+      "items": [
+        {
+          "id": "twixtor",
+          "note": "Замедление и изменение скорости."
+        },
+        {
+          "id": "rsmb",
+          "note": "Смаз движения между кадрами."
+        },
+        {
+          "id": "deep-glow-v2",
+          "note": "Свечение ярких деталей."
+        },
+        {
+          "id": "saber",
+          "note": "Неоновые контуры и световые линии."
+        },
+        {
+          "id": "flow",
+          "note": "Плавные кривые анимации."
+        }
+      ]
+    },
+    {
+      "id": "starter",
+      "title": "Для новичка",
+      "description": "Несколько инструментов с понятной ролью: удобнее работать, проще управлять анимацией и светом.",
+      "items": [
+        {
+          "id": "fxconsole",
+          "note": "Быстрый поиск и применение эффектов."
+        },
+        {
+          "id": "flow",
+          "note": "Настройка плавности ключевых кадров."
+        },
+        {
+          "id": "saber",
+          "note": "Световые контуры и неон."
+        },
+        {
+          "id": "vc-color-vibrance",
+          "note": "Усиление цвета эффектов."
+        }
+      ]
+    },
+    {
+      "id": "motion",
+      "title": "Для моушн-дизайна",
+      "description": "Кривые, движение слоёв и физическая анимация. Каждый инструмент решает свою задачу.",
+      "items": [
+        {
+          "id": "flow",
+          "note": "Управление кривыми анимации."
+        },
+        {
+          "id": "motion-tools-3",
+          "note": "Инструменты для анимации слоёв."
+        },
+        {
+          "id": "autosway",
+          "note": "Колебания и вторичное движение."
+        },
+        {
+          "id": "newton",
+          "note": "Физическая анимация объектов."
+        }
+      ]
+    }
+  ]
+}
