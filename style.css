@@ -156,3 +156,7 @@ html.motion-entry main{animation:vaultPageIn .38s ease-out both}
 .cursor-button.filter-btn{--button-glow:167,139,250}
 @media(hover:hover) and (pointer:fine){.cursor-button:hover{transform:none}}
 @media(prefers-reduced-motion:reduce){.cursor-button:before,.cursor-button:after{display:none}}
+
+/* Keep the scroll button above the draggable-icon toolbar. */
+.back-to-top{right:18px;bottom:calc(max(18px,env(safe-area-inset-bottom)) + 64px)}
+@media(max-width:640px){.back-to-top{right:12px;bottom:calc(max(12px,env(safe-area-inset-bottom)) + 64px)}}
