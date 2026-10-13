@@ -348,6 +348,32 @@ app.get('/submit.html', (req, res) => res.redirect(301, '/submit'));
 app.get('/request-plugin', (req, res) => res.send(requestPluginPage()));
 app.get('/contact', (req, res) => res.send(contactPage()));
 app.get('/admin', (req, res) => res.send(adminPage()));
-app.get('/download/:id', (req, res) => { const plugin = plugins.find((item) => item.id === req.params.id); if (!plugin || plugin.status !== 'available') return res.redirect(302, '/plugins'); logEvent('download', { plugin_id: plugin.id, path: `/download/${plugin.id}` }, req); if (req.query.version && Array.isArray(plugin.versions)) { const version = plugin.versions.find((item) => String(item.label || '').toLowerCase().replace(/[^a-z0-9]/g, '').includes(String(req.query.version).toLowerCase().replace(/[^a-z0-9]/g, ''))); if (version && version.status === 'available' && version.downloadUrl && version.downloadUrl !== '#') return res.redirect(302, version.downloadUrl); } if (!plugin.downloadUrl || plugin.downloadUrl === '#') return res.redirect(302, '/plugins'); res.redirect(302, plugin.downloadUrl); });
+function directDownloadUrl(value) {
+  try {
+    const url = new URL(value);
+    if (url.hostname !== 'drive.google.com') return value;
+    const id = url.pathname.match(/^\/file\/d\/([^/]+)/)?.[1] || url.searchParams.get('id');
+    if (!id || !/^[a-zA-Z0-9_-]+$/.test(id)) return value;
+    const direct = new URL('https://drive.google.com/uc');
+    direct.searchParams.set('export', 'download');
+    direct.searchParams.set('id', id);
+    if (url.searchParams.has('resourcekey')) direct.searchParams.set('resourcekey', url.searchParams.get('resourcekey'));
+    return direct.href;
+  } catch { return value; }
+}
+app.get('/download/:id', (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  const plugin = plugins.find((item) => item.id === req.params.id);
+  if (!plugin || plugin.status !== 'available') return res.redirect(302, '/plugins');
+  let url = plugin.downloadUrl;
+  if (req.query.version && Array.isArray(plugin.versions)) {
+    const version = plugin.versions.find((item) => String(item.label || '').toLowerCase().replace(/[^a-z0-9]/g, '').includes(String(req.query.version).toLowerCase().replace(/[^a-z0-9]/g, '')));
+    if (version && version.status === 'available' && version.downloadUrl && version.downloadUrl !== '#') url = version.downloadUrl;
+  }
+  if (!url || url === '#') return res.redirect(302, '/plugins');
+  if (req.query.open === '1') return res.redirect(302, url);
+  logEvent('download', { plugin_id: plugin.id, path: `/download/${plugin.id}` }, req);
+  res.redirect(302, directDownloadUrl(url));
+});
 app.use((req, res) => res.status(404).send(notFoundPage()));
 app.listen(PORT, () => console.log(`SSR server started: http://localhost:${PORT}`));

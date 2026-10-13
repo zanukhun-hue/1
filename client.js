@@ -100,6 +100,42 @@
   async function cancelSubmission(i,b){const list=readSubmissions(),it=list[i];if(!it||!confirm('Отменить эту заявку?'))return;try{if(b)b.disabled=true;const r=await fetch('/api/edit-submissions/cancel',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:it.serverId,url:it.url,title:it.title,author:it.author})});const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'Не удалось отменить заявку');list.splice(i,1);saveSubmissions(list);renderSubmissions();setStatus('#submitStatus','Заявка отменена.','success')}catch(e){setStatus('#submitStatus',e.message,'error');if(b)b.disabled=false}}
   function initSubmit(){renderSubmissions();document.addEventListener('click',e=>{const b=e.target.closest('.cancel-submission-btn');if(b)cancelSubmission(Number(b.dataset.cancelIndex),b)});$('#editSubmitForm')?.addEventListener('submit',async e=>{e.preventDefault();const wait=canSubmit('edit',30000);if(wait)return setStatus('#submitStatus',`Подожди ${wait} сек. перед новой отправкой.`,'error');const f=e.target,btn=f.querySelector('button[type="submit"]');try{if(btn)btn.disabled=true;setStatus('#submitStatus','Готовлю превью...',null);const thumb=await uploadPreviewIfNeeded();const item={url:$('#editUrl')?.value||'',thumb,title:$('#editTitle')?.value||'Без названия',author:$('#editAuthor')?.value||'Автор',plugins:$('#editPlugins')?.value||'',description:$('#editDescription')?.value||'',platform:inferPlatform($('#editUrl')?.value||'')};setStatus('#submitStatus','Отправляю заявку...',null);const r=await fetch('/api/edit-submissions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(item)}),d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'Не удалось отправить заявку');const row=Array.isArray(d)?d[0]:d,list=readSubmissions();list.unshift({id:'local-'+Date.now(),serverId:row&&row.id?row.id:null,...item,created:new Date().toISOString()});saveSubmissions(list);f.reset();renderSubmissions();setStatus('#submitStatus','Заявка отправлена на проверку.','success')}catch(err){setStatus('#submitStatus',err.message,'error')}finally{if(btn)btn.disabled=false}})}
 
+  function initDownloads(){
+    document.addEventListener('click',event=>{
+      if(event.defaultPrevented||event.button!==0||event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;
+      const link=event.target.closest('a[href]');
+      if(!link)return;
+      const url=new URL(link.href,location.href);
+      if(url.origin!==location.origin||!/^\/download\/[^/]+$/.test(url.pathname)||url.searchParams.get('open')==='1')return;
+      event.preventDefault();
+      let frame=document.getElementById('pluginDownloadFrame');
+      if(!frame){
+        frame=document.createElement('iframe');
+        frame.id='pluginDownloadFrame';
+        frame.hidden=true;
+        frame.title='Загрузка файла';
+        document.body.appendChild(frame);
+      }
+      frame.src=url.href;
+      const container=link.closest('.version-selector-body,.plugin-detail-content,.plugin-card')||link.parentElement;
+      let notice=container.querySelector('.download-notice');
+      if(!notice){
+        notice=document.createElement('p');
+        notice.className='download-notice';
+        notice.setAttribute('role','status');
+        container.appendChild(notice);
+      }
+      notice.replaceChildren(document.createTextNode('Запрос на скачивание отправлен. Если загрузка не началась — '));
+      const fallback=document.createElement('a');
+      url.searchParams.set('open','1');
+      fallback.href=url.pathname+url.search;
+      fallback.target='_blank';
+      fallback.rel='noopener';
+      fallback.textContent='открыть Google Диск';
+      notice.appendChild(fallback);
+    });
+  }
+
   function initFlowVersionSelector(){if(location.pathname!=='/plugin/flow')return;const a=$('.plugin-detail-content .hero-actions'),dl=$('.plugin-detail-content .hero-actions .btn-primary');if(!a||!dl||$('#flowVersionSelector'))return;const box=document.createElement('details');box.id='flowVersionSelector';box.className='version-selector reveal revealed';box.innerHTML=`<summary><span><i class="fas fa-code-branch"></i> Выбрать версию Flow</span><i class="fas fa-chevron-down chevron"></i></summary><div class="version-selector-body"><div class="version-selector-list"><a class="version-option" href="/download/flow?version=v141" target="_blank" rel="noopener"><i class="fas fa-download"></i> Скачать v1.4.1</a><a class="version-option active" href="/download/flow" target="_blank" rel="noopener"><i class="fas fa-check-circle"></i> Скачать v1.5.2</a></div><div class="version-note">Нажми на нужную версию. Основная кнопка скачивания ведёт на Flow v1.5.2.</div></div>`;a.parentNode.insertBefore(box,a);dl.innerHTML='<i class="fas fa-download"></i> Скачать v1.5.2'}
   const pluginId=()=>{const m=location.pathname.match(/^\/plugin\/([^/]+)/);return m?decodeURIComponent(m[1]):''};
   function initPluginReport(){const id=pluginId();if(!id)return;const name=$('h1')?.textContent?.replace(/ для After Effects/i,'').trim()||id;document.addEventListener('click',e=>{if(e.target.closest('.report-link-btn'))$('#pluginReportForm')&&($('#pluginReportForm').hidden=!$('#pluginReportForm').hidden)});$('#pluginReportForm')?.addEventListener('submit',async e=>{e.preventDefault();const wait=canSubmit('report',30000);if(wait)return setStatus('#pluginReportStatus',`Подожди ${wait} сек.`,'error');try{setStatus('#pluginReportStatus','Отправляю...',null);await fetch('/api/plugin-reports',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({plugin_id:id,plugin_name:name,message:$('#pluginReportMessage')?.value||null})}).then(async r=>{if(!r.ok)throw new Error((await r.json().catch(()=>({}))).error||'Ошибка')});e.target.reset();setStatus('#pluginReportStatus','Жалоба отправлена. Спасибо!','success')}catch(err){setStatus('#pluginReportStatus',err.message,'error')}})}
@@ -376,5 +412,5 @@
     document.addEventListener('click',e=>{const b=e.target.closest('.favorite-btn[data-id]');if(b){e.preventDefault();toggleFavorite(b.dataset.id)}const eb=e.target.closest('.edit-favorite-btn[data-edit-id]');if(eb){e.preventDefault();toggleEditFavorite(eb.dataset.editId)}});
     const top=$('#backToTop');window.addEventListener('scroll',()=>top?.classList.toggle('show',window.scrollY>500));top?.addEventListener('click',()=>scrollTo({top:0,behavior:'smooth'}));
   }
-  document.addEventListener('DOMContentLoaded',()=>{injectUiFixes();initTheme();initHeroPlayground();initHeroToys();initVisits();initEvents();syncFavoriteUI();initFlowVersionSelector();initBrokenThumbFallback();initPluginReport();initPluginRequest();initAdminPanel();if(page==='plugins')initCatalog();if(page==='community')initCommunity();if(page==='submit')initSubmit();setupReveals()});
+  document.addEventListener('DOMContentLoaded',()=>{injectUiFixes();initTheme();initHeroPlayground();initHeroToys();initVisits();initEvents();syncFavoriteUI();initFlowVersionSelector();initDownloads();initBrokenThumbFallback();initPluginReport();initPluginRequest();initAdminPanel();if(page==='plugins')initCatalog();if(page==='community')initCommunity();if(page==='submit')initSubmit();setupReveals()});
 })();
