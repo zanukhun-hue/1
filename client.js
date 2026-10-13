@@ -297,12 +297,14 @@
     function tick(now){
       frame=0;if(!visible||document.hidden)return;
       const dt=Math.min(last?(now-last)/16.67:1,2);last=now;
-      const dx=tx-x,dy=ty-y,d=Math.hypot(dx,dy),moving=d>18;
-      if(moving){const a=Math.atan2(dy,dx);angle+=Math.atan2(Math.sin(a-angle),Math.cos(a-angle))*.16*dt;const step=Math.min(d-18,3.5*dt);x+=dx/d*step;y+=dy/d*step;phase+=.18*dt}
+      const dx=tx-x,dy=ty-y,d=Math.hypot(dx,dy),stopDistance=mobile.matches?27:35,moving=d>stopDistance+.5;
+      const turn=Math.atan2(Math.sin(Math.atan2(dy,dx)-angle),Math.cos(Math.atan2(dy,dx)-angle)),turning=Math.abs(turn)>.015;
+      if(moving||turning)angle+=turn*Math.min(1,.18*dt);
+      if(moving){const step=Math.min(d-stopDistance,3.5*dt);x+=dx/d*step;y+=dy/d*step;phase+=.18*dt}
       draw(moving?1:0);
-      if(moving&&!reduced.matches)frame=requestAnimationFrame(tick);else last=0;
+      if((moving||turning)&&!reduced.matches)frame=requestAnimationFrame(tick);else last=0;
     }
-    function start(){if(!visible)return;if(reduced.matches){x=tx-18;y=ty;draw(0);return}if(!frame)frame=requestAnimationFrame(tick)}
+    function start(){if(!visible)return;if(reduced.matches){x=clamp(tx-(mobile.matches?27:35),45,w-45);y=clamp(ty,110,Math.max(110,h-140));angle=Math.atan2(ty-y,tx-x);draw(0);return}if(!frame)frame=requestAnimationFrame(tick)}
     function setVisible(value,persist=false){
       visible=value;release();stop();canvas.hidden=!value;handle.hidden=!value;reset.hidden=!value;
       toggle.setAttribute('aria-expanded',String(value));toggle.innerHTML=value?'<i class="fas fa-eye-slash" aria-hidden="true"></i><span>Скрыть паука</span>':'<i class="fas fa-eye" aria-hidden="true"></i><span>Показать паука</span>';
@@ -324,14 +326,19 @@
   function initPluginGallery(){
     const arena=document.querySelector('.plugin-gallery');if(!arena)return;
     const world=arena.querySelector('.gallery-world');
-    let x=-170,y=-120,drag=null,suppressUntil=0;
-    function paint(){x=Math.max(Math.min(0,arena.clientWidth-world.scrollWidth),Math.min(0,x));y=Math.max(Math.min(0,arena.clientHeight-world.scrollHeight),Math.min(0,y));world.style.transform=`translate3d(${x}px,${y}px,0)`}
+    let x=0,y=0,zoom=.85,drag=null,suppressUntil=0;
+    function paint(){x=Math.max(Math.min(0,arena.clientWidth-world.scrollWidth*zoom),Math.min(0,x));y=Math.max(Math.min(0,arena.clientHeight-world.scrollHeight*zoom),Math.min(0,y));world.style.transform=`translate3d(${x}px,${y}px,0) scale(${zoom})`}
+    function center(){x=(arena.clientWidth-world.scrollWidth*zoom)/2;y=(arena.clientHeight-world.scrollHeight*zoom)/2;paint()}
+    function changeZoom(next){const old=zoom;zoom=Math.max(.55,Math.min(1.3,next));x=arena.clientWidth/2-(arena.clientWidth/2-x)*zoom/old;y=arena.clientHeight/2-(arena.clientHeight/2-y)*zoom/old;paint();document.querySelector('.gallery-zoom-level').textContent=Math.round(zoom*100)+'%'}
+    document.querySelector('[data-gallery-zoom="in"]')?.addEventListener('click',()=>changeZoom(zoom+.1));
+    document.querySelector('[data-gallery-zoom="out"]')?.addEventListener('click',()=>changeZoom(zoom-.1));
+    document.querySelector('[data-gallery-reset]')?.addEventListener('click',center);
     arena.addEventListener('pointerdown',e=>{if(e.button!==0||drag)return;drag={id:e.pointerId,x:e.clientX,y:e.clientY,startX:e.clientX,startY:e.clientY,moved:false}});
     arena.addEventListener('pointermove',e=>{
       if(!drag||drag.id!==e.pointerId)return;
       const dx=e.clientX-drag.x,dy=e.clientY-drag.y;
       if(!drag.moved&&Math.hypot(e.clientX-drag.startX,e.clientY-drag.startY)>7){drag.moved=true;arena.setPointerCapture(e.pointerId);arena.classList.add('is-panning')}
-      if(drag.moved){x+=dx;if(e.pointerType!=='touch')y+=dy;paint()}
+      if(drag.moved){x+=dx;y+=dy;paint()}
       drag.x=e.clientX;drag.y=e.clientY;
     });
     function release(e){if(!drag||drag.id!==e.pointerId)return;const id=drag.id;if(drag.moved)suppressUntil=performance.now()+400;drag=null;arena.classList.remove('is-panning');if(arena.hasPointerCapture?.(id))arena.releasePointerCapture(id)}
@@ -344,11 +351,11 @@
       if(performance.now()<suppressUntil){e.preventDefault();return}
       const card=e.target.closest('.gallery-card');if(!card||e.ctrlKey||e.metaKey||e.shiftKey||e.altKey||typeof dialog.showModal!=='function')return;
       e.preventDefault();dialog.querySelector('h2').textContent=card.querySelector('strong').textContent;dialog.querySelector('p').textContent=card.dataset.description;
-      dialog.querySelector('.gallery-preview-icon').replaceChildren(card.querySelector('i').cloneNode(true));dialog.querySelector('a').href=card.href;dialog.showModal();
+      dialog.querySelector('.gallery-preview-icon').replaceChildren(card.querySelector('.gallery-card-art').cloneNode(true));dialog.style.setProperty('--tile-hue',card.style.getPropertyValue('--tile-hue'));dialog.querySelector('a').href=card.href;dialog.showModal();
     });
     arena.addEventListener('keydown',e=>{if(e.target!==arena)return;const steps={ArrowLeft:[70,0],ArrowRight:[-70,0],ArrowUp:[0,70],ArrowDown:[0,-70]};if(!steps[e.key])return;e.preventDefault();x+=steps[e.key][0];y+=steps[e.key][1];paint()});
     arena.querySelectorAll('.gallery-card').forEach(card=>card.addEventListener('focus',()=>{if(drag)return;const r=card.getBoundingClientRect(),a=arena.getBoundingClientRect();if(r.left<a.left)x+=a.left-r.left+12;if(r.right>a.right)x-=r.right-a.right+12;if(r.top<a.top)y+=a.top-r.top+12;if(r.bottom>a.bottom)y-=r.bottom-a.bottom+12;paint()}));
-    window.addEventListener('resize',paint);paint();
+    window.addEventListener('resize',paint);center();
   }
 
   function initSortMenu(){
@@ -356,12 +363,19 @@
     const menu=document.createElement('details');menu.className='sort-menu';
     const summary=document.createElement('summary');summary.innerHTML='<span></span><i class="fas fa-chevron-down" aria-hidden="true"></i>';summary.setAttribute('aria-label','Сортировка плагинов');
     const list=document.createElement('div');list.className='sort-options';list.setAttribute('role','group');list.setAttribute('aria-label','Варианты сортировки');
-    const options=Array.from(select.options).map(option=>{const button=document.createElement('button');button.type='button';button.textContent=option.textContent;button.dataset.value=option.value;button.addEventListener('click',()=>{select.value=option.value;select.dispatchEvent(new Event('change',{bubbles:true}));menu.open=false;summary.focus()});list.appendChild(button);return button});
+    const options=Array.from(select.options).map(option=>{const button=document.createElement('button');button.type='button';button.textContent=option.textContent;button.dataset.value=option.value;button.addEventListener('click',()=>{select.value=option.value;select.dispatchEvent(new Event('change',{bubbles:true}));setOpen(false);summary.focus()});list.appendChild(button);return button});
     function sync(){const label=summary.querySelector('span');label.textContent=select.selectedOptions[0].textContent;label.classList.remove('sort-label-enter');void label.offsetWidth;label.classList.add('sort-label-enter');options.forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.value===select.value)))}
     menu.append(summary,list);select.insertAdjacentElement('afterend',menu);select.hidden=true;select.addEventListener('change',sync);sync();
-    menu.addEventListener('keydown',e=>{if(e.key==='Escape'){menu.open=false;summary.focus();e.preventDefault();return}if(!['ArrowDown','ArrowUp','Home','End'].includes(e.key))return;e.preventDefault();menu.open=true;const i=options.indexOf(document.activeElement);const n=e.key==='Home'?0:e.key==='End'?options.length-1:e.key==='ArrowDown'?(i+1)%options.length:(i<0?options.length-1:(i+options.length-1)%options.length);options[n].focus()});
-    document.addEventListener('pointerdown',e=>{if(!menu.contains(e.target))menu.open=false});
-    menu.addEventListener('focusout',e=>{if(!menu.contains(e.relatedTarget))menu.open=false});
+    summary.dataset.caption='Сортировка';
+    const popover=typeof list.showPopover==='function';
+    if(popover)list.setAttribute('popover','manual');
+    function positionMenu(){const r=summary.getBoundingClientRect();const width=Math.min(Math.max(r.width,240),innerWidth-24);list.style.width=width+'px';list.style.left=Math.max(12,Math.min(r.left,innerWidth-width-12))+'px';list.style.top=Math.max(12,Math.min(r.bottom+8,innerHeight-list.offsetHeight-12))+'px'}
+    function setOpen(value){menu.open=value;if(popover){if(value){if(!list.matches(':popover-open'))list.showPopover();positionMenu()}else if(list.matches(':popover-open'))list.hidePopover()}}
+    menu.addEventListener('toggle',()=>setOpen(menu.open));
+    window.addEventListener('resize',()=>{if(menu.open&&popover)positionMenu()});window.addEventListener('scroll',()=>{if(menu.open&&popover)positionMenu()},true);
+    menu.addEventListener('keydown',e=>{if(e.key==='Escape'){setOpen(false);summary.focus();e.preventDefault();return}if(!['ArrowDown','ArrowUp','Home','End'].includes(e.key))return;e.preventDefault();setOpen(true);const i=options.indexOf(document.activeElement);const n=e.key==='Home'?0:e.key==='End'?options.length-1:e.key==='ArrowDown'?(i+1)%options.length:(i<0?options.length-1:(i+options.length-1)%options.length);requestAnimationFrame(()=>options[n].focus())});
+    document.addEventListener('pointerdown',e=>{if(!menu.contains(e.target))setOpen(false)});
+    menu.addEventListener('focusout',e=>{if(!menu.contains(e.relatedTarget))setOpen(false)});
   }
 
   function initEvents(){
