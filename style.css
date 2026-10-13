@@ -251,3 +251,22 @@ body[data-page="gallery"] .footer,body[data-page="gallery"] .back-to-top{display
 @media(hover:hover) and (pointer:fine){.gallery-page .gallery-card:hover{scale:1.05;rotate:0deg}}
 
 @media(hover:hover) and (pointer:fine){.gallery-page .plugin-gallery{cursor:default}.gallery-page .gallery-card{cursor:pointer}}
+
+/* A centered circular world, with camera coordinates independent of zoom. */
+.gallery-page .gallery-world{display:block;position:absolute;left:0;top:0;width:2560px;height:2560px;padding:0;transform-origin:0 0}
+.gallery-page .gallery-card{position:absolute;translate:none;rotate:0deg;z-index:2}
+.gallery-page .gallery-card:nth-child(n){translate:none;rotate:0deg}
+.gallery-page .plugin-gallery{cursor:grab;background:radial-gradient(ellipse at center,rgba(99,102,241,.09),transparent 70%),var(--bg)}
+.gallery-page .plugin-gallery.is-panning,.gallery-page .plugin-gallery.is-panning a{cursor:grabbing}
+.gallery-connections{position:absolute;inset:0;width:2560px;height:2560px;pointer-events:none;overflow:visible}
+.gallery-orbits circle{fill:none;stroke:var(--primary);stroke-width:1;stroke-opacity:.12;stroke-dasharray:3 14}
+.gallery-wire{fill:none;stroke:url(#wireGradient);stroke-width:2;stroke-opacity:.36;transition:stroke-opacity .2s,stroke-width .2s}
+.gallery-wire-glow .gallery-wire{stroke-width:7;stroke-opacity:.18}
+.gallery-wire-lines .gallery-wire{stroke-dasharray:16 8 2 8;animation:wireFlow 16s linear infinite}
+.gallery-wire.wire-active{stroke-opacity:1;stroke-width:4}.gallery-wire-glow .wire-active{stroke-width:12;stroke-opacity:.7}
+.gallery-core{fill:var(--surface);stroke:#818cf8;stroke-width:3}.gallery-core-halo{fill:rgba(99,102,241,.06);stroke:#818cf8;stroke-width:1;stroke-opacity:.3}
+.gallery-core-title{fill:var(--text);font-family:JetBrains Mono,monospace;font-size:58px;font-weight:800}.gallery-core-caption{fill:var(--muted);font-family:Inter,system-ui,sans-serif;font-size:12px;letter-spacing:2px}
+@keyframes wireFlow{to{stroke-dashoffset:-136}}
+@media(prefers-reduced-motion:reduce){.gallery-wire-lines .gallery-wire{animation:none}}
+.gallery-wire-lines .gallery-wire{vector-effect:non-scaling-stroke;stroke-width:1;stroke-opacity:.55}
+.gallery-wire-lines .gallery-wire.wire-active{stroke-width:2;stroke-opacity:1}
