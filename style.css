@@ -249,3 +249,5 @@ body[data-page="gallery"] .footer,body[data-page="gallery"] .back-to-top{display
 .gallery-page .gallery-card:focus-visible{outline:3px solid var(--primary);outline-offset:5px}
 @media(max-width:640px){.gallery-page .gallery-world{grid-template-columns:repeat(8,200px)}.gallery-page .gallery-card{width:200px;height:192px}.gallery-navigation>span{max-width:270px;white-space:normal;text-align:center;line-height:1.4}}
 @media(hover:hover) and (pointer:fine){.gallery-page .gallery-card:hover{scale:1.05;rotate:0deg}}
+
+@media(hover:hover) and (pointer:fine){.gallery-page .plugin-gallery{cursor:default}.gallery-page .gallery-card{cursor:pointer}}
