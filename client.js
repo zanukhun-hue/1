@@ -71,28 +71,18 @@
   }
 
   function initCatalogCollapse(){
-    const search=$('#pluginSearch');
-    const panel=search?.closest('.catalog-panel');
-    if(!panel||panel.querySelector('.catalog-panel-toggle'))return;
-    const body=document.createElement('div');
-    body.id='catalogPanelBody';
-    body.className='catalog-panel-body';
-    while(panel.firstChild)body.appendChild(panel.firstChild);
-    const toggle=document.createElement('button');
-    toggle.type='button';
-    toggle.className='catalog-panel-toggle';
-    toggle.setAttribute('aria-controls',body.id);
-    panel.classList.add('catalog-collapsible');
-    panel.appendChild(toggle);
-    panel.appendChild(body);
-    function setCollapsed(collapsed){
-      body.hidden=collapsed;
-      panel.classList.toggle('catalog-collapsed',collapsed);
-      toggle.setAttribute('aria-expanded',String(!collapsed));
-      toggle.textContent=collapsed?'Показать поиск и фильтры':'Скрыть поиск и фильтры';
-    }
-    setCollapsed(false);
-    toggle.addEventListener('click',()=>setCollapsed(!body.hidden));
+    const search=$('#pluginSearch'),panel=search?.closest('.catalog-panel');if(!panel||panel.querySelector('.catalog-panel-toggle'))return;
+    const advanced=[...panel.children].filter(el=>el.matches('.task-picker,.environment-controls,.catalog-row'));
+    const dialog=document.createElement('dialog');dialog.id='catalogFilterDialog';dialog.className='catalog-filter-dialog';dialog.setAttribute('aria-labelledby','catalogFilterTitle');
+    dialog.innerHTML='<div class="filter-dialog-top"><div><span class="eyebrow">Подобрать инструменты</span><h2 id="catalogFilterTitle">Фильтры каталога</h2></div><button type="button" class="filter-dialog-close" aria-label="Закрыть фильтры">×</button></div><div class="catalog-filter-body"></div><div class="filter-dialog-bottom"><button type="button" class="btn btn-primary filter-dialog-done">Показать результаты</button></div>';
+    advanced.forEach(el=>dialog.querySelector('.catalog-filter-body').append(el));document.body.append(dialog);
+    const toolbar=document.createElement('div');toolbar.className='catalog-search-toolbar';const box=search.closest('.search-box,.search-wrap');box.replaceWith(toolbar);toolbar.append(box);
+    const toggle=document.createElement('button');toggle.type='button';toggle.className='catalog-panel-toggle';toggle.setAttribute('aria-controls',dialog.id);toggle.setAttribute('aria-expanded','false');toggle.innerHTML='<i class="fas fa-sliders" aria-hidden="true"></i> Фильтры';toolbar.append(toggle);panel.classList.add('catalog-compact');
+    toggle.addEventListener('click',()=>{if(dialog.open)return;dialog.scrollTop=0;dialog.showModal();toggle.setAttribute('aria-expanded','true');dialog.querySelector('.filter-dialog-close').focus({preventScroll:true})});
+    function close(){dialog.close()}
+    dialog.querySelector('.filter-dialog-close').addEventListener('click',close);dialog.querySelector('.filter-dialog-done').addEventListener('click',close);
+    dialog.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();close()}});dialog.addEventListener('close',()=>{toggle.setAttribute('aria-expanded','false');toggle.focus({preventScroll:true})});
+    dialog.addEventListener('click',e=>{if(e.target===dialog){const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)close()}});
   }
 
   function initCatalog(){initCatalogCollapse();const p=new URLSearchParams(location.search);if(p.get('q')&&$('#pluginSearch'))$('#pluginSearch').value=p.get('q');if(p.get('favorites')==='1')$('#favoritesOnly')?.classList.add('active');document.addEventListener('input',e=>{if(e.target&&e.target.id==='pluginSearch')filterCatalog()});$('#pluginSearch')?.addEventListener('keyup',filterCatalog);$('#clearSearch')?.addEventListener('click',()=>{const i=$('#pluginSearch');if(i){i.value='';i.focus()}filterCatalog()});$('#sortPlugins')?.addEventListener('change',filterCatalog);$('#favoritesOnly')?.addEventListener('click',()=>{$('#favoritesOnly')?.classList.toggle('active');filterCatalog()});$('#categoryFilters')?.addEventListener('click',e=>{const b=e.target.closest('.filter-btn');if(!b)return;$$('.filter-btn',$('#categoryFilters')).forEach(x=>x.classList.remove('active'));b.classList.add('active');filterCatalog()});filterCatalog()}
