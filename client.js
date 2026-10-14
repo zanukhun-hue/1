@@ -327,17 +327,17 @@
 
   function initPluginGallery(){
     const arena=document.querySelector('.plugin-gallery');if(!arena)return;
-    const world=arena.querySelector('.gallery-world'),size=2560;
+    const world=arena.querySelector('.gallery-world'),size=2560,minZoom=.35,maxZoom=1.8;
     const pointers=new Map(),reduced=matchMedia('(prefers-reduced-motion: reduce)');
     let cx=size/2,cy=size/2,zoom=.4,pinch=null,suppressUntil=0;
     const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
     function paint(){
       world.style.transform=`translate3d(${arena.clientWidth/2-cx*zoom}px,${arena.clientHeight/2-cy*zoom}px,0) scale(${zoom})`;
       document.querySelector('.gallery-zoom-level').textContent=Math.round(zoom*100)+'%';
-      arena.dataset.cameraX=cx;arena.dataset.cameraY=cy;arena.dataset.zoom=zoom;updateMap();
+      arena.dataset.cameraX=cx;arena.dataset.cameraY=cy;arena.dataset.zoom=zoom;
     }
-    function center(){cx=cy=size/2;zoom=clamp(Math.min((arena.clientWidth-80)/(size-180),(arena.clientHeight-190)/(size-180)),.12,.65);paint()}
-    function changeZoom(next,px=arena.clientWidth/2,py=arena.clientHeight/2){const old=zoom;zoom=clamp(next,.12,1.8);cx+=(px-arena.clientWidth/2)*(1/old-1/zoom);cy+=(py-arena.clientHeight/2)*(1/old-1/zoom);paint()}
+    function center(){cx=cy=size/2;zoom=clamp(Math.min((arena.clientWidth-80)/(size-180),(arena.clientHeight-190)/(size-180)),minZoom,.65);paint()}
+    function changeZoom(next,px=arena.clientWidth/2,py=arena.clientHeight/2){const old=zoom;zoom=clamp(next,minZoom,maxZoom);cx+=(px-arena.clientWidth/2)*(1/old-1/zoom);cy+=(py-arena.clientHeight/2)*(1/old-1/zoom);paint()}
     document.querySelector('[data-gallery-zoom="in"]')?.addEventListener('click',()=>changeZoom(zoom*1.25));
     document.querySelector('[data-gallery-zoom="out"]')?.addEventListener('click',()=>changeZoom(zoom/1.25));
     document.querySelector('[data-gallery-reset]')?.addEventListener('click',center);
@@ -350,7 +350,7 @@
     arena.addEventListener('pointermove',e=>{
       const p=pointers.get(e.pointerId);if(!p)return;
       const dx=e.clientX-p.x,dy=e.clientY-p.y;p.x=e.clientX;p.y=e.clientY;
-      if(pointers.size===2&&pinch){const [a,b]=[...pointers.values()],r=arena.getBoundingClientRect();zoom=clamp(pinch.zoom*Math.hypot(a.x-b.x,a.y-b.y)/pinch.distance,.12,1.8);cx=pinch.worldX-((a.x+b.x)/2-r.left-r.width/2)/zoom;cy=pinch.worldY-((a.y+b.y)/2-r.top-r.height/2)/zoom;paint();return}
+      if(pointers.size===2&&pinch){const [a,b]=[...pointers.values()],r=arena.getBoundingClientRect();zoom=clamp(pinch.zoom*Math.hypot(a.x-b.x,a.y-b.y)/pinch.distance,minZoom,maxZoom);cx=pinch.worldX-((a.x+b.x)/2-r.left-r.width/2)/zoom;cy=pinch.worldY-((a.y+b.y)/2-r.top-r.height/2)/zoom;paint();return}
       if(!p.moved&&Math.hypot(p.x-p.startX,p.y-p.startY)>6){p.moved=true;arena.setPointerCapture(e.pointerId);arena.classList.add('is-panning')}
       if(p.moved){cx-=dx/zoom;cy-=dy/zoom;paint()}
     });
@@ -381,12 +381,7 @@
       const card=e.target.closest('.gallery-card');if(!card||e.ctrlKey||e.metaKey||e.shiftKey||e.altKey)return;
       e.preventDefault();showCard(card);
     });
-    const minimap=document.querySelector('.gallery-minimap'),mapNodes=minimap.querySelector('[data-map-nodes]'),viewport=minimap.querySelector('[data-map-viewport]');
-    cards.forEach(card=>{const dot=document.createElementNS('http://www.w3.org/2000/svg','circle');dot.setAttribute('cx',card.dataset.x);dot.setAttribute('cy',card.dataset.y);dot.setAttribute('r','28');dot.dataset.node=card.dataset.node;mapNodes.append(dot)});
-    function updateMap(){if(!viewport)return;const width=arena.clientWidth/zoom,height=arena.clientHeight/zoom;viewport.setAttribute('x',cx-width/2);viewport.setAttribute('y',cy-height/2);viewport.setAttribute('width',width);viewport.setAttribute('height',height)}
-    minimap.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();center();return}const steps={ArrowLeft:[-150,0],ArrowRight:[150,0],ArrowUp:[0,-150],ArrowDown:[0,150]};if(steps[e.key]){e.preventDefault();cx+=steps[e.key][0];cy+=steps[e.key][1];paint()}});
-    minimap.addEventListener('pointerdown',e=>{e.preventDefault();const r=minimap.getBoundingClientRect();cx=clamp((e.clientX-r.left)/r.width*size,0,size);cy=clamp((e.clientY-r.top)/r.height*size,0,size);paint()});
-    function filterTask(id){activeTask=id;const relevant=new Set(cards.filter(c=>id==='all'||c.dataset.tasks.split(' ').includes(id)).map(c=>c.dataset.node));cards.forEach(c=>c.classList.toggle('gallery-dimmed',!relevant.has(c.dataset.node)));edges.forEach(edge=>{const hit=relevant.has(edge.dataset.from)&&(edge.dataset.to==='-1'||relevant.has(edge.dataset.to));edge.classList.toggle('task-wire-active',id!=='all'&&hit);edge.classList.toggle('task-wire-dimmed',id!=='all'&&!hit)});mapNodes.querySelectorAll('circle').forEach(dot=>dot.classList.toggle('map-active',relevant.has(dot.dataset.node)));document.querySelectorAll('[data-gallery-task]').forEach(b=>{const on=b.dataset.galleryTask===id;b.classList.toggle('active',on);b.setAttribute('aria-pressed',String(on))})}
+    function filterTask(id){activeTask=id;const relevant=new Set(cards.filter(c=>id==='all'||c.dataset.tasks.split(' ').includes(id)).map(c=>c.dataset.node));cards.forEach(c=>c.classList.toggle('gallery-dimmed',!relevant.has(c.dataset.node)));edges.forEach(edge=>{const hit=relevant.has(edge.dataset.from)&&(edge.dataset.to==='-1'||relevant.has(edge.dataset.to));edge.classList.toggle('task-wire-active',id!=='all'&&hit);edge.classList.toggle('task-wire-dimmed',id!=='all'&&!hit)});document.querySelectorAll('[data-gallery-task]').forEach(b=>{const on=b.dataset.galleryTask===id;b.classList.toggle('active',on);b.setAttribute('aria-pressed',String(on))})}
     document.querySelector('.gallery-task-bar').addEventListener('click',e=>{const b=e.target.closest('[data-gallery-task]');if(b)filterTask(b.dataset.galleryTask)});
     filterTask('all');
     arena.addEventListener('keydown',e=>{if(e.target!==arena)return;const steps={ArrowLeft:[-70,0],ArrowRight:[70,0],ArrowUp:[0,-70],ArrowDown:[0,70]};if(!steps[e.key])return;e.preventDefault();cx+=steps[e.key][0]/zoom;cy+=steps[e.key][1]/zoom;paint()});
