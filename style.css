@@ -390,3 +390,6 @@ body[data-page="plugins"] .catalog-panel,body[data-page="plugins"] .catalog-pane
 body:has(.catalog-panel:focus-within) .spider-handle{pointer-events:none}
 .catalog-panel>.search-box{height:48px}
 body:has(.catalog-panel:focus-within) .spider-canvas,body:has(.catalog-panel:focus-within) .spider-handle{visibility:hidden}
+
+/* Artwork is not a browser drag source; basket handles use Pointer Events. */
+img,.product-cover,.hero-feature,.gallery-card,.cart-item-art{-webkit-user-drag:none}img{user-select:none;-webkit-user-select:none}

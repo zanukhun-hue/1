@@ -6,7 +6,7 @@ const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const ROOT = __dirname;
-const BUILD = process.env.RENDER_GIT_COMMIT || 'compact-search-filters-v15';
+const BUILD = process.env.RENDER_GIT_COMMIT || 'no-native-image-drag-v16';
 
 app.disable('x-powered-by');
 app.set('trust proxy', 1);
@@ -161,7 +161,7 @@ function sortPlugins(list, type = 'popular') { const rank = (plugin) => /поп�
 function relatedPlugins(plugin, count = 3) { const tags = new Set((plugin.tags || []).map((tag) => String(tag).toLowerCase())); return plugins.filter((item) => item.id !== plugin.id).map((item) => ({ item, score: (item.tags || []).filter((tag) => tags.has(String(tag).toLowerCase())).length * 3 + (item.category === plugin.category ? 2 : 0) + (item.package === plugin.package ? 1 : 0) })).filter((x) => x.score > 0).sort((a, b) => b.score - a.score || a.item.name.localeCompare(b.item.name, 'ru')).slice(0, count).map((x) => x.item); }
 function pluginArt(plugin, cls='') {
   const image=pluginImages[plugin.id]?.image;
-  return `<div class="product-art ${cls} ${['bcc-sapphire','bcc-continuum'].includes(plugin.id)?'product-logo':''}">${image?`<img src="${esc(image)}" alt="${esc(plugin.name)}" loading="lazy" width="600" height="400">`:`<span class="product-monogram" aria-hidden="true">${esc(plugin.name.split(/[ -]+/).map(w=>w[0]).join('').slice(0,3))}</span><span class="art-caption">${esc(plugin.categoryLabel)}</span>`}</div>`;
+  return `<div class="product-art ${cls} ${['bcc-sapphire','bcc-continuum'].includes(plugin.id)?'product-logo':''}">${image?`<img src="${esc(image)}" alt="${esc(plugin.name)}" draggable="false" loading="lazy" width="600" height="400">`:`<span class="product-monogram" aria-hidden="true">${esc(plugin.name.split(/[ -]+/).map(w=>w[0]).join('').slice(0,3))}</span><span class="art-caption">${esc(plugin.categoryLabel)}</span>`}</div>`;
 }
 function buildButton(id) {return `<button class="build-btn" type="button" data-build-id="${esc(id)}" aria-pressed="false">＋ В корзину</button>`;}
 function compatibilityNote(plugin) {const c=compatibility[plugin.id];return `<span class="compatibility-note" data-compat-id="${esc(plugin.id)}">${c?esc(c.label):'Совместимость уточняется'}</span>${c?`<a class="compat-source" href="${esc(c.source)}" target="_blank" rel="noopener">Данные разработчика ↗</a>`:''}`;}

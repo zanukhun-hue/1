@@ -448,7 +448,7 @@
     ids.forEach(id=>{
       const p=workspace.plugins.find(p=>p.id===id),row=document.createElement('article');row.className='cart-item';row.dataset.cartId=id;
       const art=document.createElement('a');art.className='cart-item-art';art.href='/plugin/'+encodeURIComponent(id);art.setAttribute('aria-label','Открыть '+p.name);
-      if(p.image){const img=document.createElement('img');img.src=p.image;img.alt='';art.append(img)}else{art.textContent=p.name.split(/[ -]+/).map(w=>w[0]).join('').slice(0,3)}
+      if(p.image){const img=document.createElement('img');img.src=p.image;img.alt='';img.draggable=false;art.append(img)}else{art.textContent=p.name.split(/[ -]+/).map(w=>w[0]).join('').slice(0,3)}
       const info=document.createElement('div');info.className='cart-item-info';const name=document.createElement('a');name.href=art.href;name.textContent=p.name;const meta=document.createElement('span');meta.textContent=p.version;info.append(name,meta);
       const actions=document.createElement('div');actions.className='cart-item-actions';
       const download=document.createElement(p.status==='available'?'a':'button');download.className='cart-download';if(p.status==='available'){download.href='/download/'+encodeURIComponent(id);download.textContent=id==='flow'?'↓ Скачать 1.5.2':'↓ Скачать'}else{download.type='button';download.disabled=true;download.textContent='Обновляется'}
@@ -549,7 +549,7 @@
     function activate(){
       drag.active=true;drag.button.classList.add('is-dragging');dock.classList.add('is-drag-active');dock.querySelector('strong').textContent='Отпусти плагин в корзину';document.body.classList.add('build-is-dragging');dock.hidden=false;dock.style.setProperty('--magnet-x','0px');dock.style.setProperty('--magnet-y','0px');base=dock.getBoundingClientRect();
       ghost=document.createElement('div');ghost.className='build-drag-ghost';ghost.setAttribute('aria-hidden','true');
-      if(drag.plugin.image){const img=document.createElement('img');img.src=drag.plugin.image;img.alt='';ghost.append(img)}
+      if(drag.plugin.image){const img=document.createElement('img');img.src=drag.plugin.image;img.alt='';img.draggable=false;ghost.append(img)}
       const text=document.createElement('div'),name=document.createElement('strong'),hint=document.createElement('span');name.textContent=drag.plugin.name;hint.textContent='В корзину';text.append(name,hint);ghost.append(text);document.body.append(ghost);
     }
     function move(e){
@@ -610,6 +610,7 @@
   }
 
   function initEvents(){
+    document.addEventListener('dragstart',e=>{if(e.target instanceof Element&&e.target.closest('img,.product-cover,.hero-feature,.gallery-card,.cart-item-art,.plugin-detail-art'))e.preventDefault()});
     $('#themeToggle')?.addEventListener('click',()=>{const d=!document.documentElement.classList.contains('dark-mode');applyTheme(d);localStorage.setItem(THEME_KEY,d?'dark':'light')});
     $('#menuToggle')?.addEventListener('click',()=>$('#navLinks')?.classList.toggle('open'));
     document.addEventListener('click',e=>{const b=e.target.closest('.favorite-btn[data-id]');if(b){e.preventDefault();toggleFavorite(b.dataset.id)}});
