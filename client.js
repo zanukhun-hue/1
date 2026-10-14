@@ -583,11 +583,43 @@
     document.addEventListener('keydown',e=>{if(e.key==='Escape'&&drag){e.preventDefault();finish(null,true)}});window.addEventListener('blur',()=>finish(null,true));window.addEventListener('resize',()=>finish(null,true));window.addEventListener('pagehide',()=>finish(null,true));document.addEventListener('visibilitychange',()=>{if(document.hidden)finish(null,true)});
   }
 
+  function initCardTilt(){
+    const cards=[...document.querySelectorAll('.plugin-card,.gallery-card')];if(!cards.length)return;
+    const reduced=matchMedia('(prefers-reduced-motion: reduce)'),fine=matchMedia('(hover:hover) and (pointer:fine)');
+    const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));let hovered=null,frame=0,pending=null,sensorOn=false,baseline=null;
+    const visibleCards=new Set();
+    function reset(card){card.style.setProperty('--card-rx','0deg');card.style.setProperty('--card-ry','0deg');card.style.setProperty('--card-px','0px');card.style.setProperty('--card-py','0px');card.classList.remove('card-tilting')}
+    function paint(card,x,y){if(reduced.matches||document.body.classList.contains('build-is-dragging'))return;const limit=card.classList.contains('gallery-card')?3.2:4.5;card.style.setProperty('--card-rx',(-y*limit).toFixed(2)+'deg');card.style.setProperty('--card-ry',(x*limit).toFixed(2)+'deg');card.style.setProperty('--card-px',(x*3).toFixed(2)+'px');card.style.setProperty('--card-py',(y*3).toFixed(2)+'px');card.style.setProperty('--card-light-x',((x+1)*50).toFixed(1)+'%');card.style.setProperty('--card-light-y',((y+1)*50).toFixed(1)+'%');card.classList.add('card-tilting')}
+    function queue(card,x,y){pending={card,x,y};if(!frame)frame=requestAnimationFrame(()=>{frame=0;const value=pending;pending=null;if(value)paint(value.card,value.x,value.y)})}
+    function clear(){cancelAnimationFrame(frame);frame=0;pending=null;hovered=null;cards.forEach(reset)}
+    const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting)visibleCards.add(entry.target);else{visibleCards.delete(entry.target);reset(entry.target)}}),{threshold:.1});
+    cards.forEach(card=>{
+      card.classList.add('tilt-ready');observer.observe(card);let rect=null;
+      card.addEventListener('animationend',e=>{if(e.target===card&&e.animationName==='aeReveal'){card.style.animation='none';card.style.opacity='1';card.style.filter='none'}});
+      card.addEventListener('pointerenter',e=>{if(e.pointerType!=='mouse'||e.buttons||reduced.matches)return;rect=card.getBoundingClientRect();hovered=card});
+      card.addEventListener('pointermove',e=>{if(reduced.matches||(e.pointerType==='mouse'&&e.buttons)||document.body.classList.contains('build-is-dragging'))return;if(e.pointerType==='mouse'){if(!rect)rect=card.getBoundingClientRect();hovered=card}else if(!card.classList.contains('gallery-card')){if(!rect)rect=card.getBoundingClientRect()}else return;queue(card,clamp((e.clientX-rect.left)/rect.width*2-1,-1,1),clamp((e.clientY-rect.top)/rect.height*2-1,-1,1))});
+      card.addEventListener('pointerleave',()=>{if(pending?.card===card){cancelAnimationFrame(frame);frame=0;pending=null}if(hovered===card)hovered=null;rect=null;reset(card)});
+      card.addEventListener('pointerdown',e=>{rect=card.getBoundingClientRect();reset(card);cancelAnimationFrame(frame);frame=0;pending=null;if(e.pointerType==='touch'&&!card.classList.contains('gallery-card'))queue(card,clamp((e.clientX-rect.left)/rect.width*2-1,-1,1),clamp((e.clientY-rect.top)/rect.height*2-1,-1,1))});
+      ['pointerup','pointercancel','lostpointercapture','blur'].forEach(type=>card.addEventListener(type,()=>reset(card)));
+    });
+    const controls=document.querySelector('.catalog-controls');let button=null,status=null;
+    function orientation(e){if(!sensorOn||document.hidden||reduced.matches||!Number.isFinite(e.beta)||!Number.isFinite(e.gamma))return;if(!baseline)baseline={beta:e.beta,gamma:e.gamma};let x=clamp((e.gamma-baseline.gamma)/20,-1,1),y=clamp((e.beta-baseline.beta)/20,-1,1);const angle=screen.orientation?.angle||0;if(angle===90)[x,y]=[y,-x];if(angle===270)[x,y]=[-y,x];visibleCards.forEach(card=>{if((!fine.matches||card!==hovered)&&!card.closest('[hidden]')&&!card.hidden)paint(card,x,y)})}
+    function stopSensor(){sensorOn=false;baseline=null;window.removeEventListener('deviceorientation',orientation);if(button){button.setAttribute('aria-pressed','false');button.textContent='Наклон от движения телефона'}clear()}
+    if(controls&&window.isSecureContext&&'DeviceOrientationEvent' in window&&!fine.matches){
+      button=document.createElement('button');button.type='button';button.className='card-motion-toggle';button.setAttribute('aria-pressed','false');button.textContent='Наклон от движения телефона';button.hidden=reduced.matches;controls.append(button);
+      status=document.createElement('span');status.className='card-motion-status';status.setAttribute('role','status');status.hidden=true;controls.append(status);
+      button.addEventListener('click',async()=>{if(sensorOn){stopSensor();status.hidden=true;return}try{if(typeof DeviceOrientationEvent.requestPermission==='function'){const permission=await DeviceOrientationEvent.requestPermission();if(permission!=='granted'){status.hidden=false;status.textContent='Доступ к движению не разрешён. Наклон от касания остаётся доступен.';return}}if(reduced.matches)return;sensorOn=true;baseline=null;window.addEventListener('deviceorientation',orientation,{passive:true});button.setAttribute('aria-pressed','true');button.textContent='Наклон от движения включён';status.hidden=false;status.textContent='Слегка наклони телефон. Первое положение считается ровным.'}catch{status.hidden=false;status.textContent='Движение недоступно в этом браузере. Карточки реагируют на касание.'}});
+    }
+    window.addEventListener('scroll',()=>{if(!sensorOn&&fine.matches)clear()}, {passive:true});window.addEventListener('blur',clear);window.addEventListener('resize',()=>{baseline=null;clear()});window.addEventListener('pagehide',stopSensor);document.addEventListener('visibilitychange',()=>{if(document.hidden)clear();else baseline=null});reduced.addEventListener('change',()=>{if(reduced.matches)stopSensor();if(button)button.hidden=reduced.matches});
+    // Dragging into the basket and panning the gallery take priority over decorative tilt.
+    new MutationObserver(()=>{if(document.body.classList.contains('build-is-dragging'))clear()}).observe(document.body,{attributes:true,attributeFilter:['class']});
+  }
+
   function initEvents(){
     $('#themeToggle')?.addEventListener('click',()=>{const d=!document.documentElement.classList.contains('dark-mode');applyTheme(d);localStorage.setItem(THEME_KEY,d?'dark':'light')});
     $('#menuToggle')?.addEventListener('click',()=>$('#navLinks')?.classList.toggle('open'));
     document.addEventListener('click',e=>{const b=e.target.closest('.favorite-btn[data-id]');if(b){e.preventDefault();toggleFavorite(b.dataset.id)}});
     const top=$('#backToTop');window.addEventListener('scroll',()=>top?.classList.toggle('show',window.scrollY>500));top?.addEventListener('click',()=>scrollTo({top:0,behavior:'smooth'}));
   }
-  document.addEventListener('DOMContentLoaded',()=>{injectUiFixes();initTheme();initWorkspace();initCart();initCommandPalette();initEmptyParticles();initMagneticBuild();initHeroPlayground();initSpider();initPluginGallery();initVisits();initEvents();syncFavoriteUI();initFlowVersionSelector();initDownloads();initButtonGlow();initPluginReport();initVideoComparisons();if(page==='plugins'){initCatalog();initSortMenu();initTaskSearch()}setupReveals()});
+  document.addEventListener('DOMContentLoaded',()=>{injectUiFixes();initTheme();initWorkspace();initCart();initCommandPalette();initEmptyParticles();initMagneticBuild();initHeroPlayground();initSpider();initPluginGallery();initCardTilt();initVisits();initEvents();syncFavoriteUI();initFlowVersionSelector();initDownloads();initButtonGlow();initPluginReport();initVideoComparisons();if(page==='plugins'){initCatalog();initSortMenu();initTaskSearch()}setupReveals()});
 })();
