@@ -354,12 +354,12 @@ body:has(.gallery-drawer:not([hidden])) .spider-canvas,body:has(.gallery-drawer:
 /* Subtle physical card tilt, with artwork parallax and a cursor-following reflection. */
 .plugin-card.tilt-ready,.gallery-page .gallery-card.tilt-ready{transform:perspective(1100px) rotateX(var(--card-rx,0deg)) rotateY(var(--card-ry,0deg));transform-origin:50% 50%;transition:transform .35s cubic-bezier(.2,.7,.2,1),box-shadow .25s,border-color .25s;backface-visibility:hidden}
 .plugin-card.tilt-ready.card-tilting,.gallery-page .gallery-card.tilt-ready.card-tilting{transition:transform .14s ease-out,box-shadow .25s,border-color .25s}
-.tilt-ready .product-art img,.tilt-ready .gallery-card-art img{transform:translate(var(--card-px,0px),var(--card-py,0px)) scale(1.035);transition:transform .3s ease-out}
-.tilt-ready .product-cover:after,.tilt-ready .gallery-card-art:after{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at var(--card-light-x,50%) var(--card-light-y,50%),rgba(255,255,255,.13),transparent 65%);opacity:0;transition:opacity .25s}
-.tilt-ready .gallery-card-art{position:relative}.card-tilting .product-cover:after,.card-tilting .gallery-card-art:after{opacity:1}.card-motion-toggle{border:1px solid var(--border);border-radius:12px;padding:11px 14px;background:var(--surface);color:var(--muted);font-size:.75rem;cursor:pointer}.card-motion-toggle[aria-pressed="true"]{color:var(--primary);border-color:var(--primary);background:rgba(139,124,246,.12)}.card-motion-status{flex-basis:100%;font-size:.7rem;color:var(--muted)}
+.tilt-ready .product-art img,.tilt-ready .gallery-card-art img{transform:translate(var(--card-px,0px),var(--card-py,0px)) scale(1.06);transition:transform .3s ease-out}
+.plugin-card.tilt-ready:after,.gallery-card.tilt-ready:after{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at var(--card-light-x,50%) var(--card-light-y,50%),rgba(255,255,255,.08),transparent 72%);opacity:0;transition:opacity .25s}
+.tilt-ready .gallery-card-art{position:relative}.plugin-card.card-tilting:after,.gallery-card.card-tilting:after{opacity:1}.card-motion-toggle{border:1px solid var(--border);border-radius:12px;padding:11px 14px;background:var(--surface);color:var(--muted);font-size:.75rem;cursor:pointer}.card-motion-toggle[aria-pressed="true"]{color:var(--primary);border-color:var(--primary);background:rgba(139,124,246,.12)}.card-motion-status{flex-basis:100%;font-size:.7rem;color:var(--muted)}
 .footer .footer-connect .footer-author-link{display:grid;grid-template-columns:16px minmax(0,1fr);gap:4px 7px;align-items:start}.footer-author-link>i{grid-column:1;grid-row:1/3;margin-top:3px}.footer-author-label{grid-column:2;line-height:1.5}.footer-author-link>strong{grid-column:2;color:var(--text);font-size:.82rem}
 @media(max-width:640px){.footer .footer-connect{grid-template-columns:1fr}.footer .footer-author-link{margin-top:4px!important}.footer .footer-connect .footer-author-link{grid-template-columns:16px minmax(0,1fr)}.footer-author-link>i{grid-row:1}.footer-author-link>strong{grid-column:2}}
-@media(prefers-reduced-motion:reduce){.plugin-card.tilt-ready,.gallery-page .gallery-card.tilt-ready{transform:none!important;transition:none}.tilt-ready .product-art img,.tilt-ready .gallery-card-art img{transform:none;transition:none}.tilt-ready .product-cover:after,.tilt-ready .gallery-card-art:after{display:none}}
+@media(prefers-reduced-motion:reduce){.plugin-card.tilt-ready,.gallery-page .gallery-card.tilt-ready{transform:none!important;transition:none}.tilt-ready .product-art img,.tilt-ready .gallery-card-art img{transform:none;transition:none}.plugin-card.tilt-ready:after,.gallery-card.tilt-ready:after{display:none}}
 
 /* Six sections fill the header's middle area instead of leaving wide empty gaps. */
 @media(min-width:1261px){.header .nav-container{gap:22px}.header .logo-text{font-size:1.08rem}.header .nav-links{flex:1;justify-content:center;gap:8px}.header .nav-link{flex:1;min-width:0;justify-content:center;font-size:.96rem;padding:14px 12px;border-radius:13px}.header .nav-link i{font-size:.9em}.header .header-actions{gap:8px}.header .command-trigger,.header .build-link{height:42px}.header .favorite-pill,.header .telegram-link,.header .theme-toggle{height:42px;min-width:42px}}
@@ -394,3 +394,28 @@ img,.product-cover,.hero-feature,.gallery-card,.cart-item-art{-webkit-user-drag:
 
 /* Keep product names and logos fully visible in supplied artwork. */
 .product-art.product-contained img{object-fit:contain}
+
+/* Artwork fills its viewport; CSS offsets exclude baked-in letterbox bars. */
+.product-art,.gallery-card-art,.cart-item-art{position:relative;overflow:hidden}
+.product-art img,.gallery-page .gallery-card-art img,.drawer-art img,.cart-item-art img{position:absolute;left:0;top:var(--art-top,0%);width:100%;height:var(--art-height,100%);max-width:none;object-fit:fill;padding:0}
+.product-art.product-contained img{object-fit:fill}
+.product-art.product-logo img,.gallery-page .gallery-logo-art img{object-fit:contain;top:0;height:100%;padding:16px}
+.product-art:has(img[src="/assets/plugins/red-giant.webp"]),.gallery-card-art:has(img[src="/assets/plugins/red-giant.webp"]),.product-art:has(img[src="/assets/plugins/pixdither.webp"]),.gallery-card-art:has(img[src="/assets/plugins/pixdither.webp"]){background:radial-gradient(ellipse at 50% 40%,#242440,#101426 80%)}
+img[src="/assets/plugins/red-giant.webp"],img[src="/assets/plugins/pixdither.webp"]{mix-blend-mode:screen}
+.plugin-card.tilt-ready{position:relative;isolation:isolate}.gallery-card.tilt-ready{isolation:isolate}
+.plugin-card.tilt-ready:after,.gallery-card.tilt-ready:after{border-radius:inherit;z-index:3}
+img[src="/assets/plugins/aftercodecs.webp"]{--art-height:184.0278%;--art-top:-39.5833%}
+img[src="/assets/plugins/clearplus.webp"]{--art-height:175.4967%;--art-top:-37.7483%}
+img[src="/assets/plugins/jpeg-glitch.webp"]{--art-height:175.4967%;--art-top:-37.7483%}
+img[src="/assets/plugins/mask-prompter.webp"]{--art-height:175.4967%;--art-top:-37.7483%}
+img[src="/assets/plugins/newton.webp"]{--art-height:175.4967%;--art-top:-37.7483%}
+img[src="/assets/plugins/signal.webp"]{--art-height:175.4967%;--art-top:-37.7483%}
+img[src="/assets/plugins/tracery.webp"]{--art-height:175.4967%;--art-top:-37.7483%}
+img[src="/assets/plugins/saber.webp"]{--art-height:132.3529%;--art-top:-16.1765%}
+img[src="/assets/plugins/omino.webp"]{--art-height:133.3333%;--art-top:-16.6667%}
+img[src="/assets/plugins/influx.webp"]{--art-height:193.4307%;--art-top:-42.3358%}
+.plugin-detail-art .product-art img{object-fit:fill}
+.plugin-detail-art .product-art.product-logo img{object-fit:contain}
+/* A scaled gallery world keeps one image layer, without nested hover transforms. */
+.gallery-page .gallery-card.tilt-ready,.gallery-page .gallery-card.tilt-ready.card-tilting,.gallery-page .gallery-card:hover{transform:none;scale:1;rotate:0deg;backface-visibility:visible}
+.gallery-page .gallery-card.tilt-ready .gallery-card-art img{transform:none;transition:none}

@@ -218,5 +218,11 @@
     "source": "user-provided",
     "artworkType": "brand-logo",
     "fit": "contain"
+  },
+  "ezco-crt-emulator": {
+    "image": "/assets/plugins/ezco-crt-emulator.svg",
+    "source": "site-original",
+    "artworkType": "custom-cover",
+    "fit": "fill"
   }
 }

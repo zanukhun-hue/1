@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="426" viewBox="0 0 600 426">
+<defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#111f4b"/><stop offset=".55" stop-color="#472654"/><stop offset="1" stop-color="#112638"/></linearGradient><linearGradient id="neon"><stop stop-color="#63efff"/><stop offset=".5" stop-color="#b59cff"/><stop offset="1" stop-color="#ff85c5"/></linearGradient><pattern id="scan" width="6" height="6" patternUnits="userSpaceOnUse"><path d="M0 1H6" stroke="#92c8ff" stroke-opacity=".12"/></pattern></defs>
+<path fill="url(#bg)" d="M0 0h600v426H0z"/><path fill="url(#scan)" d="M0 0h600v426H0z"/>
+<g fill="none" stroke="url(#neon)" stroke-width="4"><rect x="185" y="58" width="230" height="164" rx="25"/><rect x="201" y="73" width="198" height="130" rx="35"/><path d="m261 240 39 12 39-12M282 89l-37 55 34 14-12 33m56-102 31 55-34 14 13 33"/></g>
+<text x="38" y="43" fill="#b6c8ed" font-family="Arial,sans-serif" font-size="18" font-weight="700" letter-spacing="5">EZCO</text>
+<text x="300" y="329" text-anchor="middle" fill="url(#neon)" font-family="Arial,sans-serif" font-size="87" font-weight="900" letter-spacing="8">CRT</text>
+<text x="300" y="382" text-anchor="middle" fill="#edf2ff" font-family="Arial,sans-serif" font-size="29" font-weight="700" letter-spacing="7">EMULATOR</text>
+</svg>

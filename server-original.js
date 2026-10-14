@@ -6,7 +6,7 @@ const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const ROOT = __dirname;
-const BUILD = process.env.RENDER_GIT_COMMIT || 'plugin-artwork-v18';
+const BUILD = process.env.RENDER_GIT_COMMIT || 'full-card-artwork-v19';
 
 app.disable('x-powered-by');
 app.set('trust proxy', 1);
