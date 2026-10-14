@@ -543,10 +543,13 @@
 
   function initMagneticBuild(){
     const handles=[...document.querySelectorAll('[data-build-drag]')];if(!handles.length)return;
-    const reduced=matchMedia('(prefers-reduced-motion: reduce)');
-    const dock=document.createElement('div');dock.className='magnetic-build-dock';dock.hidden=true;dock.innerHTML='<span class="dock-symbol" aria-hidden="true">＋</span><div><strong>Корзина плагинов</strong><span class="dock-instruction">Отпусти здесь, чтобы добавить</span></div>';document.body.append(dock);
+    const reduced=matchMedia('(prefers-reduced-motion: reduce)'),fine=matchMedia('(hover:hover) and (pointer:fine)');let gridVisible=false,footerVisible=false,hovering=false;
+    const dock=document.createElement('div');dock.className='magnetic-build-dock';dock.hidden=true;dock.innerHTML='<span class="dock-symbol" aria-hidden="true">↓</span><div><strong>Перетащи плагин сюда</strong><span class="dock-instruction">Корзина плагинов · выбрано: <span data-build-count>0</span></span></div><button type="button" class="dock-open" data-cart-open>Открыть корзину →</button>';document.body.append(dock);
     const status=document.createElement('div');status.className='build-drag-status';status.setAttribute('role','status');status.hidden=true;document.body.append(status);
-    let drag=null,ghost=null,base=null,statusTimer=0;
+    let drag=null,ghost=null,base=null,statusTimer=0,suppressClickUntil=0;
+    function syncDock(){dock.hidden=!fine.matches||(!drag?.active&&!hovering&&(!gridVisible||footerVisible));if(!drag?.active){dock.style.setProperty('--magnet-x','0px');dock.style.setProperty('--magnet-y','0px');dock.querySelector('strong').textContent='Перетащи плагин сюда';dock.querySelector('.dock-instruction').innerHTML='Корзина плагинов · выбрано: <span data-build-count>'+readBuild().length+'</span>'}}
+    const footer=document.querySelector('.footer');if(footer)new IntersectionObserver(entries=>{footerVisible=entries[0].isIntersecting;syncDock()},{threshold:0}).observe(footer);
+    const grid=document.getElementById('pluginsGrid');if(grid)new IntersectionObserver(entries=>{gridVisible=entries[0].isIntersecting;syncDock()},{threshold:0}).observe(grid);fine.addEventListener('change',()=>{finish(null,true);syncDock()});
     function notify(name){clearTimeout(statusTimer);status.textContent=`${name} добавлен в корзину`;status.hidden=false;statusTimer=setTimeout(()=>status.hidden=true,2400)}
     function start(e,button){
       if(e.button!==0||e.pointerType==='touch')return;
@@ -554,7 +557,7 @@
       drag={id:e.pointerId,button,plugin,startX:e.clientX,startY:e.clientY,active:false,hit:false};button.setPointerCapture(e.pointerId);
     }
     function activate(){
-      drag.active=true;drag.button.classList.add('is-dragging');document.body.classList.add('build-is-dragging');dock.hidden=false;dock.style.setProperty('--magnet-x','0px');dock.style.setProperty('--magnet-y','0px');base=dock.getBoundingClientRect();
+      drag.active=true;drag.button.classList.add('is-dragging');dock.classList.add('is-drag-active');dock.querySelector('strong').textContent='Отпусти плагин в корзину';document.body.classList.add('build-is-dragging');dock.hidden=false;dock.style.setProperty('--magnet-x','0px');dock.style.setProperty('--magnet-y','0px');base=dock.getBoundingClientRect();
       ghost=document.createElement('div');ghost.className='build-drag-ghost';ghost.setAttribute('aria-hidden','true');
       if(drag.plugin.image){const img=document.createElement('img');img.src=drag.plugin.image;img.alt='';ghost.append(img)}
       const text=document.createElement('div'),name=document.createElement('strong'),hint=document.createElement('span');name.textContent=drag.plugin.name;hint.textContent='В корзину';text.append(name,hint);ghost.append(text);document.body.append(ghost);
@@ -571,14 +574,15 @@
     }
     function finish(e,cancelled=false){
       if(!drag||e&&e.pointerId!==drag.id)return;
-      const current=drag;drag=null;
+      const current=drag;drag=null;if(current.active)suppressClickUntil=performance.now()+400;
       if(current.active&&!cancelled&&current.hit){saveBuild([...new Set([...readBuild(),current.plugin.id])]);notify(current.plugin.name);const count=document.querySelector('[data-build-count]');if(count&&!reduced.matches)count.animate([{transform:'scale(1)'},{transform:'scale(1.6)'},{transform:'scale(1)'}],{duration:350})}
-      current.button.classList.remove('is-dragging');if(current.button.hasPointerCapture(current.id))current.button.releasePointerCapture(current.id);ghost?.remove();ghost=null;dock.hidden=true;dock.classList.remove('is-ready');document.body.classList.remove('build-is-dragging');
+      current.button.classList.remove('is-dragging');if(current.button.hasPointerCapture(current.id))current.button.releasePointerCapture(current.id);ghost?.remove();ghost=null;dock.classList.remove('is-ready','is-drag-active');document.body.classList.remove('build-is-dragging');syncDock();
     }
     handles.forEach(button=>{
+      button.addEventListener('pointerenter',()=>{hovering=true;syncDock()});button.addEventListener('pointerleave',()=>{hovering=false;syncDock()});
       button.addEventListener('pointerdown',e=>start(e,button));button.addEventListener('pointermove',move);button.addEventListener('pointerup',e=>finish(e));button.addEventListener('pointercancel',e=>finish(e,true));button.addEventListener('lostpointercapture',e=>finish(e,true));
       button.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();finish(null,true)}});
-      button.addEventListener('click',e=>{e.preventDefault();if(e.detail===0){const plugin=workspace.plugins.find(p=>p.id===button.dataset.buildDrag);saveBuild([...new Set([...readBuild(),plugin.id])]);notify(plugin.name)}});
+      button.addEventListener('click',e=>{e.preventDefault();if(performance.now()<suppressClickUntil)return;const plugin=workspace.plugins.find(p=>p.id===button.dataset.buildDrag);saveBuild([...new Set([...readBuild(),plugin.id])]);notify(plugin.name);syncDock()});
     });
     document.addEventListener('keydown',e=>{if(e.key==='Escape'&&drag){e.preventDefault();finish(null,true)}});window.addEventListener('blur',()=>finish(null,true));window.addEventListener('resize',()=>finish(null,true));window.addEventListener('pagehide',()=>finish(null,true));document.addEventListener('visibilitychange',()=>{if(document.hidden)finish(null,true)});
   }
