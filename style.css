@@ -275,7 +275,7 @@ body[data-page="gallery"] .footer,body[data-page="gallery"] .back-to-top{display
 .collections-section{padding-top:26px}.collections-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}.collection-card{padding:26px;border:1px solid var(--border);border-radius:22px;background:var(--surface)}.collection-card h2{font-size:1.5rem;letter-spacing:-.035em;margin-bottom:14px}.collection-card>p{font-size:.9rem;color:var(--muted);line-height:1.7;min-height:96px}.collection-card ul{list-style:none;margin-top:24px}.collection-card li+li{border-top:1px solid var(--border)}.collection-card li a{display:grid;gap:5px;padding:14px 0}.collection-card li strong{font-size:.96rem}.collection-card li span{font-size:.82rem;color:var(--muted)}.collection-card li small{font-size:.72rem;color:var(--primary)}
 /* Images and labels form one card, with less empty framing. */
 .gallery-page .gallery-card{height:224px;padding:0;gap:0;border-radius:18px;overflow:hidden;border-color:rgba(129,140,248,.22);box-shadow:0 10px 26px rgba(0,0,0,.28)}
-.gallery-page .gallery-card-art{height:142px;border-radius:0;background:#101426}.gallery-page .gallery-card-art img{object-fit:cover}.gallery-page .gallery-logo-art{background:#edf0f7;padding:18px}.gallery-page .gallery-logo-art img{object-fit:contain}
+.gallery-page .gallery-card-art{height:142px;border-radius:0;background:#101426}.gallery-page .gallery-card-art img{object-fit:contain}.gallery-page .gallery-logo-art{background:#edf0f7;padding:18px}.gallery-page .gallery-logo-art img{object-fit:contain}
 .gallery-card-info{position:relative;display:flex;flex-direction:column;justify-content:center;gap:7px;padding:14px 34px 16px 16px;flex:1;min-height:82px}.gallery-page .gallery-card-info strong{padding:0;font-size:.89rem;font-weight:650;line-height:1.2}.gallery-page .gallery-card-info small{padding:0;font-size:.68rem;color:var(--muted)}.gallery-open{position:absolute;right:14px;top:16px;color:var(--primary);font-size:1rem}
 .gallery-image-placeholder{background:radial-gradient(ellipse at 35% 20%,rgba(99,102,241,.24),transparent 75%),var(--surface-2);gap:8px}.gallery-image-placeholder .gallery-monogram{font-family:JetBrains Mono,monospace;font-size:2.3rem;font-weight:800;letter-spacing:-.07em;color:#a5b4fc}.gallery-image-placeholder>span:last-child{font-size:.6rem;opacity:.65}
 .gallery-preview-icon .gallery-card-art img{object-fit:contain}.gallery-preview-icon .gallery-logo-art{background:#edf0f7;padding:18px}
@@ -391,3 +391,6 @@ body:has(.catalog-panel:focus-within) .spider-canvas,body:has(.catalog-panel:foc
 
 /* Artwork is not a browser drag source; basket handles use Pointer Events. */
 img,.product-cover,.hero-feature,.gallery-card,.cart-item-art{-webkit-user-drag:none}img{user-select:none;-webkit-user-select:none}
+
+/* Keep product names and logos fully visible in supplied artwork. */
+.product-art.product-contained img{object-fit:contain}

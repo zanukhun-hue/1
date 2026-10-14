@@ -94,5 +94,129 @@
     "image": "/assets/plugins/saber.webp",
     "sourcePage": "https://www.videocopilot.net/blog/2016/03/new-plug-in-saber-now-available-100-free/",
     "sourceImage": "https://img.youtube.com/vi/reSXGxkyr0k/hqdefault.jpg"
+  },
+  "twixtor": {
+    "image": "/assets/plugins/twixtor.webp",
+    "source": "user-provided",
+    "width": 960,
+    "height": 540,
+    "fit": "contain"
+  },
+  "rsmb": {
+    "image": "/assets/plugins/rsmb.webp",
+    "source": "user-provided",
+    "width": 600,
+    "height": 600,
+    "fit": "contain"
+  },
+  "red-giant": {
+    "image": "/assets/plugins/red-giant.webp",
+    "source": "user-provided",
+    "width": 738,
+    "height": 414,
+    "fit": "contain"
+  },
+  "omino": {
+    "image": "/assets/plugins/omino.webp",
+    "source": "user-provided",
+    "width": 480,
+    "height": 360,
+    "fit": "contain"
+  },
+  "bokeh": {
+    "image": "/assets/plugins/bokeh.webp",
+    "source": "user-provided",
+    "width": 940,
+    "height": 530,
+    "fit": "contain"
+  },
+  "deep-glow-v1": {
+    "image": "/assets/plugins/deep-glow-v1.webp",
+    "source": "user-provided",
+    "width": 960,
+    "height": 540,
+    "fit": "contain"
+  },
+  "influx": {
+    "sourcePage": "https://aescripts.com/influx/",
+    "sourceImage": "https://aescripts.com/media/catalog/product/cache/b7bdf9dce07928a6c34f72fb33f91f39/a/u/autokroma__splash_images_v5__b_influx_logo_about_copy_16_9.png",
+    "image": "/assets/plugins/influx.webp",
+    "width": 265,
+    "height": 265,
+    "fit": "contain"
+  },
+  "pixdither": {
+    "sourcePage": "https://wunkolo.itch.io/pixdither",
+    "sourceImage": "https://img.itch.zone/aW1hZ2UvMTA4MTkzLzUwMjAzMy5naWY=/original/pw8zR7.gif",
+    "image": "/assets/plugins/pixdither.webp",
+    "width": 516,
+    "height": 400,
+    "fit": "contain"
+  },
+  "polytrace": {
+    "image": "/assets/plugins/polytrace.webp",
+    "sourcePage": "https://elementsupply.co/products/polytrace",
+    "sourceImage": "https://elementsupply.co/media/pages/products/polytrace/d279304ec5-1745098506/polytrace.jpg",
+    "width": 960,
+    "height": 540,
+    "fit": "contain"
+  },
+  "topaz-video-enhance": {
+    "sourcePage": "https://topazlabs.com/video-enhance-ai-/",
+    "sourceImage": "https://topazlabs.com/wp-content/uploads/2020/02/Icon-v7.png",
+    "image": "/assets/plugins/topaz-video-enhance.webp",
+    "width": 600,
+    "height": 600,
+    "fit": "contain"
+  },
+  "fxconsole": {
+    "image": "/assets/plugins/fxconsole.webp",
+    "sourcePage": "https://www.videocopilot.net/blog/2018/05/fx-console-updated-to-v1-0-3/",
+    "sourceImage": "https://d3jddrml5mymee.cloudfront.net/assets/blog/wp-content/uploads/2018/05/fx_console@2x.jpg",
+    "width": 960,
+    "height": 320,
+    "fit": "contain"
+  },
+  "heat-distortion": {
+    "image": "/assets/plugins/heat-distortion.webp",
+    "sourcePage": "https://www.videocopilot.net/products/heatdistortion/",
+    "sourceImage": "https://d3jddrml5mymee.cloudfront.net/assets/public/images/v6/products/heatdistortion/product_header.jpg",
+    "width": 529,
+    "height": 75,
+    "fit": "contain"
+  },
+  "mocha-pro": {
+    "image": "/assets/plugins/mocha-pro.webp",
+    "sourcePage": "https://borisfx.com/products/mocha-pro/",
+    "sourceImage": "https://borisfx-com-res.cloudinary.com/image/upload/q_auto,f_auto,fl_lossy/v1772151099/Marketing/2026%20Logos/MochaPro/Horizontal/Light/SVG/MochaPro_Horizontal.png",
+    "width": 960,
+    "height": 221,
+    "fit": "contain"
+  },
+  "film-convert-nitrate": {
+    "image": "/assets/plugins/film-convert-nitrate.svg",
+    "sourcePage": "https://www.filmconvert.com/nitrate",
+    "sourceImage": "https://www.filmconvert.com/assets/img/Nitrate%20logo%20white.svg",
+    "fit": "contain"
+  },
+  "glitchify": {
+    "image": "/assets/plugins/glitchify.webp",
+    "sourcePage": "https://elementsupply.co/products/glitchify",
+    "sourceImage": "https://elementsupply.co/media/pages/products/glitchify/bbc5dd06a3-1745098498/glitchify.jpg",
+    "width": 960,
+    "height": 540,
+    "fit": "contain"
+  },
+  "red-giant-shooter": {
+    "image": "/assets/plugins/red-giant.webp",
+    "source": "user-provided",
+    "artworkType": "brand-logo",
+    "fit": "contain"
+  },
+  "maxon-looks-trapcode": {
+    "image": "/assets/plugins/red-giant.webp",
+    "source": "user-provided",
+    "artworkType": "brand-logo",
+    "fit": "contain"
   }
 }
