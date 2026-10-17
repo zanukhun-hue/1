@@ -3,3 +3,10 @@ npm-debug.log*
 .env
 .env.*
 !.env.example
+
+# Paid After Effects presets: never publish binaries or paid ZIP packs
+*.ffx
+**/*_149_RUB.zip
+assets/presets/
+private-presets/
+paid-presets/
