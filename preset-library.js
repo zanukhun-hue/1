@@ -68,7 +68,7 @@ function render(items, query, root, esc, enc, telegram) {
     </article>`).join("");
   return `<div class="preset-store">
     <div class="preset-store-intro">
-      <span class="preset-store-eyebrow">NULL-OBJECT-AE / PRESET STORE</span>
+      <span class="preset-store-eyebrow">AE PLUGINS VAULT / PRESET STORE</span>
       <h2>Готовые эффекты. Сделано вручную.</h2>
       <p>Выбери набор, посмотри полный список пресетов и оформи заказ через нашего Telegram-бота. Выдача ZIP после подтверждения оплаты.</p>
       <div class="preset-store-stats"><span><strong>${categories.length}</strong> наборов</span><span><strong>${items.length}</strong> пресетов</span><span><strong>${PRICE_RUB} ₽</strong> за набор</span></div>
@@ -80,7 +80,7 @@ function render(items, query, root, esc, enc, telegram) {
     </form>
     <div class="preset-store-heading"><h2>Тематические наборы</h2><span>Найдено: ${shown.length}</span></div>
     <div class="preset-pack-grid">${cards || '<p class="preset-empty">Ничего не найдено. <a href="/presets">Показать все наборы</a></p>'}</div>
-    <dialog class="preset-preview-dialog" id="presetPreviewDialog" aria-labelledby="presetPreviewTitle"><button type="button" class="preset-preview-close" data-close-preset-preview aria-label="Закрыть окно просмотра"><i class="fas fa-xmark" aria-hidden="true"></i></button><div id="presetPreviewBody"></div></dialog>
+    <dialog class="preset-preview-dialog" id="presetPreviewDialog" aria-labelledby="presetPreviewTitle"><button type="button" class="preset-preview-close" data-close-preset-preview aria-label="Закрыть окно просмотра"><span aria-hidden="true">×</span></button><div id="presetPreviewBody"></div></dialog>
     ${previewTemplates}
     <section class="preset-howto">
       <h2>Как купить пресеты</h2>

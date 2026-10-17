@@ -41,9 +41,9 @@
   function analyticsIgnored(){return localStorage.getItem(IGNORE_ANALYTICS_KEY)==='1'}
   async function logSiteVisit(){try{if(analyticsIgnored())return;await sbInsert('site_visits',{path:location.pathname,visitor_hash:visitorId(),user_agent:(navigator.userAgent||'').slice(0,180)})}catch(e){console.warn('Site visit analytics skipped:',e.message)}}
 
-  function syncFavoriteUI(){const fav=getFavorites();$$('#favoriteCount').forEach(e=>e.textContent=fav.length);$$('.favorite-btn[data-id]').forEach(b=>{const a=fav.includes(b.dataset.id),w=b.classList.contains('btn');b.classList.toggle('active',a);b.innerHTML=a?`<i class="fas fa-heart"></i>${w?' В избранном':''}`:`<i class="far fa-heart"></i>${w?' В избранное':''}`})}
+  function syncFavoriteUI(){const fav=getFavorites();$$('#favoriteCount').forEach(e=>e.textContent=fav.length);$$('.favorite-btn[data-id]').forEach(b=>{const a=fav.includes(b.dataset.id),w=b.classList.contains('btn');b.classList.toggle('active',a);b.setAttribute('aria-pressed',String(a));if(!w)b.setAttribute('aria-label',(a?'Убрать из избранного: ':'Добавить в избранное: ')+(b.closest('[data-plugin-card]')?.dataset.name||b.dataset.id));b.innerHTML=a?`<span class="favorite-symbol" aria-hidden="true">♥</span>${w?' В избранном':''}`:`<span class="favorite-symbol" aria-hidden="true">♡</span>${w?' В избранное':''}`})}
   function toggleFavorite(id){const a=getFavorites(),i=a.indexOf(id);i>=0?a.splice(i,1):a.push(id);saveFavorites(a);syncFavoriteUI();filterCatalog()}
-  function applyTheme(d){document.documentElement.classList.toggle('dark-mode',d);document.documentElement.classList.toggle('light-mode',!d);document.body.classList.toggle('dark-mode',d);document.body.classList.toggle('light-mode',!d);const i=$('#themeToggle i');if(i)i.className=d?'fas fa-sun':'fas fa-moon'}
+  function applyTheme(d){document.documentElement.classList.toggle('dark-mode',d);document.documentElement.classList.toggle('light-mode',!d);document.body.classList.toggle('dark-mode',d);document.body.classList.toggle('light-mode',!d);const toggle=$('#themeToggle');if(toggle){toggle.setAttribute('aria-label',d?'Включить светлую тему':'Включить тёмную тему');toggle.setAttribute('aria-pressed',String(d))}}
   function initTheme(){const s=localStorage.getItem(THEME_KEY);applyTheme(s?s==='dark':true)}
   function initVisits(){logSiteVisit()}
   function setupReveals(){const items=$$('.reveal:not(.revealed)');if(!('IntersectionObserver'in window)){items.forEach(x=>x.classList.add('revealed'));return}const o=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('revealed');o.unobserve(e.target)}}),{threshold:.08});items.forEach(x=>o.observe(x))}
@@ -528,13 +528,12 @@
 
   function initMagneticBuild(){
     const handles=[...document.querySelectorAll('[data-build-drag]')];if(!handles.length)return;
-    const reduced=matchMedia('(prefers-reduced-motion: reduce)'),fine=matchMedia('(hover:hover) and (pointer:fine)');let gridVisible=false,footerVisible=false,hovering=false;
+    const reduced=matchMedia('(prefers-reduced-motion: reduce)'),fine=matchMedia('(hover:hover) and (pointer:fine)');let hovering=false;
     const dock=document.createElement('div');dock.className='magnetic-build-dock';dock.hidden=true;dock.innerHTML='<span class="dock-symbol" aria-hidden="true">↓</span><div><strong>Перетащи плагин сюда</strong><span class="dock-instruction">Корзина плагинов · выбрано: <span data-build-count>0</span></span></div><button type="button" class="dock-open" data-cart-open>Открыть корзину →</button>';document.body.append(dock);
     const status=document.createElement('div');status.className='build-drag-status';status.setAttribute('role','status');status.hidden=true;document.body.append(status);
     let drag=null,ghost=null,base=null,statusTimer=0,suppressClickUntil=0;
-    function syncDock(){dock.hidden=!fine.matches||(!drag?.active&&!hovering&&(!gridVisible||footerVisible));if(!drag?.active){dock.style.setProperty('--magnet-x','0px');dock.style.setProperty('--magnet-y','0px');dock.querySelector('strong').textContent='Перетащи плагин сюда';dock.querySelector('.dock-instruction').innerHTML='Корзина плагинов · выбрано: <span data-build-count>'+readBuild().length+'</span>'}}
-    const footer=document.querySelector('.footer');if(footer)new IntersectionObserver(entries=>{footerVisible=entries[0].isIntersecting;syncDock()},{threshold:0}).observe(footer);
-    const grid=document.getElementById('pluginsGrid');if(grid)new IntersectionObserver(entries=>{gridVisible=entries[0].isIntersecting;syncDock()},{threshold:0}).observe(grid);fine.addEventListener('change',()=>{finish(null,true);syncDock()});
+    function syncDock(){dock.hidden=!fine.matches||(!drag?.active&&!hovering);if(!drag?.active){dock.style.setProperty('--magnet-x','0px');dock.style.setProperty('--magnet-y','0px');dock.querySelector('strong').textContent='Перетащи плагин сюда';dock.querySelector('.dock-instruction').innerHTML='Корзина плагинов · выбрано: <span data-build-count>'+readBuild().length+'</span>'}}
+    fine.addEventListener('change',()=>{finish(null,true);syncDock()});
     function notify(name){clearTimeout(statusTimer);status.textContent=`${name} добавлен в корзину`;status.hidden=false;statusTimer=setTimeout(()=>status.hidden=true,2400)}
     function start(e,button){
       if(e.button!==0||e.pointerType==='touch')return;
@@ -632,9 +631,14 @@
   function initEvents(){
     document.addEventListener('dragstart',e=>{if(e.target instanceof Element&&e.target.closest('img,.product-cover,.hero-feature,.gallery-card,.cart-item-art,.plugin-detail-art'))e.preventDefault()});
     $('#themeToggle')?.addEventListener('click',()=>{const d=!document.documentElement.classList.contains('dark-mode');applyTheme(d);localStorage.setItem(THEME_KEY,d?'dark':'light')});
-    $('#menuToggle')?.addEventListener('click',()=>$('#navLinks')?.classList.toggle('open'));
+    const menu=$('#menuToggle'),nav=$('#navLinks');
+    function closeMenu(){nav?.classList.remove('open');menu?.setAttribute('aria-expanded','false')}
+    menu?.addEventListener('click',()=>{const open=nav?.classList.toggle('open');menu.setAttribute('aria-expanded',String(!!open))});
+    document.addEventListener('keydown',e=>{if(e.key==='Escape'&&nav?.classList.contains('open')){closeMenu();menu.focus()}});
+    document.addEventListener('click',e=>{if(!e.target.closest('.header'))closeMenu()});
+    nav?.addEventListener('click',e=>{if(e.target.closest('a'))closeMenu()});
     document.addEventListener('click',e=>{const b=e.target.closest('.favorite-btn[data-id]');if(b){e.preventDefault();toggleFavorite(b.dataset.id)}});
     const top=$('#backToTop');window.addEventListener('scroll',()=>top?.classList.toggle('show',window.scrollY>500));top?.addEventListener('click',()=>scrollTo({top:0,behavior:'smooth'}));
   }
-  document.addEventListener('DOMContentLoaded',()=>{injectUiFixes();initTheme();initWorkspace();initCart();initCommandPalette();initEmptyParticles();initMagneticBuild();initHeroPlayground();initSpider();initPluginGallery();initCardTilt();initPresetPreviews();initVisits();initEvents();syncFavoriteUI();initFlowVersionSelector();initDownloads();initButtonGlow();initPluginReport();initVideoComparisons();if(page==='plugins'){initCatalog();initSortMenu();initTaskSearch()}setupReveals()});
+  document.addEventListener('DOMContentLoaded',()=>{initTheme();initWorkspace();initCart();initCommandPalette();initMagneticBuild();initPluginGallery();initPresetPreviews();initVisits();initEvents();syncFavoriteUI();initFlowVersionSelector();initDownloads();initPluginReport();initVideoComparisons();if(page==='plugins'){initCatalog();initSortMenu();initTaskSearch()}setupReveals()});
 })();
