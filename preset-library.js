@@ -68,7 +68,7 @@ function render(items, query, root, esc, enc, telegram) {
     </article>`).join("");
   return `<div class="preset-store">
     <div class="preset-store-intro">
-      <span class="preset-store-eyebrow">NULL-OBJECT-AE / PRESET STORE</span>
+      <span class="preset-store-eyebrow">AE PLUGINS VAULT / PRESET STORE</span>
       <h2>Готовые эффекты. Сделано вручную.</h2>
       <p>Выбери набор, посмотри полный список пресетов и оформи заказ через нашего Telegram-бота. Выдача ZIP после подтверждения оплаты.</p>
       <div class="preset-store-stats"><span><strong>${categories.length}</strong> наборов</span><span><strong>${items.length}</strong> пресетов</span><span><strong>${PRICE_RUB} ₽</strong> за набор</span></div>

@@ -632,9 +632,14 @@
   function initEvents(){
     document.addEventListener('dragstart',e=>{if(e.target instanceof Element&&e.target.closest('img,.product-cover,.hero-feature,.gallery-card,.cart-item-art,.plugin-detail-art'))e.preventDefault()});
     $('#themeToggle')?.addEventListener('click',()=>{const d=!document.documentElement.classList.contains('dark-mode');applyTheme(d);localStorage.setItem(THEME_KEY,d?'dark':'light')});
-    $('#menuToggle')?.addEventListener('click',()=>$('#navLinks')?.classList.toggle('open'));
+    const menu=$('#menuToggle'),nav=$('#navLinks');
+    function closeMenu(){nav?.classList.remove('open');menu?.setAttribute('aria-expanded','false')}
+    menu?.addEventListener('click',()=>{const open=nav?.classList.toggle('open');menu.setAttribute('aria-expanded',String(!!open))});
+    document.addEventListener('keydown',e=>{if(e.key==='Escape'&&nav?.classList.contains('open')){closeMenu();menu.focus()}});
+    document.addEventListener('click',e=>{if(!e.target.closest('.header'))closeMenu()});
+    nav?.addEventListener('click',e=>{if(e.target.closest('a'))closeMenu()});
     document.addEventListener('click',e=>{const b=e.target.closest('.favorite-btn[data-id]');if(b){e.preventDefault();toggleFavorite(b.dataset.id)}});
     const top=$('#backToTop');window.addEventListener('scroll',()=>top?.classList.toggle('show',window.scrollY>500));top?.addEventListener('click',()=>scrollTo({top:0,behavior:'smooth'}));
   }
-  document.addEventListener('DOMContentLoaded',()=>{injectUiFixes();initTheme();initWorkspace();initCart();initCommandPalette();initEmptyParticles();initMagneticBuild();initHeroPlayground();initSpider();initPluginGallery();initCardTilt();initPresetPreviews();initVisits();initEvents();syncFavoriteUI();initFlowVersionSelector();initDownloads();initButtonGlow();initPluginReport();initVideoComparisons();if(page==='plugins'){initCatalog();initSortMenu();initTaskSearch()}setupReveals()});
+  document.addEventListener('DOMContentLoaded',()=>{initTheme();initWorkspace();initCart();initCommandPalette();initMagneticBuild();initPluginGallery();initPresetPreviews();initVisits();initEvents();syncFavoriteUI();initFlowVersionSelector();initDownloads();initPluginReport();initVideoComparisons();if(page==='plugins'){initCatalog();initSortMenu();initTaskSearch()}setupReveals()});
 })();
