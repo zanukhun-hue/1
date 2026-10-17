@@ -28,15 +28,8 @@ function read(root) {
 }
 
 function orderUrl(telegram, category) {
-  let url;
-  try {
-    url = new URL(telegram);
-    if (!['t.me', 'telegram.me', 'telegram.dog'].includes(url.hostname)) throw Error('Invalid Telegram host');
-    if (!/^\/[a-zA-Z0-9_]{5,32}\/?$/.test(url.pathname)) throw Error('Invalid Telegram username');
-  } catch (_) { url = new URL('https://t.me/endfire'); }
-  url.searchParams.set('text', 'Здравствуйте! Хочу купить набор пресетов «' + category.title + '» (' +
-    category.count + ' шт.) для After Effects за ' + PRICE_RUB + ' ₽. Подскажите, пожалуйста, как оплатить.');
-  return url.toString();
+  const { telegramLink } = require('./telegram-preset-store');
+  return telegramLink(telegram, category.id);
 }
 
 function render(items, query, root, esc, enc, telegram) {
@@ -56,7 +49,7 @@ function render(items, query, root, esc, enc, telegram) {
         <h3>${esc(category.title)}</h3>
         <p>${esc(category.description)}</p>
         <div class="preset-pack-includes"><strong>Внутри набора:</strong><ul>${sample(category)}</ul>${category.count > 4 ? '<span>И ещё ' + (category.count - 4) + ' пресетов</span>' : ''}</div>
-        <div class="preset-pack-purchase"><div><span>Цена набора</span><strong>${PRICE_RUB} ₽</strong></div><a class="preset-purchase" href="${esc(orderUrl(telegram,category))}" target="_blank" rel="noopener noreferrer"><i class="fab fa-telegram-plane" aria-hidden="true"></i> Купить в Telegram ↗</a></div>
+        <div class="preset-pack-purchase"><div><span>Цена набора</span><strong>${PRICE_RUB} ₽</strong></div>${orderUrl(telegram,category) ? `<a class="preset-purchase" href="${esc(orderUrl(telegram,category))}" target="_blank" rel="noopener noreferrer"><i class="fab fa-telegram-plane" aria-hidden="true"></i> Заказать в боте ↗</a>` : '<span class="preset-pending">Продажи скоро откроются</span>'}</div>
       </div>
     </article>`).join('');
 
@@ -76,7 +69,7 @@ function render(items, query, root, esc, enc, telegram) {
     <div class="preset-pack-grid">${cards || '<p class="preset-empty">Ничего не найдено. <a href="/presets">Показать все наборы</a></p>'}</div>
     <section class="preset-howto">
       <h2>Как купить пресеты</h2>
-      <ol><li><strong>Выбери набор.</strong> Каждая категория продаётся отдельно за ${PRICE_RUB} ₽.</li><li><strong>Нажми «Купить в Telegram».</strong> Название и цена добавятся в черновик сообщения.</li><li><strong>Оплати по инструкции автора.</strong> После подтверждения оплаты автор вручную отправит ZIP-архив.</li></ol>
+      <ol><li><strong>Выбери набор.</strong> Каждая категория продаётся отдельно за ${PRICE_RUB} ₽.</li><li><strong>Нажми «Купить в Telegram».</strong> Название и цена добавятся в черновик сообщения.</li><li><strong>Согласуй оплату с магазином.</strong> После подтверждения оплаты автор вручную отправит ZIP-архив.</li></ol>
       <p><i class="fas fa-circle-info" aria-hidden="true"></i> Формат файлов — .ffx для Adobe After Effects. Некоторым эффектам нужны дополнительные плагины. Совместимость зависит от версии AE. Плагины и скрипты в <a href="/plugins">бесплатном каталоге</a> продаваемыми пресетами не являются.</p>
     </section>
   </div>`;
