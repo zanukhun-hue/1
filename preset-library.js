@@ -80,7 +80,7 @@ function render(items, query, root, esc, enc, telegram) {
     </form>
     <div class="preset-store-heading"><h2>Тематические наборы</h2><span>Найдено: ${shown.length}</span></div>
     <div class="preset-pack-grid">${cards || '<p class="preset-empty">Ничего не найдено. <a href="/presets">Показать все наборы</a></p>'}</div>
-    <dialog class="preset-preview-dialog" id="presetPreviewDialog" aria-labelledby="presetPreviewTitle"><button type="button" class="preset-preview-close" data-close-preset-preview aria-label="Закрыть окно просмотра"><i class="fas fa-xmark" aria-hidden="true"></i></button><div id="presetPreviewBody"></div></dialog>
+    <dialog class="preset-preview-dialog" id="presetPreviewDialog" aria-labelledby="presetPreviewTitle"><button type="button" class="preset-preview-close" data-close-preset-preview aria-label="Закрыть окно просмотра"><span aria-hidden="true">×</span></button><div id="presetPreviewBody"></div></dialog>
     ${previewTemplates}
     <section class="preset-howto">
       <h2>Как купить пресеты</h2>

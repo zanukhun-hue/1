@@ -1799,3 +1799,66 @@ body .preset-store .preset-pack-art:before,body .preset-store .preset-pack-art:a
     top:180px;
   }
 }
+/* Essential controls stay legible when external icon fonts are unavailable. */
+.ui-icon { width:18px; height:18px; flex-shrink:0; display:block; }
+.favorite-symbol { display:inline-block; font:22px/1 Arial,sans-serif; vertical-align:middle; }
+.btn.favorite-btn .favorite-symbol { font-size:18px; margin-right:6px; }
+.magnetic-build-dock { bottom:20px; }
+.section-head:has(>.eyebrow) { flex-wrap:wrap; justify-content:flex-start; }
+.section-head:has(>.eyebrow)>.eyebrow { flex-basis:100%; }
+.status-badge.available, .status-badge.updating { background:none!important; }
+@media(max-width:700px) { .magnetic-build-dock { display:none!important; } }
+/* An opening horizontal card completes the two-column editorial spreads. */
+@media(min-width:701px) and (max-width:1100px) {
+  .plugins-grid.compact .plugin-card:first-child {
+    grid-column:1/-1;
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    grid-template-rows:auto 1fr auto auto auto;
+  }
+  .plugins-grid.compact .plugin-card:first-child>.product-cover { grid-column:1; grid-row:1/6; border-bottom:0; border-right:1px solid var(--border); }
+  .plugins-grid.compact .plugin-card:first-child>.product-cover .product-art { height:100%; aspect-ratio:auto; min-height:280px; }
+  .plugins-grid.compact .plugin-card:first-child>.plugin-card-header { grid-column:2; grid-row:1; }
+  .plugins-grid.compact .plugin-card:first-child>.plugin-card-content { grid-column:2; grid-row:2; }
+  .plugins-grid.compact .plugin-card:first-child>.card-build-row { grid-column:2; grid-row:3; }
+  .plugins-grid.compact .plugin-card:first-child>.plugin-card-footer { grid-column:2; grid-row:4; }
+  .plugins-grid.compact .plugin-card:first-child>.build-drag-handle { grid-column:2; grid-row:5; }
+}
+/* Preset storefront and previews use the same editorial surfaces. */
+body .preset-store-intro { border:0; border-block:1px solid var(--border); border-radius:0; padding:24px 0; background:none; }
+body .preset-store-eyebrow, body .preset-preview-kicker { font:10px/1.6 'JetBrains Mono',monospace; letter-spacing:.1em; color:var(--muted); }
+body .preset-store-intro h2 { font-size:28px; font-weight:500; }
+body .preset-store-intro p { font-size:13px; line-height:1.8; }
+body .preset-store-stats span { font-size:12px; padding:8px 12px; }
+body .preset-store-stats strong { font-size:14px; font-weight:500; }
+body .preset-search { padding:8px; gap:8px; border-radius:2px; background:var(--surface); }
+body .preset-search input { font-size:12px; }
+body .preset-search button, body .preset-store .preset-purchase { border-radius:2px; background:var(--accent-fill); color:var(--on-accent); font-size:12px; font-weight:500; }
+body .preset-store-heading { align-items:baseline; }
+body .preset-store-heading h2 { font-size:25px; font-weight:500; }
+body .preset-store-heading>span { font:10px 'JetBrains Mono',monospace; flex-shrink:0; }
+body .preset-store .preset-pack-art { color:var(--text); }
+body .preset-art-pattern, body .preset-art-emblem { display:none; }
+body .preset-art-wordmark { font-weight:500; text-shadow:none; color:var(--text); }
+body .preset-art-corner { color:var(--muted); }
+body .preset-preview-trigger { font-size:12px; font-weight:500; border-radius:2px; }
+body .preset-preview-trigger i { display:none; }
+body .preset-preview-dialog { border-radius:3px; background:var(--surface); box-shadow:0 20px 70px #0004; }
+body .preset-preview-dialog::backdrop { background:#12130fc9; backdrop-filter:none; }
+body .preset-preview-close, body .preset-preview-facts span { border-radius:2px; }
+body .preset-preview-close { font-size:24px; }
+body .preset-preview-icon { display:none; }
+body .preset-preview-heading h2 { font-weight:500; }
+body .preset-preview-placeholder { background:var(--surface-2); border:1px solid var(--border); border-radius:2px; }
+body .preset-preview-placeholder>i { display:none; }
+body .preset-preview-list { font-size:12px; }
+body .preset-howto h2 { font-weight:500; font-size:25px; }
+body .preset-howto ol, body .preset-howto p { font-size:12px; }
+@media(max-width:700px) {
+  body .preset-store-heading { flex-direction:column; align-items:start; gap:8px; }
+  body .preset-store-intro h2 { font-size:25px; }
+}
+body .preset-preview-list li { border-radius:2px; font-size:12px; }
+body .preset-preview-footer { bottom:0; gap:12px; padding-block:14px; }
+body .preset-preview-footer>strong { white-space:nowrap; flex-shrink:0; font-size:21px; font-weight:500; }
+body .preset-preview-footer>.preset-purchase { flex:1; min-width:0; padding:12px; background:var(--accent-fill); color:var(--on-accent); font-size:12px; border-radius:2px; }
