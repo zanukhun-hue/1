@@ -23,6 +23,11 @@ function store({telegram,send,adminChat,api}){
    await say(adminChat,'🛒 Заказ набора\nПак: '+labels[id]+'\nКлиент Telegram ID: '+userId+'\nЦена: 149 ₽\nНомер: '+token+'\n\nПодтверждай только после проверки оплаты.',kb([[{text:'✅ Выдать ZIP',callback_data:'store:approve:'+token},{text:'❌ Отказать',callback_data:'store:reject:'+token}]]));
  }
  async function handle(update){
+   if(update.message?.document && String(update.message.chat.id)===String(adminChat) && String(update.message.from.id)===String(adminChat)){
+     const doc=update.message.document;
+     await say(update.message.chat.id,'📦 Загружен документ: '+doc.file_name+'\\nTelegram file_id:\\n'+doc.file_id+'\\n\\nСохрани file_id в защищённой переменной PRESET_FILE_ID_КАТЕГОРИЯ на Render.');
+     return true;
+   }
    if(update.message?.chat?.type==='private'){
      const msg=update.message,raw=String(msg.text||'').trim();
      if(raw==='/presets'||raw==='/shop'||raw==='/start') {await say(msg.chat.id,'Магазин авторских пресетов After Effects. 9 наборов по 149 ₽. Выберите набор:',productMenu);return true}
