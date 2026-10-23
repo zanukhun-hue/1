@@ -1,5 +1,5 @@
 {
-  "generator": "Blender 4.3.2",
+  "generator": "Blender 5.2.3 LTS",
   "glb": "ae-sculpture.glb",
   "frontAxis": "+Z",
   "upAxis": "+Y",
@@ -11,17 +11,19 @@
   "bounds": [
     3.89,
     3.89,
-    0.6935
+    0.66725
   ],
-  "meshes": 3,
-  "glbBytes": 524128,
+  "meshes": 2,
+  "glbBytes": 385088,
   "materials": [
-    "Rose porcelain / clear glaze",
-    "Pearl pink / glyph face",
-    "Petal chrome / softened bevel",
-    "Mulberry ceramic / glyph sides",
-    "Lilac anodised edge"
+    "Dusty raspberry / dense fibre undercoat",
+    "Rose fibre / glyph face",
+    "Rose fibre / rounded edge",
+    "Mulberry fibre / glyph sides",
+    "Pink wool / individual fibres"
   ],
+  "surface": "Matte rose wool; 82,000 instanced browser fibres (42,000 on narrow screens)",
+  "posterHair": "39,000 parents with 3 interpolated children; render only",
   "recommendedMotion": "Rock Y +/- 16 degrees; X +/- 9 degrees. Keep face towards camera.",
   "source": "tools/build-ae-model.py"
 }

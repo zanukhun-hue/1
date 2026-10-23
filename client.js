@@ -551,7 +551,7 @@
       if(!drag||e.pointerId!==drag.id)return;
       if(!drag.active&&Math.hypot(e.clientX-drag.startX,e.clientY-drag.startY)<7)return;
       e.preventDefault();if(!drag.active)activate();
-      ghost.style.transform=`translate3d(${Math.max(8,Math.min(innerWidth-204,e.clientX+18))}px,${Math.max(8,Math.min(innerHeight-80,e.clientY+18))}px,0)`;
+      ghost.style.transform=`translate3d(${e.clientX}px,${e.clientY}px,0) translate(-50%,-50%)`;
       const dx=e.clientX-(base.left+base.width/2),dy=e.clientY-(base.top+base.height/2),near=Math.hypot(dx,dy)<230;
       dock.style.setProperty('--magnet-x',(!reduced.matches&&near?Math.max(-22,Math.min(22,dx*.12)):0)+'px');dock.style.setProperty('--magnet-y',(!reduced.matches&&near?Math.max(-16,Math.min(16,dy*.1)):0)+'px');
       const r=dock.getBoundingClientRect();drag.hit=e.clientX>=r.left-18&&e.clientX<=r.right+18&&e.clientY>=r.top-18&&e.clientY<=r.bottom+18;

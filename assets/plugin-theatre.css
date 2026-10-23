@@ -63,6 +63,7 @@
   transition: color .2s, border-color .2s, background .2s;
 }
 .ae-theatre-controls button:hover { color: #fff; border-color: #ffffff77; }
+.ae-theatre-controls [data-theatre-auto] { margin-left: auto; }
 .ae-theatre-controls button[aria-pressed="true"] {
   color: #08080a;
   background: #f2f1ec;
@@ -111,8 +112,10 @@
 @media (max-width: 700px) {
   .ae-theatre-heading { padding-bottom: 12px; font-size: 10px; }
   .ae-theatre-screen { min-height: 225px; aspect-ratio: 1.42; }
-  .ae-theatre-controls { gap: 5px; }
+  .ae-theatre-controls { gap: 6px; }
   .ae-theatre-controls button { padding: 9px 10px; font-size: 7px; }
+  .ae-theatre-controls [data-theatre-select] { flex: 1 0 calc(33.333% - 6px); }
+  .ae-theatre-controls [data-theatre-auto] { margin-left: 0; }
   .ae-theatre-timeline { margin-top: 18px; }
   .ae-plugin-theatre [data-theatre-caption] { font-size: 9px; min-height: 28px; }
   .ae-plugin-theatre[data-variant="catalog"] { min-height: 380px; }
