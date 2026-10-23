@@ -20,27 +20,33 @@
         </g>
       </g>
       <g class="ae-guide-effort ae-guide-wire"><path d="m28 57-7-5m11-7-2-8m8 4 3-7"/></g>
+      <path class="ae-guide-wire" data-guide-grip="left"/><path class="ae-guide-wire" data-guide-grip="right"/>
     </g>
   </svg>`;
   const body = mascot.querySelector('[data-guide-body]');
   const face = mascot.querySelector('[data-guide-face]');
   const arms = ['left', 'right'].map(side => mascot.querySelector(`[data-guide-arm="${side}"]`));
   const legs = ['left', 'right'].map(side => mascot.querySelector(`[data-guide-leg="${side}"]`));
+  const grips = ['left', 'right'].map(side => mascot.querySelector(`[data-guide-grip="${side}"]`));
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
   const catalog = stage.querySelector('.ae-catalog-visual') || stage.querySelector('[data-plugin-theatre="catalog"]');
   const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
   const mix = (a, b, t) => a + (b - a) * t;
   const ease = v => { const t = clamp(v); return t * t * (3 - 2 * t); };
-  const NODE_COUNT = 25;
+  const NODE_COUNT = 49;
+  const PREPARE_SECONDS = .28;
+  const LAND_SECONDS = .64;
   const PUSH_SECONDS = 4;
   const PUSH_END = 1 + PUSH_SECONDS;
   const lines = Array.from(stage.querySelectorAll('[data-elastic-line]'), (svg, index) => {
     const path = svg.querySelector('path') || svg.appendChild(document.createElementNS('http://www.w3.org/2000/svg', 'path'));
-    return { svg, path, index, box: null, y: Array.from({ length: NODE_COUNT }, (_, i) => 26 + 6 * Math.sin(i / (NODE_COUNT - 1) * Math.PI)), velocity: Array(NODE_COUNT).fill(0) };
+    return { svg, path, index, box: null, y: Array.from({ length: NODE_COUNT }, (_, i) => 26 + 3 * Math.sin(i / (NODE_COUNT - 1) * Math.PI)), velocity: Array(NODE_COUNT).fill(0) };
   });
 
   let geometry, raf = 0, measureRaf = 0, previousTime = 0, clock = 0;
   let support = null, transfer = null, actor = null, initialized = false;
+  let landing = 0, resting = 0, lastRig = null;
+  let scrollDirection = 1, lastScrollY = window.scrollY;
   let intro = { phase: 'waiting', elapsed: 0, complete: false };
   let galleryCue = { started: false, elapsed: 0, sent: false, replay: false };
   const pointer = { x: -1000, y: -1000, active: false };
@@ -107,8 +113,8 @@
   }
 
   function lineSupport(line) {
-    const poses = ['stand', 'hang', 'sit', 'stand'];
-    return { kind: 'line', line, pose: reduced.matches ? 'stand' : poses[line.index % poses.length] };
+    const poses = ['sit', 'hang', 'sit', 'hang'];
+    return { kind: 'line', line, pose: poses[line.index % poses.length] };
   }
 
   function mount(on) {
@@ -119,7 +125,8 @@
     const line = on.line;
     const fractions = geometry.mobile ? [.76, .73, .77, .69] : [.58, .66, .57, .72];
     const x = line.box.x + line.box.width * fractions[line.index % fractions.length];
-    return { x, y: lineHeight(line, x), localY: on.pose === 'hang' ? 33 : on.pose === 'sit' ? 138 : 188, pose: on.pose, line };
+    const seatX = x + 8.5 * geometry.scale;
+    return { x, y: lineHeight(line, on.pose === 'sit' ? seatX : x), localY: on.pose === 'hang' ? 26 : on.pose === 'sit' ? 136 : 188, pose: on.pose, line };
   }
 
   function renderedMount(on) {
@@ -138,103 +145,214 @@
     const end = renderedMount(next);
     const start = actor || end;
     const distance = Math.hypot(end.x - start.x, end.top - start.top);
-    const duration = clamp(distance / 1100, .55, 1);
-    // The quadratic has constant downward acceleration and starts at the actual
-    // previous support, including when that support has scrolled out of view.
-    const rise = Math.max(geometry.mobile ? 36 : 64, Math.max(0, end.top - start.top) * .27 + 28);
-    transfer = { from: { x: start.x, top: start.top }, to: next, elapsed: 0, duration, rise, end };
+    const upward = end.top < start.top && scrollDirection < 0;
+    const duration = upward ? clamp(.48 + Math.sqrt(distance) * .011, .68, .98) : clamp(.5 + Math.sqrt(distance) * .027, .76, 1.55);
+    const rise = Math.max(geometry.mobile ? 48 : 85, Math.max(0, end.top - start.top) * .38 + 42);
+    transfer = { from: { x: start.x, top: start.top }, source: support, to: next, phase: 'prepare', elapsed: 0, duration, rise, end, upward, launchRig: null };
     mascot.dataset.jumpFrom = `${start.x.toFixed(1)},${start.top.toFixed(1)}`;
     mascot.dataset.jumpTo = `${end.x.toFixed(1)},${end.top.toFixed(1)}`;
     mascot.dataset.jumpDuration = duration.toFixed(3);
     mascot.dataset.jumpProgress = '0';
     mascot.dataset.activeJump = 'true';
-    support = null;
+    resting = 0;
+  }
+
+  function contactXs(on) {
+    const m = mount(on), s = geometry.scale;
+    if (on.pose === 'hang') return [m.x - 51 * s, m.x + 55 * s];
+    if (on.pose === 'sit') return [m.x + 8.5 * s];
+    return [m.x - 22 * s, m.x + 38 * s];
+  }
+
+  function impulse(on, strength) {
+    if (on?.kind !== 'line') return;
+    const line = on.line;
+    for (const px of contactXs(on)) {
+      const p = (px - line.box.x) / line.box.width;
+      for (let i = 1; i < NODE_COUNT - 1; i++) {
+        const x = i / (NODE_COUNT - 1);
+        line.velocity[i] += Math.exp(-((x - p) ** 2) / .007) * strength / contactXs(on).length;
+      }
+    }
   }
 
   function updateSprings(dt) {
+    // Released strings must settle even outside the viewport; culling here
+    // freezes their last loaded shape until the user scrolls back.
     for (const line of lines) {
       if (!line.box?.width) continue;
-      const lineY = viewportY(line.box.y);
-      if (lineY < -250 || lineY > geometry.vh + 150) continue;
       const loaded = support?.kind === 'line' && support.line === line;
-      const loadMount = loaded ? mount(support) : null;
-      const loadX = loadMount ? (loadMount.x - line.box.x) / line.box.width : .5;
+      const contacts = loaded ? contactXs(support).map(x => (x - line.box.x) / line.box.width) : [];
+      const preparing = loaded && transfer?.phase === 'prepare' ? ease(transfer.elapsed / PREPARE_SECONDS) : 0;
       const pointerX = (pointer.x - geometry.left - line.box.x) / line.box.width;
       const pointerY = pointer.y + scrollY - geometry.top - line.box.y;
       const pointerClose = pointer.active && pointerX > 0 && pointerX < 1 && Math.abs(pointerY - line.box.height * .4) < 45;
       for (let i = 1; i < NODE_COUNT - 1; i++) {
         const x = i / (NODE_COUNT - 1);
-        let target = 26 + Math.sin(x * Math.PI) * 6;
+        let target = 26 + Math.sin(x * Math.PI) * 3;
         if (loaded) {
-          const weight = support.pose === 'hang' ? 22 : support.pose === 'sit' ? 17 : 14;
-          target += Math.exp(-((x - loadX) ** 2) / .012) * weight;
-          if (galleryCue.started && !galleryCue.sent && line.index === 0) target += Math.exp(-((x - loadX + .045) ** 2) / .003) * Math.sin(clamp(galleryCue.elapsed / .75) * Math.PI) * 9;
+          // A wide catenary carries the weight to both ends; the local indentation
+          // follows the seat or the two actual grips rather than the actor centre.
+          const weight = (support.pose === 'hang' ? 43 : 37) * (1 + preparing * .34);
+          for (const p of contacts) {
+            const span = x < p ? x / p : (1 - x) / (1 - p);
+            const local = Math.exp(-((x - p) ** 2) / .004);
+            target += weight * (.79 * Math.sin(clamp(span) * Math.PI / 2) + .21 * local) / contacts.length;
+          }
         }
-        if (pointerClose && !geometry.mobile) target += Math.exp(-((x - pointerX) ** 2) / .006) * clamp(pointerY / line.box.height * 80 - 30, -15, 19) * .6;
-        const force = (target - line.y[i]) * .043 + (line.y[i - 1] + line.y[i + 1] - 2 * line.y[i]) * .07;
-        line.velocity[i] = (line.velocity[i] + force * dt) * Math.pow(.81, dt);
+        if (pointerClose && !geometry.mobile) target += Math.exp(-((x - pointerX) ** 2) / .006) * clamp(pointerY / line.box.height * 80 - 30, -12, 16) * .35;
+        const force = (target - line.y[i]) * .028 + (line.y[i - 1] + line.y[i + 1] - 2 * line.y[i]) * .085;
+        line.velocity[i] = (line.velocity[i] + force * dt) * Math.pow(.875, dt);
       }
       for (let i = 1; i < NODE_COUNT - 1; i++) line.y[i] += line.velocity[i] * dt;
       line.path.setAttribute('d', pathFor(line));
+      line.svg.dataset.lineSag = ((Math.max(...line.y) - 29) / 80 * line.box.height).toFixed(2);
     }
+  }
+
+  function localLineY(line, x, place = actor) {
+    return line ? (lineHeight(line, place.x + (x - 90) * geometry.scale) - place.top) / geometry.scale : 188;
+  }
+
+  // One rig drives the body and all four limb roots. Grips and seat anchors
+  // stay in stage coordinates, so secondary motion cannot detach a hand.
+  function makeRig(kind, time, opts = {}, place = actor) {
+    const still = reduced.matches;
+    const wave = still ? 0 : Math.sin(time * 1.75);
+    const rig = {
+      tx: 0, ty: still ? 0 : Math.sin(time * 2.2) * .65,
+      angle: 0, sx: 1, sy: 1, px: 98.5, py: 136,
+      elbows: [[24, 108], [149, 103]], hands: [[19, 131], [158, 127]],
+      knees: [[76, 163], [115, 162]], feet: [[69, 188], [129, 188]],
+      hook: 0, toe: [-1, 1]
+    };
+    if (kind === 'sit') {
+      const seatWorld = place.x + 8.5 * geometry.scale;
+      const slope = opts.line ? Math.atan2(lineHeight(opts.line, seatWorld + 6) - lineHeight(opts.line, seatWorld - 6), 12) * 180 / Math.PI : 0;
+      rig.angle = 10.46 + slope + wave * .55;
+      rig.ty = 0;
+      rig.sx = 1 + wave * .003;
+      rig.hands = [[43, localLineY(opts.line, 43, place) - 2], [147, localLineY(opts.line, 147, place) - 2]];
+      rig.elbows = [[27, 116], [157, 112]];
+      const kick = still ? 0 : Math.sin(time * 2.1) * 6;
+      rig.knees = [[77 + kick * .3, 162], [116 - kick * .2, 157]];
+      rig.feet = [[84 + kick, 189], [133 - kick * .85, 184]];
+      rig.toe = [1, 1];
+    } else if (kind === 'hang') {
+      const swing = still ? 0 : Math.sin(time * 1.8);
+      rig.tx = swing * 9;
+      rig.ty = 13 + (still ? 0 : Math.cos(time * 3.6) * 1.3);
+      rig.angle = -swing * 5;
+      rig.hands = [[39, localLineY(opts.line, 39, place)], [145, localLineY(opts.line, 145, place)]];
+      rig.elbows = [[30 + swing * 3, 63], [154 + swing * 3, 58]];
+      const lag = still ? 0 : Math.sin(time * 1.8 - .65) * 12;
+      rig.knees = [[80 + lag, 171], [121 + lag, 168]];
+      rig.feet = [[67 + lag * 1.5, 199], [135 + lag * 1.3, 192]];
+      rig.hook = 1;
+    } else if (kind === 'jump') {
+      const p = opts.flight ?? .5;
+      const tuck = Math.sin(p * Math.PI);
+      const direction = opts.direction || 1;
+      rig.angle = direction * (8 - p * 15);
+      rig.sx = 1 - Math.sin(p * Math.PI) * .035;
+      rig.sy = 1 + Math.sin(p * Math.PI) * .045;
+      rig.hands = [[15 - tuck * 2, 49 - tuck * 20], [158 + tuck * 7, 44 - tuck * 22]];
+      rig.elbows = [[20, 78], [154, 69]];
+      rig.knees = [[67 - tuck * 7, 157], [127 + tuck * 8, 151]];
+      rig.feet = [[52 - tuck * 9, 177 - tuck * 9], [148 + tuck * 7, 171 - tuck * 14]];
+    } else if (kind === 'push' || kind === 'brace') {
+      const stride = kind === 'push' ? Math.sin(time * 11) : 0;
+      rig.angle = kind === 'push' ? 9 : 4 + (opts.progress || 0) * 5;
+      rig.ty = Math.abs(stride) * 1.4;
+      rig.hands = [[169, 120], [169, 94]];
+      rig.elbows = [[64, 132], [151, 94]];
+      rig.knees = [[74 - stride * 4, 163], [114 + stride * 4, 163]];
+      rig.feet = [[68 - stride * 14, 188 - Math.max(0, stride) * 5], [129 + stride * 14, 188 - Math.max(0, -stride) * 5]];
+    } else {
+      rig.feet = [[69, localLineY(opts.line, 69, place)], [129, localLineY(opts.line, 129, place)]];
+    }
+    const crouch = opts.crouch || 0;
+    const impact = opts.impact || 0;
+    if (kind === 'hang') {
+      rig.ty += impact * 9 - crouch * 7;
+      rig.sy += impact * .06;
+    } else if (kind === 'sit') {
+      rig.sy -= (crouch + impact) * .09;
+      rig.sx += (crouch + impact) * .055;
+      rig.angle -= crouch * 4;
+    } else if (kind !== 'jump') {
+      rig.ty += (crouch + impact) * 12;
+      rig.sy -= (crouch + impact) * .055;
+      rig.sx += (crouch + impact) * .035;
+      rig.knees[0][0] -= crouch * 7;
+      rig.knees[1][0] += crouch * 7;
+    }
+    return rig;
+  }
+
+  function blendRig(a, b, t) {
+    const result = {};
+    for (const key of ['tx', 'ty', 'angle', 'sx', 'sy', 'px', 'py', 'hook']) result[key] = mix(a[key], b[key], t);
+    for (const key of ['elbows', 'hands', 'knees', 'feet']) result[key] = a[key].map((point, i) => point.map((n, j) => mix(n, b[key][i][j], t)));
+    result.toe = b.toe;
+    return result;
+  }
+
+  function bodyPoint(rig, x, y) {
+    const angle = rig.angle * Math.PI / 180;
+    const dx = (x - rig.px) * rig.sx, dy = (y - rig.py) * rig.sy;
+    return [rig.px + rig.tx + dx * Math.cos(angle) - dy * Math.sin(angle), rig.py + rig.ty + dx * Math.sin(angle) + dy * Math.cos(angle)];
+  }
+
+  function limbPath(start, middle, end, width, toe = 0) {
+    const normal = (a, b) => {
+      const dx = b[0] - a[0], dy = b[1] - a[1], length = Math.max(1, Math.hypot(dx, dy));
+      return [-dy / length * width, dx / length * width];
+    };
+    const a = normal(start, middle), b = normal(middle, end);
+    const tip = toe ? [end[0] + toe * 11, end[1] + 1] : end;
+    const f = n => n.toFixed(2);
+    return 'M' + f(start[0] + a[0]) + ' ' + f(start[1] + a[1]) +
+      'Q' + f(middle[0] + a[0]) + ' ' + f(middle[1] + a[1]) + ' ' + f(end[0] + b[0]) + ' ' + f(end[1] + b[1]) +
+      'Q' + f(tip[0] + b[0]) + ' ' + f(tip[1] + b[1]) + ' ' + f(tip[0]) + ' ' + f(tip[1] + (toe ? 3 : 0)) +
+      'L' + f(end[0] - b[0]) + ' ' + f(end[1] - b[1]) +
+      'Q' + f(middle[0] - a[0]) + ' ' + f(middle[1] - a[1]) + ' ' + f(start[0] - a[0]) + ' ' + f(start[1] - a[1]) + 'Z';
   }
 
   function pose(kind, time, opts = {}) {
     mascot.dataset.pose = kind;
-    const s = geometry.scale;
-    const stride = kind === 'push' ? Math.sin(time * 12) * 10 : 0;
-    const breathe = kind === 'push' ? Math.sin(time * 12) * .6 : reduced.matches ? 0 : Math.sin(time * 2.5) * .7;
-    const tilt = kind === 'push' ? 8 : kind === 'brace' ? 5 + (opts.progress || 0) * 3 : kind === 'jump' ? -5 : kind === 'hang' ? Math.sin(time * 1.5) * 1.5 : 0;
-    body.setAttribute('transform', `translate(0 ${breathe.toFixed(2)}) rotate(${tilt.toFixed(2)} 87 132)`);
-    const gx = pointer.active && actor ? clamp((pointer.x - geometry.left - actor.x) / 160, -2.5, 2.5) : kind === 'push' || kind === 'brace' || kind === 'point' ? 2 : 0;
-    const gy = pointer.active && actor ? clamp((pointer.y + scrollY - geometry.top - actor.top - 100 * s) / 160, -1.5, 1.5) : 0;
-    face.setAttribute('transform', `translate(${gx.toFixed(2)} ${gy.toFixed(2)})`);
-    let footL = 188, footR = 188;
-    if (opts.line && actor) {
-      footL = (lineHeight(opts.line, actor.x - 20 * s) - actor.top) / s;
-      footR = (lineHeight(opts.line, actor.x + 35 * s) - actor.top) / s;
+    let rig = opts.rig || makeRig(kind, time, opts);
+    lastRig = rig;
+    const transformedOrigin = bodyPoint(rig, 0, 0);
+    const angle = rig.angle * Math.PI / 180;
+    body.setAttribute('transform', 'matrix(' + [Math.cos(angle) * rig.sx, Math.sin(angle) * rig.sx, -Math.sin(angle) * rig.sy, Math.cos(angle) * rig.sy, ...transformedOrigin].map(v => v.toFixed(5)).join(' ') + ')');
+    const gx = pointer.active ? clamp((pointer.x - geometry.left - actor.x) / 160, -2.5, 2.5) : kind === 'push' ? 2 : 0;
+    const gy = pointer.active ? clamp((pointer.y + scrollY - geometry.top - actor.top - 100 * geometry.scale) / 160, -1.5, 1.5) : 0;
+    face.setAttribute('transform', 'translate(' + gx.toFixed(2) + ' ' + gy.toFixed(2) + ')');
+    const shoulders = [bodyPoint(rig, 45, 88), bodyPoint(rig, 130, 86)];
+    const hips = [bodyPoint(rig, 83, 134), bodyPoint(rig, 116, 130)];
+    for (let i = 0; i < 2; i++) {
+      arms[i].setAttribute('d', limbPath(shoulders[i], rig.elbows[i], rig.hands[i], 3.5));
+      legs[i].setAttribute('d', limbPath(hips[i], rig.knees[i], rig.feet[i], 5.2, rig.toe[i]));
+      const [x, y] = rig.hands[i];
+      grips[i].setAttribute('d', 'M' + (x - 3).toFixed(2) + ' ' + (y + 2).toFixed(2) + 'v-5q0-6 5-6q5 0 5 5v4');
+      grips[i].style.opacity = rig.hook.toFixed(3);
     }
-    if (kind === 'push' || kind === 'brace') {
-      arms[0].setAttribute('d', 'M44 86Q39 112 81 119L164 111Q170 109 169 115L169 121Q169 126 163 124L81 132Q45 132 40 111');
-      arms[1].setAttribute('d', 'M132 81Q148 86 163 85Q169 84 169 90L169 98Q169 103 164 101L150 100 132 105');
-    } else if (kind === 'jump') {
-      arms[0].setAttribute('d', 'M44 86Q28 78 23 61L17 48Q15 43 11 45L10 52Q5 53 8 60L17 78 41 106');
-      arms[1].setAttribute('d', 'M132 80Q147 74 152 56L157 45Q160 40 164 43L163 51Q169 51 167 57L158 77 131 102');
-    } else if (kind === 'hang') {
-      const hookL = opts.line ? (lineHeight(opts.line, actor.x - 53 * s) - actor.top) / s : 33;
-      const hookR = opts.line ? (lineHeight(opts.line, actor.x + 58 * s) - actor.top) / s : 33;
-      arms[0].setAttribute('d', `M44 88Q27 71 32 ${hookL + 11}L32 ${hookL - 2}Q33 ${hookL - 8} 39 ${hookL - 6}L44 ${hookL - 2}Q47 ${hookL + 2} 43 ${hookL + 5}L40 ${hookL + 3} 41 ${hookL + 14} 54 83`);
-      arms[1].setAttribute('d', `M132 82Q154 66 151 ${hookR + 10}L152 ${hookR - 2}Q151 ${hookR - 8} 145 ${hookR - 6}L140 ${hookR - 2}Q137 ${hookR + 2} 141 ${hookR + 5}L145 ${hookR + 3} 143 ${hookR + 15} 125 103`);
-    } else if (kind === 'point') {
-      const pullY = opts.line ? (lineHeight(opts.line, actor.x - 55 * s) - actor.top) / s : 185;
-      const extend = ease(clamp((galleryCue.elapsed - .08) / .35));
-      const handX = mix(153, 179, extend), handY = mix(125, 94, extend);
-      arms[0].setAttribute('d', `M44 86Q24 116 31 ${pullY - 12}L31 ${pullY - 2}Q27 ${pullY - 5} 25 ${pullY - 1}Q25 ${pullY + 4} 32 ${pullY + 4}L39 ${pullY + 2} 42 ${pullY - 15} 50 105`);
-      arms[1].setAttribute('d', `M132 80Q151 85 ${handX - 8} ${handY - 4}L${handX} ${handY - 4}Q${handX + 5} ${handY - 3} ${handX + 2} ${handY + 1}L${handX - 6} ${handY + 2}Q${handX - 5} ${handY + 7} ${handX - 10} ${handY + 6}L146 105 130 103`);
-    } else if (kind === 'sit') {
-      arms[0].setAttribute('d', 'M44 86Q25 108 41 135L49 140Q55 140 54 135L47 128 48 109');
-      arms[1].setAttribute('d', 'M132 80Q151 108 142 132L134 141Q129 145 126 140L132 130 127 103');
-    } else {
-      arms[0].setAttribute('d', 'M44 83Q29 91 24 113L14 128Q12 133 17 134L24 130Q28 132 31 128L39 115 48 105');
-      arms[1].setAttribute('d', 'M132 79Q146 89 151 109L161 124Q164 130 159 131L152 126Q148 129 145 124L134 107 128 101');
-    }
-    if (kind === 'sit') {
-      legs[0].setAttribute('d', 'M73 133 69 162 80 184 94 183 83 158 97 132Z');
-      legs[1].setAttribute('d', 'M107 130 113 160 130 180 144 176 126 154 124 127Z');
-    } else if (kind === 'hang' || kind === 'jump') {
-      legs[0].setAttribute('d', 'M73 133 67 159 52 172 66 180 86 166 96 131Z');
-      legs[1].setAttribute('d', 'M107 130 114 156 131 169 145 162 127 149 124 127Z');
-    } else {
-      const liftL = kind === 'push' ? Math.max(0, stride) * .45 : 0;
-      const liftR = kind === 'push' ? Math.max(0, -stride) * .45 : 0;
-      legs[0].setAttribute('d', `M73 133 ${71 - stride * .3} 163 ${58 - stride} ${footL - liftL} ${78 - stride} ${footL - liftL} ${94 - stride * .2} 164 96 131Z`);
-      legs[1].setAttribute('d', `M107 130 ${108 + stride * .2} 164 ${119 + stride} ${footR - liftR} ${138 + stride} ${footR - liftR} ${123 + stride * .3} 158 124 127Z`);
-    }
+    if (opts.line && !opts.rig) {
+      let error = 0;
+      if (kind === 'hang') error = Math.max(...rig.hands.map(([x, y]) => Math.abs(y - localLineY(opts.line, x)) * geometry.scale));
+      if (kind === 'sit') {
+        const [x, y] = bodyPoint(rig, 98.5, 136);
+        error = Math.abs(y - localLineY(opts.line, x)) * geometry.scale;
+      }
+      mascot.dataset.contactError = error.toFixed(3);
+    } else mascot.dataset.contactError = '';
   }
 
   function draw(place, kind, opts = {}) {
     actor = place;
-    mascot.dataset.motionState = kind === 'stand' && !opts.line && intro.complete ? 'perch' : kind;
+    mascot.dataset.motionState = opts.state || (kind === 'stand' && !opts.line && intro.complete ? 'perch' : kind);
+    mascot.dataset.supportLine = support?.kind === 'line' ? String(support.line.index) : '';
     mascot.style.transform = `translate3d(${(place.x - geometry.w / 2).toFixed(2)}px,${place.top.toFixed(2)}px,0)`;
     mascot.style.opacity = '1';
     mascot.classList.add('is-ready');
@@ -283,16 +401,19 @@
       return true;
     }
     intro.phase = 'hop';
-    const t = clamp((intro.elapsed - PUSH_END) / .55);
+    const t = clamp((intro.elapsed - PUSH_END) / .85);
     const end = renderedMount({ kind: 'demo', pose: 'stand' });
     const fromX = box.x - 79 * geometry.scale;
     mascot.dataset.activeJump = 'true';
     mascot.dataset.jumpFrom = `${fromX.toFixed(1)},${startTop.toFixed(1)}`;
     mascot.dataset.jumpTo = `${end.x.toFixed(1)},${end.top.toFixed(1)}`;
-    mascot.dataset.jumpDuration = '.550';
+    mascot.dataset.jumpDuration = '.850';
     mascot.dataset.jumpProgress = t.toFixed(3);
-    draw({ x: mix(fromX, end.x, t), top: mix(startTop, end.top, t) - 4 * (geometry.mobile ? 36 : 74) * t * (1 - t) }, 'jump');
-    if (t >= 1) { finishIntro(); draw(renderedMount(support), 'stand'); }
+    const flight = makeRig('jump', clock, { flight: t });
+    const ready = makeRig('stand', clock, {}, end);
+    const rig = blendRig(flight, ready, ease((t - .68) / .32));
+    draw({ x: mix(fromX, end.x, ease(t)), top: mix(startTop, end.top, t) - 4 * (geometry.mobile ? 48 : 95) * t * (1 - t) }, 'jump', { rig });
+    if (t >= 1) { finishIntro(); landing = LAND_SECONDS; resting = 0; draw(renderedMount(support), 'stand'); }
     return true;
   }
 
@@ -304,7 +425,7 @@
     const firstLineVisible = lines[0]?.box && viewportY(lines[0].box.y) > 8 && viewportY(lines[0].box.y) < geometry.vh;
     const canPoint = support?.kind === 'line' && support.line.index === 0 && firstLineVisible && !transfer;
     if (firstLineVisible && !canPoint && !reduced.matches && viewportY(lines[0].box.y) <= geometry.vh * .75) {
-      if (!transfer && support?.kind !== 'line') beginTransfer(lineSupport(lines[0]));
+      if (!transfer && !landing && resting > .7 && support?.kind !== 'line') beginTransfer(lineSupport(lines[0]));
       if (transfer?.to.line === lines[0]) return;
     }
     galleryCue.started = true;
@@ -316,29 +437,64 @@
   }
 
   function updateAttachment(seconds) {
+    resting += seconds;
     const candidate = candidateLine();
-    if (!transfer && candidate && (support?.kind !== 'line' || support.line !== candidate)) beginTransfer(lineSupport(candidate));
+    if (!transfer && !landing && resting > .7 && candidate && (support?.kind !== 'line' || support.line !== candidate)) {
+      const origin = support ? renderedMount(support) : actor;
+      const destination = renderedMount(lineSupport(candidate));
+      // On reverse scroll the actor stays attached until the previous string
+      // leaves the bottom of the viewport. The next jump then bursts from below.
+      const reverseWaiting = scrollDirection < 0 && origin && destination.top < origin.top && viewportY(origin.top) < geometry.vh + 18;
+      if (!reverseWaiting) beginTransfer(lineSupport(candidate));
+    }
+    if (transfer?.phase === 'prepare') {
+      transfer.elapsed += seconds;
+      const t = clamp(transfer.elapsed / PREPARE_SECONDS);
+      const on = transfer.source || { kind: 'demo', pose: 'stand' };
+      const start = renderedMount(on);
+      draw(start, on.pose, { line: on.line, crouch: ease(t), state: 'anticipate' });
+      if (t >= 1) {
+        transfer.from = { x: start.x, top: start.top };
+        transfer.launchRig = lastRig;
+        transfer.phase = 'flight';
+        transfer.elapsed = 0;
+        mascot.dataset.jumpFrom = start.x.toFixed(1) + ',' + start.top.toFixed(1);
+        impulse(support, -3.4);
+        support = null;
+      }
+      return;
+    }
     if (transfer) {
       transfer.elapsed += seconds;
       const end = renderedMount(transfer.to);
       transfer.end = end;
       const t = clamp(transfer.elapsed / transfer.duration);
       mascot.dataset.jumpProgress = t.toFixed(3);
-      mascot.dataset.jumpTo = `${end.x.toFixed(1)},${end.top.toFixed(1)}`;
-      draw({ x: mix(transfer.from.x, end.x, t), top: mix(transfer.from.top, end.top, t) - 4 * transfer.rise * t * (1 - t) }, 'jump');
+      mascot.dataset.jumpTo = end.x.toFixed(1) + ',' + end.top.toFixed(1);
+      const flight = makeRig('jump', clock, { flight: t, direction: Math.sign(end.x - transfer.from.x) || 1 });
+      let rig = blendRig(transfer.launchRig, flight, ease(t / .2));
+      const target = makeRig(transfer.to.pose, clock, { line: transfer.to.line }, end);
+      rig = blendRig(rig, target, ease((t - .58) / .42));
+      draw({ x: mix(transfer.from.x, end.x, ease(t)), top: mix(transfer.from.top, end.top, t) - 4 * transfer.rise * t * (1 - t) }, 'jump', { rig });
       if (t >= 1) {
         support = transfer.to;
         transfer = null;
+        resting = 0;
+        landing = LAND_SECONDS;
+        impulse(support, 4.8);
         mascot.dataset.activeJump = 'false';
-        const landed = renderedMount(support);
-        draw(landed, support.pose, { line: landed.line });
+        draw(renderedMount(support), support.pose, { line: support.line, state: 'land' });
       }
       return;
     }
     if (!support) support = { kind: 'demo', pose: 'stand' };
-    const place = renderedMount(support);
-    const pointing = support.kind === 'line' && support.line.index === 0 && galleryCue.started && galleryCue.elapsed < .95;
-    draw(place, pointing ? 'point' : support.pose, { line: place.line });
+    if (landing > 0) {
+      landing = Math.max(0, landing - seconds);
+      const p = 1 - landing / LAND_SECONDS;
+      draw(renderedMount(support), support.pose, { line: support.line, impact: Math.sin(p * Math.PI) * Math.exp(-p * 1.6), state: landing ? 'land' : support.pose });
+    } else {
+      draw(renderedMount(support), support.pose, { line: support.line });
+    }
     if (galleryCue.started && galleryCue.sent && galleryCue.elapsed < 1) galleryCue.elapsed += seconds;
   }
 
@@ -346,11 +502,12 @@
     if (!geometry) return;
     finishIntro();
     transfer = null;
+    landing = 0;
     const candidate = candidateLine();
     support = candidate ? lineSupport(candidate) : { kind: 'demo', pose: 'stand' };
-    for (const line of lines) line.path.setAttribute('d', pathFor(line));
+    for (let i = 0; i < 90; i++) updateSprings(1);
     const place = renderedMount(support);
-    draw(place, 'stand', { line: place.line });
+    draw(place, support.pose, { line: place.line });
     updateGalleryCue(0);
   }
 
@@ -358,10 +515,11 @@
     raf = 0;
     if (document.hidden || !geometry) return;
     if (reduced.matches) { renderReduced(); return; }
-    const seconds = previousTime ? Math.max((timestamp - previousTime) / 1000, .001) : 1 / 60;
+    const seconds = previousTime ? clamp((timestamp - previousTime) / 1000, .001, .05) : 1 / 60;
     previousTime = timestamp;
     clock += seconds;
-    updateSprings(Math.min(seconds * 60, 2));
+    const steps = Math.ceil(seconds * 60);
+    for (let i = 0; i < steps; i++) updateSprings(seconds * 60 / steps);
     const inIntro = !intro.complete && updateIntro(seconds);
     if (!inIntro) {
       updateAttachment(seconds);
@@ -380,6 +538,9 @@
     support = null;
     transfer = null;
     actor = null;
+    lastRig = null;
+    landing = 0;
+    resting = 0;
     if (geometry) setWindowOffset(reduced.matches ? 0 : -geometry.pushDistance);
     mascot.dataset.motionState = 'waiting';
     mascot.dataset.activeJump = 'false';
@@ -392,7 +553,12 @@
   stage.querySelector('[data-replay-intro]')?.addEventListener('click', replayIntro);
   window.addEventListener('pointermove', event => { pointer.x = event.clientX; pointer.y = event.clientY; pointer.active = event.pointerType !== 'touch'; }, { passive: true });
   document.addEventListener('pointerleave', () => { pointer.active = false; });
-  window.addEventListener('scroll', () => { if (reduced.matches) wake(); }, { passive: true });
+  window.addEventListener('scroll', () => {
+    const delta = window.scrollY - lastScrollY;
+    if (Math.abs(delta) > 2) scrollDirection = Math.sign(delta);
+    lastScrollY = window.scrollY;
+    if (reduced.matches) wake();
+  }, { passive: true });
   window.addEventListener('resize', refresh, { passive: true });
   window.addEventListener('load', refresh, { once: true });
   document.fonts?.ready.then(refresh);

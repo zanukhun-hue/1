@@ -7,7 +7,7 @@ const redesign = require('./redesign');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const ROOT = __dirname;
-const BUILD = process.env.RENDER_GIT_COMMIT || 'living-collection-v7';
+const BUILD = process.env.RENDER_GIT_COMMIT || 'living-collection-v8';
 
 app.disable('x-powered-by');
 app.set('trust proxy', 1);
