@@ -1,0 +1,112 @@
+/* Real, interactive image planes. The stage owns perspective; the world stays 3D. */
+.ae-orbit {
+  --orbit-card-width: 144px;
+  --orbit-card-height: 102px;
+  position: relative;
+  width: 100%;
+  height: 650px;
+  min-width: 0;
+  overflow: hidden;
+  perspective: 1200px;
+  perspective-origin: 50% 46%;
+  isolation: isolate;
+  touch-action: pan-y;
+  cursor: grab;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ae-orbit[data-variant="hero"] {
+  height: 100%;
+  min-height: 260px;
+  perspective: 850px;
+}
+
+.ae-orbit.is-dragging,
+.ae-orbit.is-dragging .ae-orbit-tile { cursor: grabbing; }
+
+.ae-orbit-world {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.ae-orbit .ae-orbit-tile {
+  position: absolute;
+  display: block;
+  left: calc(var(--orbit-card-width) * -.5);
+  top: calc(var(--orbit-card-height) * -.5);
+  width: var(--orbit-card-width);
+  height: var(--orbit-card-height);
+  margin: 0;
+  padding: 0;
+  border: 1px solid rgba(255,255,255,.24);
+  border-radius: 1px;
+  background: #141319;
+  box-shadow: 0 8px 20px #0005;
+  text-decoration: none;
+  color: #fff;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform-style: preserve-3d;
+  transform-origin: center;
+  outline-offset: 5px;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  will-change: transform;
+}
+
+.ae-orbit-tile::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 50%, rgba(0,0,0,.55));
+  pointer-events: none;
+}
+
+.ae-orbit .ae-orbit-tile img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+  filter: saturate(1.17) contrast(1.035);
+  pointer-events: none;
+  -webkit-user-drag: none;
+}
+
+.ae-orbit .ae-orbit-tile span {
+  position: absolute;
+  z-index: 1;
+  left: 7px;
+  right: 6px;
+  bottom: 6px;
+  overflow: hidden;
+  font: 500 9px/1.15 Arial, sans-serif;
+  letter-spacing: -.01em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-shadow: 0 1px 5px #000b;
+  pointer-events: none;
+}
+
+.ae-orbit .ae-orbit-tile:focus-visible {
+  outline: 2px solid #c9a6ff;
+  border-color: #fff;
+}
+
+.ae-orbit:not(.is-ready) .ae-orbit-world { visibility: hidden; }
+
+@media (max-width: 700px) {
+  .ae-orbit { height: 380px; perspective: 850px; }
+  .ae-orbit[data-variant="hero"] { min-height: 210px; }
+  .ae-orbit .ae-orbit-tile span { font-size: 8px; left: 5px; bottom: 5px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ae-orbit-world, .ae-orbit .ae-orbit-tile { will-change: auto; }
+}

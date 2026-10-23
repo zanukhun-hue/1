@@ -10,3 +10,7 @@ npm-debug.log*
 assets/presets/
 private-presets/
 paid-presets/
+
+# Local visual QA and preview helpers
+.preview-qa.cjs
+.qa/
