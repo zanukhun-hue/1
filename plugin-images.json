@@ -1,54 +1,112 @@
 {
   "autosway": {
     "sourcePage": "https://aescripts.com/autosway/",
-    "image": "/assets/plugins/autosway.webp"
+    "image": "/assets/plugins-enhanced/autosway.webp",
+    "originalImage": "/assets/plugins/autosway.webp",
+    "width": 1672,
+    "height": 941,
+    "fit": "cover",
+    "enhanced": true
   },
   "aftercodecs": {
     "sourcePage": "https://aescripts.com/aftercodecs/",
-    "image": "/assets/plugins/aftercodecs.webp"
+    "image": "/assets/plugins-enhanced/aftercodecs.webp",
+    "originalImage": "/assets/plugins/aftercodecs.webp",
+    "width": 1672,
+    "height": 941,
+    "fit": "cover",
+    "enhanced": true
   },
   "flow": {
     "sourcePage": "https://aescripts.com/flow/",
-    "image": "/assets/plugins/flow.webp"
+    "image": "/assets/plugins-enhanced/flow.webp",
+    "originalImage": "/assets/plugins/flow.webp",
+    "width": 1672,
+    "height": 941,
+    "fit": "cover",
+    "enhanced": true
   },
   "clearplus": {
     "sourcePage": "https://aescripts.com/clearplus/",
-    "image": "/assets/plugins/clearplus.webp"
+    "image": "/assets/plugins-enhanced/clearplus.webp",
+    "originalImage": "/assets/plugins/clearplus.webp",
+    "width": 1672,
+    "height": 941,
+    "fit": "cover",
+    "enhanced": true
   },
   "bevelizer": {
     "sourcePage": "https://aescripts.com/bevelizer/",
-    "image": "/assets/plugins/bevelizer.webp"
+    "image": "/assets/plugins-enhanced/bevelizer.webp",
+    "originalImage": "/assets/plugins/bevelizer.webp",
+    "width": 1672,
+    "height": 941,
+    "fit": "cover",
+    "enhanced": true
   },
   "ballpoint": {
     "sourcePage": "https://aescripts.com/ballpoint/",
-    "image": "/assets/plugins/ballpoint.webp"
+    "image": "/assets/plugins-enhanced/ballpoint.webp",
+    "originalImage": "/assets/plugins/ballpoint.webp",
+    "width": 1672,
+    "height": 941,
+    "fit": "cover",
+    "enhanced": true
   },
   "fxaa": {
     "sourcePage": "https://aescripts.com/fxaa/",
-    "image": "/assets/plugins/fxaa.webp"
+    "image": "/assets/plugins-enhanced/fxaa.webp",
+    "originalImage": "/assets/plugins/fxaa.webp",
+    "width": 1672,
+    "height": 941,
+    "fit": "cover",
+    "enhanced": true
   },
   "jpeg-glitch": {
     "sourcePage": "https://aescripts.com/jpeg-glitch/",
-    "image": "/assets/plugins/jpeg-glitch.webp"
+    "image": "/assets/plugins-enhanced/jpeg-glitch.webp",
+    "originalImage": "/assets/plugins/jpeg-glitch.webp",
+    "width": 1672,
+    "height": 941,
+    "fit": "cover",
+    "enhanced": true
   },
   "mask-prompter": {
     "sourcePage": "https://aescripts.com/mask-prompter/",
-    "image": "/assets/plugins/mask-prompter.webp"
+    "image": "/assets/plugins-enhanced/mask-prompter.webp",
+    "originalImage": "/assets/plugins/mask-prompter.webp",
+    "width": 1672,
+    "height": 941,
+    "fit": "cover",
+    "enhanced": true
   },
   "newton": {
     "sourcePage": "https://aescripts.com/newton/",
-    "image": "/assets/plugins/newton.webp"
+    "image": "/assets/plugins-enhanced/newton.webp",
+    "originalImage": "/assets/plugins/newton.webp",
+    "width": 1672,
+    "height": 941,
+    "fit": "cover",
+    "enhanced": true
   },
   "optical-flares": {
     "sourcePage": "https://www.videocopilot.net/products/opticalflares/",
-    "image": "/assets/plugins/optical-flares.webp"
+    "image": "/assets/plugins-enhanced/optical-flares.webp",
+    "originalImage": "/assets/plugins/optical-flares.webp",
+    "width": 1672,
+    "height": 941,
+    "fit": "cover",
+    "enhanced": true
   },
   "deep-glow-v2": {
     "sourcePage": "https://aescripts.com/deep-glow/",
     "sourceImage": "https://aescripts.com/media/catalog/product/cache/b7bdf9dce07928a6c34f72fb33f91f39/t/h/thumb_1920x1080_text_1_2.jpg",
-    "image": "/assets/plugins/deep-glow-v2.webp",
-    "width": 265,
-    "height": 265
+    "image": "/assets/plugins-enhanced/deep-glow-v2.webp",
+    "width": 1672,
+    "height": 941,
+    "originalImage": "/assets/plugins/deep-glow-v2.webp",
+    "fit": "cover",
+    "enhanced": true
   },
   "bcc-sapphire": {
     "image": "/assets/plugins/bcc-sapphire.webp",
@@ -64,11 +122,21 @@
   },
   "signal": {
     "sourcePage": "https://aescripts.com/signal/",
-    "image": "/assets/plugins/signal.webp"
+    "image": "/assets/plugins-enhanced/signal.webp",
+    "originalImage": "/assets/plugins/signal.webp",
+    "width": 1672,
+    "height": 940,
+    "fit": "cover",
+    "enhanced": true
   },
   "tracery": {
     "sourcePage": "https://aescripts.com/tracery/",
-    "image": "/assets/plugins/tracery.webp"
+    "image": "/assets/plugins-enhanced/tracery.webp",
+    "originalImage": "/assets/plugins/tracery.webp",
+    "width": 1672,
+    "height": 941,
+    "fit": "cover",
+    "enhanced": true
   },
   "twitch": {
     "sourcePage": "https://www.videocopilot.net/products/twitch/",
@@ -81,19 +149,32 @@
   "shadow-studio-3": {
     "sourcePage": "https://aescripts.com/shadow-studio/",
     "sourceImage": "https://aescripts.com/media/catalog/product/cache/b7bdf9dce07928a6c34f72fb33f91f39/a/e/aes_social_1.jpg",
-    "image": "/assets/plugins/shadow-studio-3.webp",
-    "width": 265,
-    "height": 265
+    "image": "/assets/plugins-enhanced/shadow-studio-3.webp",
+    "width": 1672,
+    "height": 941,
+    "originalImage": "/assets/plugins/shadow-studio-3.webp",
+    "fit": "cover",
+    "enhanced": true
   },
   "element-3d": {
-    "image": "/assets/plugins/element-3d.webp",
+    "image": "/assets/plugins-enhanced/element-3d.webp",
     "sourcePage": "https://www.videocopilot.net/products/element2/",
-    "sourceImage": "https://d3jddrml5mymee.cloudfront.net/assets/public/images/v7/products/73/header-dropdown/320x133.jpg"
+    "sourceImage": "https://d3jddrml5mymee.cloudfront.net/assets/public/images/v7/products/73/header-dropdown/320x133.jpg",
+    "originalImage": "/assets/plugins/element-3d.webp",
+    "width": 1672,
+    "height": 941,
+    "fit": "cover",
+    "enhanced": true
   },
   "saber": {
-    "image": "/assets/plugins/saber.webp",
+    "image": "/assets/plugins-enhanced/saber.webp",
     "sourcePage": "https://www.videocopilot.net/blog/2016/03/new-plug-in-saber-now-available-100-free/",
-    "sourceImage": "https://img.youtube.com/vi/reSXGxkyr0k/hqdefault.jpg"
+    "sourceImage": "https://img.youtube.com/vi/reSXGxkyr0k/hqdefault.jpg",
+    "originalImage": "/assets/plugins/saber.webp",
+    "width": 1672,
+    "height": 941,
+    "fit": "cover",
+    "enhanced": true
   },
   "twixtor": {
     "image": "/assets/plugins/twixtor.webp",
@@ -103,11 +184,13 @@
     "fit": "contain"
   },
   "rsmb": {
-    "image": "/assets/plugins/rsmb.webp",
+    "image": "/assets/plugins-enhanced/rsmb.webp",
     "source": "user-provided",
-    "width": 600,
-    "height": 600,
-    "fit": "contain"
+    "width": 1672,
+    "height": 941,
+    "fit": "cover",
+    "originalImage": "/assets/plugins/rsmb.webp",
+    "enhanced": true
   },
   "red-giant": {
     "image": "/assets/plugins/red-giant.webp",
@@ -117,11 +200,13 @@
     "fit": "contain"
   },
   "omino": {
-    "image": "/assets/plugins/omino.webp",
+    "image": "/assets/plugins-enhanced/omino.webp",
     "source": "user-provided",
-    "width": 480,
-    "height": 360,
-    "fit": "contain"
+    "width": 1672,
+    "height": 941,
+    "fit": "cover",
+    "originalImage": "/assets/plugins/omino.webp",
+    "enhanced": true
   },
   "bokeh": {
     "image": "/assets/plugins/bokeh.webp",
@@ -140,10 +225,12 @@
   "influx": {
     "sourcePage": "https://aescripts.com/influx/",
     "sourceImage": "https://aescripts.com/media/catalog/product/cache/b7bdf9dce07928a6c34f72fb33f91f39/a/u/autokroma__splash_images_v5__b_influx_logo_about_copy_16_9.png",
-    "image": "/assets/plugins/influx.webp",
-    "width": 265,
-    "height": 265,
-    "fit": "contain"
+    "image": "/assets/plugins-enhanced/influx.webp",
+    "width": 1672,
+    "height": 941,
+    "fit": "cover",
+    "originalImage": "/assets/plugins/influx.webp",
+    "enhanced": true
   },
   "pixdither": {
     "sourcePage": "https://wunkolo.itch.io/pixdither",
@@ -178,12 +265,14 @@
     "fit": "contain"
   },
   "heat-distortion": {
-    "image": "/assets/plugins/heat-distortion.webp",
+    "image": "/assets/plugins-enhanced/heat-distortion.webp",
     "sourcePage": "https://www.videocopilot.net/products/heatdistortion/",
     "sourceImage": "https://d3jddrml5mymee.cloudfront.net/assets/public/images/v6/products/heatdistortion/product_header.jpg",
-    "width": 529,
-    "height": 75,
-    "fit": "contain"
+    "width": 1672,
+    "height": 940,
+    "fit": "cover",
+    "originalImage": "/assets/plugins/heat-distortion.webp",
+    "enhanced": true
   },
   "mocha-pro": {
     "image": "/assets/plugins/mocha-pro.webp",

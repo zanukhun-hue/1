@@ -221,6 +221,22 @@ body:not([data-page="home"]) .plugin-detail-grid { gap: clamp(30px,4vw,70px); ma
 body:not([data-page="home"]) .plugin-detail-art { border-color: var(--border); border-radius: 12px; background: transparent; }
 body:not([data-page="home"]) .plugin-detail-art .product-art { height: auto; aspect-ratio: 16/11; background: #111; }
 body:not([data-page="home"]) .plugin-detail-art .product-art.product-logo { background: #edf0f7; }
+
+/* Enhanced covers have full artwork at 16:9 and need no legacy letterbox crop. */
+body:not([data-page="home"]) .plugin-card .product-art:has(img[src^="/assets/plugins-enhanced/"]),
+body:not([data-page="home"]) .plugin-detail-art .product-art:has(img[src^="/assets/plugins-enhanced/"]) {
+  height: auto;
+  aspect-ratio: 16 / 9;
+}
+.product-art img[src^="/assets/plugins-enhanced/"],
+.gallery-page .gallery-card-art img[src^="/assets/plugins-enhanced/"],
+.drawer-art img[src^="/assets/plugins-enhanced/"],
+.cart-item-art img[src^="/assets/plugins-enhanced/"] {
+  top: 0;
+  height: 100%;
+  object-fit: cover;
+  padding: 0;
+}
 body:not([data-page="home"]) .detail-art-caption { padding: 18px 22px; font-size: .65rem; }
 body:not([data-page="home"]) .plugin-detail-content .detail-badges { gap: 20px; margin-bottom: 22px; }
 body:not([data-page="home"]) .plugin-detail-content h1 { margin: 0 0 24px; font-size: clamp(2.7rem,5vw,5.4rem); font-weight: 400; letter-spacing: -.06em; }

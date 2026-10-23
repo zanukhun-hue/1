@@ -1,0 +1,170 @@
+[
+  {
+    "id": "aftercodecs",
+    "source": "assets/plugins/aftercodecs.webp",
+    "master": "assets/plugins-enhanced/aftercodecs.png",
+    "delivery": "assets/plugins-enhanced/aftercodecs.webp",
+    "method": "Built-in image_gen.imagegen edit",
+    "prompt": "Use case: precise-object-edit. Input image 1 is the edit target, an existing After Effects plugin cover. Produce a faithful restored/upscaled full-bleed landscape 16:9 cover, at least 1536 pixels wide. Preserve product identity, existing logo shapes, exact text and primary composition. Remove compression artifacts and restore naturally sharp details. Remove black/white letterbox borders by continuing the artwork background seamlessly to the edges. Never crop lettering. Do not add badges, watermark, extra logos or new advertising copy. Preserve the bright magenta cover and yellow/orange triangular AfterCodecs logo with white \"AfterCodecs\" wordmark and small white tagline \"Encoding couldn't get any better\". Replace the black bars and black footer with continued magenta artwork, keep a clean wide magenta presentation. Retain existing Autokroma mark and small Adobe/OS compatibility symbols at the bottom in restrained white, carefully recreate existing symbols only. Do not add UI elements."
+  },
+  {
+    "id": "autosway",
+    "source": "assets/plugins/autosway.webp",
+    "master": "assets/plugins-enhanced/autosway.png",
+    "delivery": "assets/plugins-enhanced/autosway.webp",
+    "method": "Built-in image_gen.imagegen edit",
+    "prompt": "Use case: precise-object-edit. Input image 1 is the edit target, an existing After Effects plugin cover. Produce a faithful restored/upscaled full-bleed landscape 16:9 cover, at least 1536 pixels wide. Preserve product identity, existing logo shapes, exact text and primary composition. Remove compression artifacts and restore naturally sharp details. Remove black/white letterbox borders by continuing the artwork background seamlessly to the edges. Never crop lettering. Do not add badges, watermark, extra logos or new advertising copy. Keep the anime-style young woman on the right, dark violet hair and dark outfit, illustrated flowing scarf/hair with subtle blue lights, all matching reference identity and pose; do not replace the character. At left preserve dark gray rounded wordmark \"AutoSway\" and tiny tagline \"autosway lets you easily make your layers sway\". Extend its white softly luminous illustrated backdrop to full bleed; the white area must feel like the intentional whole background rather than top/bottom padding. Large crisp logo and illustration, minimal composition."
+  },
+  {
+    "id": "ballpoint",
+    "source": "assets/plugins/ballpoint.webp",
+    "master": "assets/plugins-enhanced/ballpoint.png",
+    "delivery": "assets/plugins-enhanced/ballpoint.webp",
+    "method": "Built-in image_gen.imagegen edit",
+    "prompt": "Use case: precise-object-edit. Input image 1 is the edit target, an existing After Effects plugin cover. Produce a faithful restored/upscaled full-bleed landscape 16:9 cover, at least 1536 pixels wide. Preserve product identity, existing logo shapes, exact text and primary composition. Remove compression artifacts and restore naturally sharp details. Remove black/white letterbox borders by continuing the artwork background seamlessly to the edges. Never crop lettering. Do not add badges, watermark, extra logos or new advertising copy. Keep the black-and-white swirling intricate ballpoint pen drawing texture across the whole image and a realistic hand holding a pen entering from lower right. Preserve horizontal black strip centered with large cyan italic uppercase \"BALLPOINT\". Extend the organic pen texture into the old white bars so it goes edge to edge, preserving exactly this drawing look. Make line art detailed and high clarity. Do not add extra text."
+  },
+  {
+    "id": "bevelizer",
+    "source": "assets/plugins/bevelizer.webp",
+    "master": "assets/plugins-enhanced/bevelizer.png",
+    "delivery": "assets/plugins-enhanced/bevelizer.webp",
+    "method": "Built-in image_gen.imagegen edit",
+    "prompt": "Use case: precise-object-edit. Input image 1 is the edit target, an existing After Effects plugin cover. Produce a faithful restored/upscaled full-bleed landscape 16:9 cover, at least 1536 pixels wide. Preserve product identity, existing logo shapes, exact text and primary composition. Remove compression artifacts and restore naturally sharp details. Remove black/white letterbox borders by continuing the artwork background seamlessly to the edges. Never crop lettering. Do not add badges, watermark, extra logos or new advertising copy. Preserve the central pink metallic angular graffiti wordmark \"BEVELIZER\" exactly as product identity, with its thick glossy pink 3D beveled contours and black outlines. Preserve the folded chrome/silver liquid-metal backdrop. Continue reflective chrome backdrop to all edges to remove white bars. Faithfully sharpen edges and highlights at high resolution, same energetic centered composition, no new objects or text."
+  },
+  {
+    "id": "clearplus",
+    "source": "assets/plugins/clearplus.webp",
+    "master": "assets/plugins-enhanced/clearplus.png",
+    "delivery": "assets/plugins-enhanced/clearplus.webp",
+    "method": "Built-in image_gen.imagegen edit",
+    "prompt": "Use case: precise-object-edit. Input image 1 is the edit target, an existing After Effects plugin cover. Produce a faithful restored/upscaled full-bleed landscape 16:9 cover, at least 1536 pixels wide. Preserve product identity, existing logo shapes, exact text and primary composition. Remove compression artifacts and restore naturally sharp details. Remove black/white letterbox borders by continuing the artwork background seamlessly to the edges. Never crop lettering. Do not add badges, watermark, extra logos or new advertising copy. Keep the vivid royal-blue sky with soft white cumulus clouds, exact centered white text \"ClearPlus\" and smaller \"Make Colors Pop\". Fill the entire image edge to edge by extending this sky/cloud background into the black letterbox area. Make natural crisp cloud details and clean white typography. No new objects."
+  },
+  {
+    "id": "deep-glow-v2",
+    "source": "assets/plugins/deep-glow-v2.webp",
+    "master": "assets/plugins-enhanced/deep-glow-v2.png",
+    "delivery": "assets/plugins-enhanced/deep-glow-v2.webp",
+    "method": "Built-in image_gen.imagegen edit",
+    "prompt": "Use case: precise-object-edit. Asset type: wide high-resolution plugin cover for an After Effects catalog. Input image 1 is the edit target. Restore and upscale the existing DEEP GLOW II artwork into a clean 1536x864 landscape cover. Remove the white padding at the top and bottom entirely; the dark rainbow neon artwork should fill every edge. Extend the existing subtle dark luminous background naturally to fit landscape, without adding a frame. Keep the exact central outlined neon wordmark \"DEEP GLOW II\", colors, letter shapes, rainbow highlights and small red lines of text from the reference. The text is \"PLUG-IN EVERYTHING\" at top and \"NEW WAYS TO GLOW DEEPER\" at bottom. Preserve accurate typography; improve clarity of edges and gradients, remove compression only. No additional objects, no redesign, no watermark. Wide 16:9 full bleed image, large crisp central title with comfortable margins."
+  },
+  {
+    "id": "element-3d",
+    "source": "assets/plugins/element-3d.webp",
+    "master": "assets/plugins-enhanced/element-3d.png",
+    "delivery": "assets/plugins-enhanced/element-3d.webp",
+    "method": "Built-in image_gen.imagegen edit",
+    "prompt": "Use case: precise-object-edit. Input image 1 is the edit target, an existing After Effects plugin cover. Produce a faithful restored/upscaled full-bleed landscape 16:9 cover, at least 1536 pixels wide. Preserve product identity, existing logo shapes, exact text and primary composition. Remove compression artifacts and restore naturally sharp details. Remove black/white letterbox borders by continuing the artwork background seamlessly to the edges. Never crop lettering. Do not add badges, watermark, extra logos or new advertising copy. The source is 3 pairs of futuristic black and silver over-ear headphones on a red product photography backdrop. Preserve these exact three headphones, their design, reflective silver headbands, black cushions and red earcup details, perspective and relative positions. Widen the red studio background naturally and restore fine metallic highlights at high resolution. Do not add text as the original has none. Clean finished product render, exact same subject, no letters, no frame."
+  },
+  {
+    "id": "flow",
+    "source": "assets/plugins/flow.webp",
+    "master": "assets/plugins-enhanced/flow.png",
+    "delivery": "assets/plugins-enhanced/flow.webp",
+    "method": "Built-in image_gen.imagegen edit",
+    "prompt": "Use case: precise-object-edit. Asset type: wide high-resolution plugin cover for an After Effects catalog. Input image 1 is the edit target. Restore/upscale the Flow artwork into a crisp 1536x864 landscape image. Remove the white letterbox padding; extend the same pale sky-blue background to all edges, full bleed with no frame. Preserve the original dark teal script \"Flow\" exactly as its identity, centered, with the same relative layout and two-line white italic text reading \"Intuitive controls\" and \"for animation curves\". Keep lettering correct, restore clean graceful curves, preserve the minimal original blue palette. Do not introduce objects, shadows, badges, extra logos or extra text. Large enough lettering for a plugin thumbnail; natural faithful restoration."
+  },
+  {
+    "id": "fxaa",
+    "source": "assets/plugins/fxaa.webp",
+    "master": "assets/plugins-enhanced/fxaa.png",
+    "delivery": "assets/plugins-enhanced/fxaa.webp",
+    "method": "Built-in image_gen.imagegen edit",
+    "prompt": "Use case: precise-object-edit. Input image 1 is the edit target, an existing After Effects plugin cover. Produce a faithful restored/upscaled full-bleed landscape 16:9 cover, at least 1536 pixels wide. Preserve product identity, existing logo shapes, exact text and primary composition. Remove compression artifacts and restore naturally sharp details. Remove black/white letterbox borders by continuing the artwork background seamlessly to the edges. Never crop lettering. Do not add badges, watermark, extra logos or new advertising copy. Keep the giant bold red uppercase \"FXAA\" on a very dark charcoal slightly pixelated stepped background. Small muted gray uppercase text above reads \"KILLS JAGGIES.\" and below at the left reads \"FAST.\" Keep existing visual identity, typography and clean red shape. Replace white top/bottom padding with continuous charcoal background, full-bleed widescreen. No illustrations or new visual objects."
+  },
+  {
+    "id": "heat-distortion",
+    "source": "assets/plugins/heat-distortion.webp",
+    "master": "assets/plugins-enhanced/heat-distortion.png",
+    "delivery": "assets/plugins-enhanced/heat-distortion.webp",
+    "method": "Built-in image_gen.imagegen edit",
+    "prompt": "Use case: precise-object-edit. Input image 1 is the edit target, an existing After Effects plugin cover. Produce a faithful restored/upscaled full-bleed landscape 16:9 cover, at least 1536 pixels wide. Preserve product identity, existing logo shapes, exact text and primary composition. Remove compression artifacts and restore naturally sharp details. Remove black/white letterbox borders by continuing the artwork background seamlessly to the edges. Never crop lettering. Do not add badges, watermark, extra logos or new advertising copy. The source is a narrow dark charcoal promotional banner. Faithfully expand to a balanced landscape cover while retaining all original identity. Preserve silver uppercase futuristic two-line title \"HEAT DISTORTION\" and \"FOR AFTER EFFECTS\". Keep the small original product-box artwork at left featuring a glowing orange flame/heat arc, dark case and tiny \"HEAT DISTORTION\" title. Extend the subtle dark gray gradient environment vertically, positioning the original box larger at left and typography centered-right with ample margins. Same restrained charcoal/silver/orange palette; this is a clean extension of existing artwork, no new product objects, no unrelated graphics, no invented copy."
+  },
+  {
+    "id": "influx",
+    "source": "assets/plugins/influx.webp",
+    "master": "assets/plugins-enhanced/influx.png",
+    "delivery": "assets/plugins-enhanced/influx.webp",
+    "method": "Built-in image_gen.imagegen edit",
+    "prompt": "Use case: precise-object-edit. Input image 1 is the edit target, an existing After Effects plugin cover. Produce a faithful restored/upscaled full-bleed landscape 16:9 cover, at least 1536 pixels wide. Preserve product identity, existing logo shapes, exact text and primary composition. Remove compression artifacts and restore naturally sharp details. Remove black/white letterbox borders by continuing the artwork background seamlessly to the edges. Never crop lettering. Do not add badges, watermark, extra logos or new advertising copy. Keep the large turquoise wordmark \"Influx\", pale cyan mint background, and smaller turquoise sentence \"All-in-one Importer for Adobe CC\". Remove black letterboxing and footer panel by extending the pale mint backdrop continuously to all edges. Retain the small existing Autokroma and compatibility symbols along the bottom with ample breathing room, in dark gray to work on pale background, no new symbols. Logo stays clear and centered, minimal exact original identity."
+  },
+  {
+    "id": "jpeg-glitch",
+    "source": "assets/plugins/jpeg-glitch.webp",
+    "master": "assets/plugins-enhanced/jpeg-glitch.png",
+    "delivery": "assets/plugins-enhanced/jpeg-glitch.webp",
+    "method": "Built-in image_gen.imagegen edit",
+    "prompt": "Use case: precise-object-edit. Input image 1 is the edit target, an existing After Effects plugin cover. Produce a faithful restored/upscaled full-bleed landscape 16:9 cover, at least 1536 pixels wide. Preserve product identity, existing logo shapes, exact text and primary composition. Remove compression artifacts and restore naturally sharp details. Remove black/white letterbox borders by continuing the artwork background seamlessly to the edges. Never crop lettering. Do not add badges, watermark, extra logos or new advertising copy. Preserve the central exact white glitchy pixel wordmark \"JPEG GLITCH\" over the existing intense neon/glitched image of angular crystalline multicolored planes and analog noise. Fill every edge with faithful continuation of the same saturated ultramarine, hot pink, red, yellow and acid-green glitch texture, no black bars. Crisp text edges while preserving intentional digital distortion, no extra text or objects."
+  },
+  {
+    "id": "mask-prompter",
+    "source": "assets/plugins/mask-prompter.webp",
+    "master": "assets/plugins-enhanced/mask-prompter.png",
+    "delivery": "assets/plugins-enhanced/mask-prompter.webp",
+    "method": "Built-in image_gen.imagegen edit",
+    "prompt": "Use case: precise-object-edit. Input image 1 is the edit target, an existing After Effects plugin cover. Produce a faithful restored/upscaled full-bleed landscape 16:9 cover, at least 1536 pixels wide. Preserve product identity, existing logo shapes, exact text and primary composition. Remove compression artifacts and restore naturally sharp details. Remove black/white letterbox borders by continuing the artwork background seamlessly to the edges. Never crop lettering. Do not add badges, watermark, extra logos or new advertising copy. Keep the pale cream/apricot background filled with vibrant purple cutout organic bird silhouettes from the reference. Keep centered two black text bars: the upper white bold title \"Mask Prompter 3\", lower white subtitle \"ai based object matting\". Continue bird silhouettes and the light warm background into old black bars for full bleed. Large clear title and subtitle, no other text. Exact original flat graphic/matting visual, no redesign."
+  },
+  {
+    "id": "newton",
+    "source": "assets/plugins/newton.webp",
+    "master": "assets/plugins-enhanced/newton.png",
+    "delivery": "assets/plugins-enhanced/newton.webp",
+    "method": "Built-in image_gen.imagegen edit",
+    "prompt": "Use case: precise-object-edit. Input image 1 is the edit target, an existing After Effects plugin cover. Produce a faithful restored/upscaled full-bleed landscape 16:9 cover, at least 1536 pixels wide. Preserve product identity, existing logo shapes, exact text and primary composition. Remove compression artifacts and restore naturally sharp details. Remove black/white letterbox borders by continuing the artwork background seamlessly to the edges. Never crop lettering. Do not add badges, watermark, extra logos or new advertising copy. The only central text is \"NEWTON⁴\" and \"The 2D physics engine\". Keep its large white extruded uppercase letters with the superscript 4 at upper right and soft elongated shadow. Fill the entire canvas with the existing vivid coral orange backdrop. No black bars, no new shapes."
+  },
+  {
+    "id": "omino",
+    "source": "assets/plugins/omino.webp",
+    "master": "assets/plugins-enhanced/omino.png",
+    "delivery": "assets/plugins-enhanced/omino.webp",
+    "method": "Built-in image_gen.imagegen edit",
+    "prompt": "Use case: precise-object-edit. Input image 1 is the edit target, an existing After Effects plugin cover. Produce a faithful restored/upscaled full-bleed landscape 16:9 cover, at least 1536 pixels wide. Preserve product identity, existing logo shapes, exact text and primary composition. Remove compression artifacts and restore naturally sharp details. Remove black/white letterbox borders by continuing the artwork background seamlessly to the edges. Never crop lettering. Do not add badges, watermark, extra logos or new advertising copy. Preserve original tutorial-thumbnail identity: large colorful glowing circular turbine/ring at upper center with flowing red blue orange green light trails, dark navy-to-brown backdrop, white arrows on the trails and small keyframe/curve symbols. Main title is large condensed yellow uppercase \"OMINO SNAKE\" centered at bottom; white line above reads \"AFTER EFFECT PLUGIN TUTORIAL\". Upper-right keep small original \"PLUG-IN\", \"Ae\", and yellow \"FREE PLUGIN\" labels. Extend dark backdrop into black padding, preserve whole composition and accurate text. Restore fine energy trails and clean shapes without changing the visual."
+  },
+  {
+    "id": "optical-flares",
+    "source": "assets/plugins/optical-flares.webp",
+    "master": "assets/plugins-enhanced/optical-flares.png",
+    "delivery": "assets/plugins-enhanced/optical-flares.webp",
+    "method": "Built-in image_gen.imagegen edit",
+    "prompt": "Use case: precise-object-edit. Input image 1 is the edit target, an existing After Effects plugin cover. Produce a faithful restored/upscaled full-bleed landscape 16:9 cover, at least 1536 pixels wide. Preserve product identity, existing logo shapes, exact text and primary composition. Remove compression artifacts and restore naturally sharp details. Remove black/white letterbox borders by continuing the artwork background seamlessly to the edges. Never crop lettering. Do not add badges, watermark, extra logos or new advertising copy. This is the existing blue-toned music-video artwork used for the Optical Flares plugin. Preserve the performer on the left wearing a dark jacket and trousers, night blue stage with horizontal electric-blue light streaks and walls. Restore a wide crisp frame by continuing only the dark blue stage background to the right and removing gray framing and lower outside caption. Keep the human subject's clothing, identity, stance and scale faithful to the reference. The image content is a still, no new text, no face redesign, no new objects; preserve original cobalt-blue lighting and photographic texture."
+  },
+  {
+    "id": "rsmb",
+    "source": "assets/plugins/rsmb.webp",
+    "master": "assets/plugins-enhanced/rsmb.png",
+    "delivery": "assets/plugins-enhanced/rsmb.webp",
+    "method": "Built-in image_gen.imagegen edit",
+    "prompt": "Use case: precise-object-edit. Input image 1 is an existing RSMB / ReelSmart Motion Blur plugin cover, the edit target. Faithfully restore and expand to a high-resolution landscape 16:9 full-bleed cover at least 1536 pixels wide. Preserve the golden yellow/olive-black deliberately motion-blurred background with diagonal \"RSMB\" letters, keep its intentional motion effect rather than making that background sharp. Remove the thin white top and bottom padding by continuing the same colored backdrop. Keep exact centered white text \"RE:VISION EFFECTS\", a thin rough blue horizontal underline, and below it the two large white bold uppercase lines \"REELSMART\" and \"MOTION BLUR\". The whole identity and all letters must be visible with ample margins, no clipping. Sharpen the foreground type and restore compression only. Same restrained original palette, same visual identity, no new objects, logos, watermark or extra text."
+  },
+  {
+    "id": "saber",
+    "source": "assets/plugins/saber.webp",
+    "master": "assets/plugins-enhanced/saber.png",
+    "delivery": "assets/plugins-enhanced/saber.webp",
+    "method": "Built-in image_gen.imagegen edit",
+    "prompt": "Use case: precise-object-edit. Input image 1 is the edit target, an existing After Effects plugin cover. Produce a faithful restored/upscaled full-bleed landscape 16:9 cover, at least 1536 pixels wide. Preserve product identity, existing logo shapes, exact text and primary composition. Remove compression artifacts and restore naturally sharp details. Remove black/white letterbox borders by continuing the artwork background seamlessly to the edges. Never crop lettering. Do not add badges, watermark, extra logos or new advertising copy. Preserve the dark sci-fi machinery, three red/orange, cyan and green luminous energy beams and white futuristic lettering \"PLUG-IN\" over \"SABER\" in the upper right. Extend dark navy environment at top/bottom to remove the bars, maintain visible machinery and dramatic electric glow, no new object. Text remains readable with generous edge margins."
+  },
+  {
+    "id": "shadow-studio-3",
+    "source": "assets/plugins/shadow-studio-3.webp",
+    "master": "assets/plugins-enhanced/shadow-studio-3.png",
+    "delivery": "assets/plugins-enhanced/shadow-studio-3.webp",
+    "method": "Built-in image_gen.imagegen edit",
+    "prompt": "Use case: precise-object-edit. Input image 1 is the edit target, an existing After Effects plugin cover. Produce a faithful restored/upscaled full-bleed landscape 16:9 cover, at least 1536 pixels wide. Preserve product identity, existing logo shapes, exact text and primary composition. Remove compression artifacts and restore naturally sharp details. Remove black/white letterbox borders by continuing the artwork background seamlessly to the edges. Never crop lettering. Do not add badges, watermark, extra logos or new advertising copy. Preserve the centered stacked extruded 3D typography reading exactly \"Shadow\" and \"Studio 3\". Keep glossy deep red lettering at left shifting to purple at right, and its dark soft cinematic blue/purple/teal gradient background with faint grid lines and upper-left lens glow. Continue this background to all edges and remove white letterbox bars. Sharpen the 3D bevels and light reflections, do not change words or add objects."
+  },
+  {
+    "id": "signal",
+    "source": "assets/plugins/signal.webp",
+    "master": "assets/plugins-enhanced/signal.png",
+    "delivery": "assets/plugins-enhanced/signal.webp",
+    "method": "Built-in image_gen.imagegen edit",
+    "prompt": "Use case: precise-object-edit. Input image 1 is the edit target, an existing After Effects plugin cover. Produce a faithful restored/upscaled full-bleed landscape 16:9 cover, at least 1536 pixels wide. Preserve product identity, existing logo shapes, exact text and primary composition. Remove compression artifacts and restore naturally sharp details. Remove black/white letterbox borders by continuing the artwork background seamlessly to the edges. Never crop lettering. Do not add badges, watermark, extra logos or new advertising copy. Keep the original large bold white centered wordmark \"Signal\", blue/teal abstract mountainous warped terrain and subtle CRT vertical scanline/noise texture. Continue the blue/teal retro analog background over old black bars at top and bottom. Restore high-resolution details while retaining purposeful chromatic aberration and scanlines, exact white text still easy to read. Do not add new objects or text."
+  },
+  {
+    "id": "tracery",
+    "source": "assets/plugins/tracery.webp",
+    "master": "assets/plugins-enhanced/tracery.png",
+    "delivery": "assets/plugins-enhanced/tracery.webp",
+    "method": "Built-in image_gen.imagegen edit",
+    "prompt": "Use case: precise-object-edit. Input image 1 is the edit target, an existing After Effects plugin cover. Produce a faithful restored/upscaled full-bleed landscape 16:9 cover, at least 1536 pixels wide. Preserve product identity, existing logo shapes, exact text and primary composition. Remove compression artifacts and restore naturally sharp details. Remove black/white letterbox borders by continuing the artwork background seamlessly to the edges. Never crop lettering. Do not add badges, watermark, extra logos or new advertising copy. Preserve the peculiar 3D-rendered white slim creature in side view, running toward left, with long tail rising at right, and glossy hot-pink organic sphere at the back. Keep the thin lime-yellow/green motion tracking circles/rig lines. At left preserve bright lime vertical stripe with tall black condensed uppercase title \"TRACERY2\" rotated as in the reference, with small \"ELEMENT SUPPLY COMPANY\" identity nearby. Improve the 3D render clarity and extend the black scene naturally into the former letterboxing. The intentional scene background is black, but there must be no rectangular bars interrupting the lime strip or artwork. Preserve all body parts and pose; do not create another creature or change text."
+  }
+]

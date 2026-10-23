@@ -1,0 +1,27 @@
+{
+  "generator": "Blender 4.3.2",
+  "glb": "ae-sculpture.glb",
+  "frontAxis": "+Z",
+  "upAxis": "+Y",
+  "centre": [
+    0,
+    0,
+    0
+  ],
+  "bounds": [
+    3.89,
+    3.89,
+    0.6935
+  ],
+  "meshes": 3,
+  "glbBytes": 524128,
+  "materials": [
+    "Rose porcelain / clear glaze",
+    "Pearl pink / glyph face",
+    "Petal chrome / softened bevel",
+    "Mulberry ceramic / glyph sides",
+    "Lilac anodised edge"
+  ],
+  "recommendedMotion": "Rock Y +/- 16 degrees; X +/- 9 degrees. Keep face towards camera.",
+  "source": "tools/build-ae-model.py"
+}

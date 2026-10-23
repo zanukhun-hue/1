@@ -1,0 +1,282 @@
+[
+  {
+    "id": "aftercodecs",
+    "width": 265,
+    "height": 265,
+    "bytes": 4448,
+    "near_black_top_rows": 57,
+    "near_black_bottom_rows": 64
+  },
+  {
+    "id": "autosway",
+    "width": 265,
+    "height": 265,
+    "bytes": 6332,
+    "near_black_top_rows": 0,
+    "near_black_bottom_rows": 0
+  },
+  {
+    "id": "ballpoint",
+    "width": 265,
+    "height": 265,
+    "bytes": 18188,
+    "near_black_top_rows": 0,
+    "near_black_bottom_rows": 0
+  },
+  {
+    "id": "bcc-continuum",
+    "width": 600,
+    "height": 137,
+    "bytes": 4750,
+    "near_black_top_rows": 0,
+    "near_black_bottom_rows": 0
+  },
+  {
+    "id": "bcc-sapphire",
+    "width": 600,
+    "height": 157,
+    "bytes": 3426,
+    "near_black_top_rows": 0,
+    "near_black_bottom_rows": 0
+  },
+  {
+    "id": "bevelizer",
+    "width": 265,
+    "height": 265,
+    "bytes": 11286,
+    "near_black_top_rows": 0,
+    "near_black_bottom_rows": 0
+  },
+  {
+    "id": "bokeh",
+    "width": 940,
+    "height": 530,
+    "bytes": 19154,
+    "near_black_top_rows": 0,
+    "near_black_bottom_rows": 0
+  },
+  {
+    "id": "clearplus",
+    "width": 265,
+    "height": 265,
+    "bytes": 8840,
+    "near_black_top_rows": 57,
+    "near_black_bottom_rows": 57
+  },
+  {
+    "id": "deep-glow-v1",
+    "width": 960,
+    "height": 540,
+    "bytes": 54598,
+    "near_black_top_rows": 0,
+    "near_black_bottom_rows": 0
+  },
+  {
+    "id": "deep-glow-v2",
+    "width": 265,
+    "height": 265,
+    "bytes": 8172,
+    "near_black_top_rows": 0,
+    "near_black_bottom_rows": 0
+  },
+  {
+    "id": "element-3d",
+    "width": 320,
+    "height": 133,
+    "bytes": 8790,
+    "near_black_top_rows": 0,
+    "near_black_bottom_rows": 0
+  },
+  {
+    "id": "flow",
+    "width": 265,
+    "height": 265,
+    "bytes": 2870,
+    "near_black_top_rows": 0,
+    "near_black_bottom_rows": 0
+  },
+  {
+    "id": "fxaa",
+    "width": 265,
+    "height": 265,
+    "bytes": 2992,
+    "near_black_top_rows": 0,
+    "near_black_bottom_rows": 0
+  },
+  {
+    "id": "fxconsole",
+    "width": 960,
+    "height": 320,
+    "bytes": 30302,
+    "near_black_top_rows": 0,
+    "near_black_bottom_rows": 0
+  },
+  {
+    "id": "glitchify",
+    "width": 960,
+    "height": 540,
+    "bytes": 92118,
+    "near_black_top_rows": 0,
+    "near_black_bottom_rows": 0
+  },
+  {
+    "id": "heat-distortion",
+    "width": 529,
+    "height": 75,
+    "bytes": 6580,
+    "near_black_top_rows": 0,
+    "near_black_bottom_rows": 0
+  },
+  {
+    "id": "influx",
+    "width": 265,
+    "height": 265,
+    "bytes": 3414,
+    "near_black_top_rows": 58,
+    "near_black_bottom_rows": 70
+  },
+  {
+    "id": "jpeg-glitch",
+    "width": 265,
+    "height": 265,
+    "bytes": 20452,
+    "near_black_top_rows": 57,
+    "near_black_bottom_rows": 56
+  },
+  {
+    "id": "mask-prompter",
+    "width": 265,
+    "height": 265,
+    "bytes": 9730,
+    "near_black_top_rows": 57,
+    "near_black_bottom_rows": 57
+  },
+  {
+    "id": "mocha-pro",
+    "width": 960,
+    "height": 221,
+    "bytes": 8200,
+    "near_black_top_rows": 0,
+    "near_black_bottom_rows": 0
+  },
+  {
+    "id": "newton",
+    "width": 265,
+    "height": 265,
+    "bytes": 4366,
+    "near_black_top_rows": 57,
+    "near_black_bottom_rows": 57
+  },
+  {
+    "id": "omino",
+    "width": 480,
+    "height": 360,
+    "bytes": 24266,
+    "near_black_top_rows": 45,
+    "near_black_bottom_rows": 45
+  },
+  {
+    "id": "optical-flares",
+    "width": 232,
+    "height": 176,
+    "bytes": 3744,
+    "near_black_top_rows": 0,
+    "near_black_bottom_rows": 0
+  },
+  {
+    "id": "pixdither",
+    "width": 516,
+    "height": 400,
+    "bytes": 3750,
+    "near_black_top_rows": 149,
+    "near_black_bottom_rows": 160
+  },
+  {
+    "id": "polytrace",
+    "width": 960,
+    "height": 540,
+    "bytes": 106414,
+    "near_black_top_rows": 0,
+    "near_black_bottom_rows": 0
+  },
+  {
+    "id": "red-giant",
+    "width": 738,
+    "height": 414,
+    "bytes": 4404,
+    "near_black_top_rows": 177,
+    "near_black_bottom_rows": 177
+  },
+  {
+    "id": "rsmb",
+    "width": 600,
+    "height": 600,
+    "bytes": 38018,
+    "near_black_top_rows": 0,
+    "near_black_bottom_rows": 0
+  },
+  {
+    "id": "saber",
+    "width": 480,
+    "height": 360,
+    "bytes": 17408,
+    "near_black_top_rows": 43,
+    "near_black_bottom_rows": 44
+  },
+  {
+    "id": "shadow-studio-3",
+    "width": 265,
+    "height": 265,
+    "bytes": 5318,
+    "near_black_top_rows": 0,
+    "near_black_bottom_rows": 0
+  },
+  {
+    "id": "signal",
+    "width": 265,
+    "height": 265,
+    "bytes": 13202,
+    "near_black_top_rows": 57,
+    "near_black_bottom_rows": 57
+  },
+  {
+    "id": "topaz-video-enhance",
+    "width": 600,
+    "height": 600,
+    "bytes": 12530,
+    "near_black_top_rows": 0,
+    "near_black_bottom_rows": 0
+  },
+  {
+    "id": "tracery",
+    "width": 265,
+    "height": 265,
+    "bytes": 9000,
+    "near_black_top_rows": 57,
+    "near_black_bottom_rows": 57
+  },
+  {
+    "id": "twitch",
+    "width": 450,
+    "height": 364,
+    "bytes": 18482,
+    "near_black_top_rows": 0,
+    "near_black_bottom_rows": 0
+  },
+  {
+    "id": "twixtor",
+    "width": 960,
+    "height": 540,
+    "bytes": 55608,
+    "near_black_top_rows": 0,
+    "near_black_bottom_rows": 0
+  },
+  {
+    "id": "vc-color-vibrance",
+    "width": 600,
+    "height": 335,
+    "bytes": 19388,
+    "near_black_top_rows": 0,
+    "near_black_bottom_rows": 0
+  }
+]

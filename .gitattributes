@@ -1,0 +1,3 @@
+# Bundled Three.js contains upstream GLSL string literals with significant formatting.
+# Review the maintained source in assets/model-viewer-source.js.
+assets/model-viewer.js linguist-generated=true -whitespace
