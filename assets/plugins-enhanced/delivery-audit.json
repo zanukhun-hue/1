@@ -1,0 +1,191 @@
+[
+  {
+    "id": "aftercodecs",
+    "master": "aftercodecs.png",
+    "delivery": "aftercodecs.webp",
+    "width": 1672,
+    "height": 941,
+    "pngBytes": 1340624,
+    "webpBytes": 78448
+  },
+  {
+    "id": "autosway",
+    "master": "autosway.png",
+    "delivery": "autosway.webp",
+    "width": 1672,
+    "height": 941,
+    "pngBytes": 1699610,
+    "webpBytes": 168070
+  },
+  {
+    "id": "ballpoint",
+    "master": "ballpoint.png",
+    "delivery": "ballpoint.webp",
+    "width": 1672,
+    "height": 941,
+    "pngBytes": 4290282,
+    "webpBytes": 865348
+  },
+  {
+    "id": "bevelizer",
+    "master": "bevelizer.png",
+    "delivery": "bevelizer.webp",
+    "width": 1672,
+    "height": 941,
+    "pngBytes": 2336799,
+    "webpBytes": 306184
+  },
+  {
+    "id": "clearplus",
+    "master": "clearplus.png",
+    "delivery": "clearplus.webp",
+    "width": 1672,
+    "height": 941,
+    "pngBytes": 1869801,
+    "webpBytes": 205086
+  },
+  {
+    "id": "deep-glow-v2",
+    "master": "deep-glow-v2.png",
+    "delivery": "deep-glow-v2.webp",
+    "width": 1672,
+    "height": 941,
+    "pngBytes": 1608813,
+    "webpBytes": 155254
+  },
+  {
+    "id": "element-3d",
+    "master": "element-3d.png",
+    "delivery": "element-3d.webp",
+    "width": 1672,
+    "height": 941,
+    "pngBytes": 1746597,
+    "webpBytes": 152652
+  },
+  {
+    "id": "flow",
+    "master": "flow.png",
+    "delivery": "flow.webp",
+    "width": 1672,
+    "height": 941,
+    "pngBytes": 1277561,
+    "webpBytes": 52664
+  },
+  {
+    "id": "fxaa",
+    "master": "fxaa.png",
+    "delivery": "fxaa.webp",
+    "width": 1672,
+    "height": 941,
+    "pngBytes": 1254307,
+    "webpBytes": 40416
+  },
+  {
+    "id": "heat-distortion",
+    "master": "heat-distortion.png",
+    "delivery": "heat-distortion.webp",
+    "width": 1672,
+    "height": 940,
+    "pngBytes": 1626255,
+    "webpBytes": 80722
+  },
+  {
+    "id": "influx",
+    "master": "influx.png",
+    "delivery": "influx.webp",
+    "width": 1672,
+    "height": 941,
+    "pngBytes": 1170781,
+    "webpBytes": 50318
+  },
+  {
+    "id": "jpeg-glitch",
+    "master": "jpeg-glitch.png",
+    "delivery": "jpeg-glitch.webp",
+    "width": 1672,
+    "height": 941,
+    "pngBytes": 3662211,
+    "webpBytes": 967752
+  },
+  {
+    "id": "mask-prompter",
+    "master": "mask-prompter.png",
+    "delivery": "mask-prompter.webp",
+    "width": 1672,
+    "height": 941,
+    "pngBytes": 1673344,
+    "webpBytes": 171278
+  },
+  {
+    "id": "newton",
+    "master": "newton.png",
+    "delivery": "newton.webp",
+    "width": 1672,
+    "height": 941,
+    "pngBytes": 1342849,
+    "webpBytes": 63568
+  },
+  {
+    "id": "omino",
+    "master": "omino.png",
+    "delivery": "omino.webp",
+    "width": 1672,
+    "height": 941,
+    "pngBytes": 1803373,
+    "webpBytes": 209904
+  },
+  {
+    "id": "optical-flares",
+    "master": "optical-flares.png",
+    "delivery": "optical-flares.webp",
+    "width": 1672,
+    "height": 941,
+    "pngBytes": 2017540,
+    "webpBytes": 213954
+  },
+  {
+    "id": "rsmb",
+    "master": "rsmb.png",
+    "delivery": "rsmb.webp",
+    "width": 1672,
+    "height": 941,
+    "pngBytes": 1557530,
+    "webpBytes": 109406
+  },
+  {
+    "id": "saber",
+    "master": "saber.png",
+    "delivery": "saber.webp",
+    "width": 1672,
+    "height": 941,
+    "pngBytes": 1980636,
+    "webpBytes": 277960
+  },
+  {
+    "id": "shadow-studio-3",
+    "master": "shadow-studio-3.png",
+    "delivery": "shadow-studio-3.webp",
+    "width": 1672,
+    "height": 941,
+    "pngBytes": 1733275,
+    "webpBytes": 136798
+  },
+  {
+    "id": "signal",
+    "master": "signal.png",
+    "delivery": "signal.webp",
+    "width": 1672,
+    "height": 940,
+    "pngBytes": 3160033,
+    "webpBytes": 660816
+  },
+  {
+    "id": "tracery",
+    "master": "tracery.png",
+    "delivery": "tracery.webp",
+    "width": 1672,
+    "height": 941,
+    "pngBytes": 1281472,
+    "webpBytes": 136092
+  }
+]

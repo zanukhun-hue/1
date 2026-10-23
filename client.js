@@ -44,8 +44,8 @@
   function syncFavoriteUI(){const fav=getFavorites();$$('#favoriteCount').forEach(e=>e.textContent=fav.length);$$('.favorite-btn[data-id]').forEach(b=>{const a=fav.includes(b.dataset.id),w=b.classList.contains('btn');b.classList.toggle('active',a);b.innerHTML=a?`<i class="fas fa-heart"></i>${w?' В избранном':''}`:`<i class="far fa-heart"></i>${w?' В избранное':''}`})}
   function toggleFavorite(id){const a=getFavorites(),i=a.indexOf(id);i>=0?a.splice(i,1):a.push(id);saveFavorites(a);syncFavoriteUI();filterCatalog()}
   function applyTheme(d){document.documentElement.classList.toggle('dark-mode',d);document.documentElement.classList.toggle('light-mode',!d);document.body.classList.toggle('dark-mode',d);document.body.classList.toggle('light-mode',!d);const i=$('#themeToggle i');if(i)i.className=d?'fas fa-sun':'fas fa-moon'}
-  function initTheme(){const s=localStorage.getItem(THEME_KEY);applyTheme(s?s==='dark':true)}
-  function initVisits(){logSiteVisit()}
+  function initTheme(){applyTheme(true)}
+  function initVisits(){if(!['localhost','127.0.0.1','[::1]'].includes(location.hostname))logSiteVisit()}
   function setupReveals(){const items=$$('.reveal:not(.revealed)');if(!('IntersectionObserver'in window)){items.forEach(x=>x.classList.add('revealed'));return}const o=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('revealed');o.unobserve(e.target)}}),{threshold:.08});items.forEach(x=>o.observe(x))}
 
   function cardText(c){return[c.dataset.name||'',c.textContent||'',c.dataset.searchExtra||''].join(' ').toLowerCase()}
@@ -533,7 +533,7 @@
     const status=document.createElement('div');status.className='build-drag-status';status.setAttribute('role','status');status.hidden=true;document.body.append(status);
     let drag=null,ghost=null,base=null,statusTimer=0,suppressClickUntil=0;
     function syncDock(){dock.hidden=!fine.matches||(!drag?.active&&!hovering&&(!gridVisible||footerVisible));if(!drag?.active){dock.style.setProperty('--magnet-x','0px');dock.style.setProperty('--magnet-y','0px');dock.querySelector('strong').textContent='Перетащи плагин сюда';dock.querySelector('.dock-instruction').innerHTML='Корзина плагинов · выбрано: <span data-build-count>'+readBuild().length+'</span>'}}
-    const footer=document.querySelector('.footer');if(footer)new IntersectionObserver(entries=>{footerVisible=entries[0].isIntersecting;syncDock()},{threshold:0}).observe(footer);
+    const footer=document.querySelector('.footer,.ae-footer');if(footer)new IntersectionObserver(entries=>{footerVisible=entries[0].isIntersecting;syncDock()},{threshold:0}).observe(footer);
     const grid=document.getElementById('pluginsGrid');if(grid)new IntersectionObserver(entries=>{gridVisible=entries[0].isIntersecting;syncDock()},{threshold:0}).observe(grid);fine.addEventListener('change',()=>{finish(null,true);syncDock()});
     function notify(name){clearTimeout(statusTimer);status.textContent=`${name} добавлен в корзину`;status.hidden=false;statusTimer=setTimeout(()=>status.hidden=true,2400)}
     function start(e,button){
@@ -551,7 +551,7 @@
       if(!drag||e.pointerId!==drag.id)return;
       if(!drag.active&&Math.hypot(e.clientX-drag.startX,e.clientY-drag.startY)<7)return;
       e.preventDefault();if(!drag.active)activate();
-      ghost.style.transform=`translate3d(${Math.max(8,Math.min(innerWidth-204,e.clientX+18))}px,${Math.max(8,Math.min(innerHeight-80,e.clientY+18))}px,0)`;
+      ghost.style.transform=`translate3d(${e.clientX}px,${e.clientY}px,0) translate(-50%,-50%)`;
       const dx=e.clientX-(base.left+base.width/2),dy=e.clientY-(base.top+base.height/2),near=Math.hypot(dx,dy)<230;
       dock.style.setProperty('--magnet-x',(!reduced.matches&&near?Math.max(-22,Math.min(22,dx*.12)):0)+'px');dock.style.setProperty('--magnet-y',(!reduced.matches&&near?Math.max(-16,Math.min(16,dy*.1)):0)+'px');
       const r=dock.getBoundingClientRect();drag.hit=e.clientX>=r.left-18&&e.clientX<=r.right+18&&e.clientY>=r.top-18&&e.clientY<=r.bottom+18;
@@ -636,5 +636,5 @@
     document.addEventListener('click',e=>{const b=e.target.closest('.favorite-btn[data-id]');if(b){e.preventDefault();toggleFavorite(b.dataset.id)}});
     const top=$('#backToTop');window.addEventListener('scroll',()=>top?.classList.toggle('show',window.scrollY>500));top?.addEventListener('click',()=>scrollTo({top:0,behavior:'smooth'}));
   }
-  document.addEventListener('DOMContentLoaded',()=>{injectUiFixes();initTheme();initWorkspace();initCart();initCommandPalette();initEmptyParticles();initMagneticBuild();initHeroPlayground();initSpider();initPluginGallery();initCardTilt();initPresetPreviews();initVisits();initEvents();syncFavoriteUI();initFlowVersionSelector();initDownloads();initButtonGlow();initPluginReport();initVideoComparisons();if(page==='plugins'){initCatalog();initSortMenu();initTaskSearch()}setupReveals()});
+  document.addEventListener('DOMContentLoaded',()=>{injectUiFixes();initTheme();initWorkspace();initCart();initCommandPalette();initEmptyParticles();initMagneticBuild();initHeroPlayground();initPluginGallery();initCardTilt();initPresetPreviews();initVisits();initEvents();syncFavoriteUI();initFlowVersionSelector();initDownloads();initButtonGlow();initPluginReport();initVideoComparisons();if(page==='plugins'){initCatalog();initSortMenu();initTaskSearch()}setupReveals()});
 })();
