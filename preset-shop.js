@@ -10,11 +10,21 @@ const menu = {inline_keyboard:[
 const terms = 'Набор стоит '+PRICE_STARS+' ⭐ Telegram Stars. После подтверждения платежа бот отправит ZIP с файлами .ffx для After Effects. Некоторым пресетам нужны дополнительные плагины; состав указан на сайте. Повторная выдача доступна в «Мои покупки». По вопросам оплаты, выдачи и возврата: /paysupport <описание>. Поддержку по этому заказу оказывает магазин, а не Telegram.';
 function createPresetSales({telegramApi, site, supabase, supabaseRequest}) {
   const flights = new Map();
+  const clearedKeyboards = new Set();
   const configured = () => Boolean(site.tgBotToken && supabase.url && supabase.adminKey);
   const query = (path,options={}) => supabaseRequest(path,{signal:AbortSignal.timeout(3000),...options},true);
   const send = (chat_id,text,reply_markup=menu) => telegramApi('sendMessage',{chat_id,text,reply_markup,disable_web_page_preview:true});
   const json = (body,prefer='return=representation') => ({method:'POST',headers:{'Content-Type':'application/json',Prefer:prefer},body:JSON.stringify(body)});
   const patch = body => ({...json(body),method:'PATCH'});
+  function rememberKeyboard(chatId) {
+    if(clearedKeyboards.size>=5000)clearedKeyboards.clear();
+    clearedKeyboards.add(String(chatId));
+  }
+  async function clearKeyboard(chatId) {
+    if(clearedKeyboards.has(String(chatId)))return;
+    await send(chatId,'Магазин пресетов · старое меню убрано.',{remove_keyboard:true});
+    rememberKeyboard(chatId);
+  }
   const chargePath = charge => 'preset_sales_orders?telegram_payment_charge_id=eq.'+encodeURIComponent(charge);
   async function list(chatId) {
     return send(chatId,'9 наборов авторских пресетов для After Effects. Каждый — '+PRICE_STARS+' ⭐. Выбери нужный:',{
@@ -136,6 +146,7 @@ function createPresetSales({telegramApi, site, supabase, supabaseRequest}) {
       const [command,...args]=msg.text.trim().split(/\s+/);const base=command.toLowerCase().split('@')[0];const arg=args.join(' ');
       if(base==='/start'){
         await send(msg.chat.id,'NULL—OBJECT / PRESET STORE\nАвторские пресеты для After Effects. 9 наборов по '+PRICE_STARS+' ⭐.',{remove_keyboard:true});
+        rememberKeyboard(msg.chat.id);
         if(/^pack_[a-z]+$/.test(arg))await showPack(msg.chat.id,arg.slice(5));else await list(msg.chat.id);return true;
       }
       if(['/packs','/shop','/presets'].includes(base)){await list(msg.chat.id);return true;}
@@ -151,7 +162,10 @@ function createPresetSales({telegramApi, site, supabase, supabaseRequest}) {
       if(String(cb.from.id)!==String(cb.message.chat.id)){await telegramApi('answerCallbackQuery',{callback_query_id:cb.id,text:'Открой личный чат с ботом'});return true;}
       await telegramApi('answerCallbackQuery',{callback_query_id:cb.id});
       const [prefix,action,id]=String(cb.data||'').split(':');const chatId=cb.message.chat.id;
-      if(prefix!=='presets'){await send(chatId,'Эта кнопка устарела. Открой актуальный каталог.');return true;}
+      if(prefix!=='presets'){
+        if(cb.message.message_id)await telegramApi('editMessageReplyMarkup',{chat_id:chatId,message_id:cb.message.message_id,reply_markup:{inline_keyboard:[]}}).catch(()=>{});
+        await list(chatId);return true;
+      }
       if(action==='list')await list(chatId);
       else if(action==='view')await showPack(chatId,id);
       else if(action==='buy'&&packs.has(id))await send(chatId,terms,{inline_keyboard:[[{text:'Принимаю условия · оплатить '+PRICE_STARS+' ⭐',callback_data:'presets:accept:'+id}],[{text:'← Назад',callback_data:'presets:view:'+id}]]});
@@ -164,7 +178,13 @@ function createPresetSales({telegramApi, site, supabase, supabaseRequest}) {
     return false;
   }
   async function safeHandle(update) {
-    try {return await handle(update);} catch(error) {
+    try {
+      const chat=update.message?.chat||update.callback_query?.message?.chat;
+      const financial=update.pre_checkout_query||update.message?.successful_payment||update.message?.refunded_payment;
+      const start=/^\/start(?:@\w+)?(?:\s|$)/i.test(update.message?.text||'');
+      if(chat?.type==='private'&&!financial&&!start)await clearKeyboard(chat.id);
+      return await handle(update);
+    } catch(error) {
       // Payments must remain retryable: a failed persistence/delivery gets HTTP 500.
       if(update.pre_checkout_query||update.message?.successful_payment||update.message?.refunded_payment)throw error;
       const chat=update.message?.chat||update.callback_query?.message?.chat;
