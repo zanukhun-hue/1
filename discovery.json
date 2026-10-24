@@ -9,7 +9,11 @@
         "deep-glow-v2",
         "saber",
         "bcc-sapphire",
-        "optical-flares"
+        "optical-flares",
+        "revision-effections-plus",
+        "filmconvert-halation",
+        "filmconvert-hazy",
+        "universe"
       ]
     },
     {
@@ -17,7 +21,8 @@
       "label": "Замедление",
       "keywords": "замедление замедлить ускорить скорость slowmo slow motion ретайм",
       "plugins": [
-        "twixtor"
+        "twixtor",
+        "revision-effections-plus"
       ]
     },
     {
@@ -27,7 +32,11 @@
       "plugins": [
         "motion-tools-3",
         "flow",
-        "autosway"
+        "autosway",
+        "mister-horse-product-manager",
+        "autofill",
+        "trapcode",
+        "loopflow"
       ]
     },
     {
@@ -35,7 +44,8 @@
       "label": "Убрать шум",
       "keywords": "убрать шум шумоподавление очистить denoise шум шумы улучшить качество",
       "plugins": [
-        "topaz-video-enhance"
+        "topaz-video-enhance",
+        "revision-effections-plus"
       ]
     },
     {
@@ -47,7 +57,12 @@
         "jpeg-glitch",
         "glitchify",
         "ezco-crt-emulator",
-        "signal"
+        "signal",
+        "glitch-7-in-1",
+        "data-glitch",
+        "displacer-pro",
+        "ae-pixel-sorter-2",
+        "universe"
       ]
     },
     {
@@ -58,7 +73,11 @@
         "film-convert-nitrate",
         "maxon-looks-trapcode",
         "red-giant",
-        "vc-color-vibrance"
+        "vc-color-vibrance",
+        "filmconvert-pro",
+        "dehancer-pro",
+        "filmconvert-halation",
+        "filmconvert-hazy"
       ]
     },
     {
@@ -67,7 +86,9 @@
       "keywords": "размытие размыть motion blur смаз боке bokeh",
       "plugins": [
         "rsmb",
-        "bokeh"
+        "bokeh",
+        "crossphere-bokeh",
+        "depth-scanner"
       ]
     },
     {
@@ -76,7 +97,10 @@
       "keywords": "трекинг tracking отслеживание отследить движение маска",
       "plugins": [
         "mocha-pro",
-        "mask-prompter"
+        "mask-prompter",
+        "lockdown",
+        "geotracker",
+        "goodbye-greenscreen"
       ]
     }
   ],

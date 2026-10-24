@@ -13,7 +13,12 @@ window.AE_PLUGINS = [
     "downloadUrl": "#",
     "badge": "Комплект",
     "icon": "fas fa-box-archive",
-    "tags": ["комплект", "ae", "2020", "2025"],
+    "tags": [
+      "комплект",
+      "ae",
+      "2020",
+      "2025"
+    ],
     "updated": "Обновляется",
     "compatibility": "After Effects 2020–2025"
   },
@@ -31,7 +36,12 @@ window.AE_PLUGINS = [
     "downloadUrl": "https://drive.google.com/file/d/1QrFR1hmNC3idmFap2SoqKEr2OSqs9bjO/view?usp=drive_link",
     "badge": "Утилита",
     "icon": "fas fa-file-video",
-    "tags": ["экспорт", "кодек", "рендер", "aex"],
+    "tags": [
+      "экспорт",
+      "кодек",
+      "рендер",
+      "aex"
+    ],
     "updated": "12.06.2026",
     "compatibility": "After Effects 2020+ / лучше AE 2022 и новее"
   },
@@ -49,7 +59,10 @@ window.AE_PLUGINS = [
     "downloadUrl": "https://drive.google.com/file/d/1OMLa4wbLGeJ760CqjPeOa3ooXG0uNpD1/view?usp=drive_link",
     "badge": "Скрипт",
     "icon": "fas fa-random",
-    "tags": ["анимация", "jsx"],
+    "tags": [
+      "анимация",
+      "jsx"
+    ],
     "updated": "15.05.2026",
     "compatibility": "After Effects 2018+ / лучше AE 2022 и новее"
   },
@@ -67,7 +80,11 @@ window.AE_PLUGINS = [
     "downloadUrl": "https://drive.google.com/file/d/18COpTB3mpQShnAKr-Hwg6C6nulseA_mn/view?usp=drive_link",
     "badge": "Новый",
     "icon": "fas fa-pen-nib",
-    "tags": ["анимация", "линии", "aex"],
+    "tags": [
+      "анимация",
+      "линии",
+      "aex"
+    ],
     "updated": "12.06.2026",
     "compatibility": "After Effects 2020+ / лучше AE 2022 и новее"
   },
@@ -79,15 +96,35 @@ window.AE_PLUGINS = [
     "categoryLabel": "Комплект",
     "package": "aex",
     "minAe": "2022",
-    "version": "v2024",
-    "size": "2.1 GB",
+    "version": "2026 · 19.0.1",
+    "size": "2910.6 MB",
     "status": "available",
-    "downloadUrl": "https://drive.google.com/file/d/1wjiCMn2cOGR0WDy1Iy2jKUhKltJN_Vl-/view?usp=drive_link",
+    "downloadUrl": "https://t.me/ae_plugins_vault/96",
     "badge": "Комплект",
     "icon": "fas fa-infinity",
-    "tags": ["комплект", "aex", "bcc", "continuum"],
-    "updated": "15.05.2026",
-    "compatibility": "After Effects 2022+ / лучше AE 2022 и новее"
+    "tags": [
+      "комплект",
+      "aex",
+      "bcc",
+      "continuum"
+    ],
+    "updated": "24.10.2026",
+    "compatibility": "After Effects 2022+ / лучше AE 2022 и новее",
+    "downloadLabel": "Скачать Adobe 2026",
+    "versions": [
+      {
+        "key": "adobe2026",
+        "label": "Continuum 2026 Adobe · 19.0.1",
+        "downloadUrl": "https://t.me/ae_plugins_vault/96",
+        "status": "available"
+      },
+      {
+        "key": "drive",
+        "label": "Continuum · архив Google Диска",
+        "downloadUrl": "https://drive.google.com/file/d/1l3BTeiANsqvV0CWqXpfEaAyoIxnivbzj/view?usp=sharing",
+        "status": "available"
+      }
+    ]
   },
   {
     "id": "bcc-sapphire",
@@ -97,15 +134,36 @@ window.AE_PLUGINS = [
     "categoryLabel": "Эффекты",
     "package": "aex",
     "minAe": "2021",
-    "version": "v2024.01",
-    "size": "850 MB",
+    "version": "2026 · After Effects",
+    "size": "1398.1 MB",
     "status": "available",
-    "downloadUrl": "https://drive.google.com/file/d/1gXX0MUQ-Cz4S75TsW4RtHnstO1CTaXog/view?usp=drive_link",
+    "downloadUrl": "https://t.me/ae_plugins_vault/95",
     "badge": "Популярный",
     "icon": "fas fa-sparkles",
-    "tags": ["эффекты", "aex", "popular", "sapphire"],
-    "updated": "15.05.2026",
-    "compatibility": "After Effects 2021+ / лучше AE 2022 и новее"
+    "tags": [
+      "эффекты",
+      "aex",
+      "popular",
+      "sapphire"
+    ],
+    "updated": "24.10.2026",
+    "compatibility": "After Effects 2021+ / лучше AE 2022 и новее",
+    "downloadLabel": "Скачать для After Effects",
+    "versions": [
+      {
+        "key": "ae2026",
+        "label": "Sapphire 2026 · After Effects",
+        "downloadUrl": "https://t.me/ae_plugins_vault/95",
+        "status": "available"
+      },
+      {
+        "key": "ofx2025",
+        "label": "Sapphire OFX 2025.5 · не для After Effects",
+        "downloadUrl": "https://drive.google.com/file/d/1de076xxmes4mNu4_IgHm_O40iea9tGa7/view?usp=sharing",
+        "status": "available"
+      }
+    ],
+    "versionsNote": "Для After Effects выбирай сборку Adobe. OFX предназначен для других приложений."
   },
   {
     "id": "bevelizer",
@@ -121,27 +179,38 @@ window.AE_PLUGINS = [
     "downloadUrl": "https://drive.google.com/file/d/1qJwvm_nQoe79NNwxpE9YlWCzFVYv4vk6/view?usp=drive_link",
     "badge": "3D",
     "icon": "fas fa-cube",
-    "tags": ["3d", "bevel", "aex"],
+    "tags": [
+      "3d",
+      "bevel",
+      "aex"
+    ],
     "updated": "12.06.2026",
     "compatibility": "After Effects 2020+ / лучше AE 2022 и новее"
   },
   {
     "id": "bokeh",
-    "name": "Bokeh",
-    "description": "Создание эффектов боке и размытия с художественным контролем над формой и интенсивностью.",
+    "name": "Fast Bokeh",
+    "description": "Быстрое размытие глубины резкости по карте глубины с аккуратной обработкой границ объектов.",
     "category": "effects",
     "categoryLabel": "Эффекты",
     "package": "aex",
     "minAe": "2020",
-    "version": "v1.1.0",
-    "size": "22 MB",
+    "version": "2.0.6",
+    "size": "Размер уточняется",
     "status": "available",
-    "downloadUrl": "https://drive.google.com/file/d/1bjfHjjp4FQSr1yaMDhz8yL_e1DB6SFj-/view?usp=drive_link",
+    "downloadUrl": "https://drive.google.com/file/d/1lQfFCFGafLHYJ_Kv4hVSJc17OCRFGENM/view?usp=sharing",
     "badge": "Эффект",
     "icon": "fas fa-tint",
-    "tags": ["эффекты", "aex", "bokeh"],
-    "updated": "15.05.2026",
-    "compatibility": "After Effects 2020+ / лучше AE 2022 и новее"
+    "tags": [
+      "fastbokeh",
+      "fast bokeh",
+      "боке",
+      "depth",
+      "blur"
+    ],
+    "updated": "24.10.2026",
+    "compatibility": "After Effects 2020+ / лучше AE 2022 и новее",
+    "sourcePage": "https://www.rowbyte.com/fast-bokeh/"
   },
   {
     "id": "clearplus",
@@ -157,7 +226,11 @@ window.AE_PLUGINS = [
     "downloadUrl": "https://drive.google.com/file/d/1V_FrAeJib1m63DciWBNpB0IqIGJ98q7k/view?usp=drive_link",
     "badge": "Эффект",
     "icon": "fas fa-wand-magic-sparkles",
-    "tags": ["эффекты", "clean", "aex"],
+    "tags": [
+      "эффекты",
+      "clean",
+      "aex"
+    ],
     "updated": "12.06.2026",
     "compatibility": "After Effects 2020+ / лучше AE 2022 и новее"
   },
@@ -169,14 +242,18 @@ window.AE_PLUGINS = [
     "categoryLabel": "Эффекты",
     "package": "aex",
     "minAe": "2020",
-    "version": "v1",
-    "size": "Обновляется",
+    "version": "1.5.5 · Win + Mac",
+    "size": "Размер уточняется",
     "status": "available",
-    "downloadUrl": "https://drive.google.com/file/d/1orkdfgx_stkORU_DZM5OKTLYp6FsJL_-/view?usp=drive_link",
+    "downloadUrl": "https://drive.google.com/file/d/1_71i2HuS3nhZ8UL3AbGUTodyAATL7qV9/view?usp=sharing",
     "badge": "Glow",
     "icon": "fas fa-sun",
-    "tags": ["эффекты", "glow", "aex"],
-    "updated": "12.06.2026",
+    "tags": [
+      "эффекты",
+      "glow",
+      "aex"
+    ],
+    "updated": "24.10.2026",
     "compatibility": "After Effects 2020+ / лучше AE 2022 и новее"
   },
   {
@@ -190,11 +267,16 @@ window.AE_PLUGINS = [
     "version": "v2",
     "size": "Обновляется",
     "status": "available",
-    "downloadUrl": "https://drive.google.com/file/d/1NdqsXooTDJhloO5fGENOOFRsFcNGFXPF/view?usp=drive_link",
+    "downloadUrl": "https://drive.google.com/file/d/1vw1E5Gz3v4IEh-Oe8DMROicpvJlhwTZc/view?usp=sharing",
     "badge": "Glow",
     "icon": "fas fa-sun",
-    "tags": ["эффекты", "glow", "aex", "new"],
-    "updated": "12.06.2026",
+    "tags": [
+      "эффекты",
+      "glow",
+      "aex",
+      "new"
+    ],
+    "updated": "24.10.2026",
     "compatibility": "After Effects 2021+ / лучше AE 2022 и новее"
   },
   {
@@ -205,14 +287,18 @@ window.AE_PLUGINS = [
     "categoryLabel": "3D",
     "package": "aex",
     "minAe": "2020",
-    "version": "Обновляется",
-    "size": "Обновляется",
+    "version": "2.2.3.2192",
+    "size": "Размер уточняется",
     "status": "available",
-    "downloadUrl": "https://drive.google.com/file/d/1_Svv0oDkar6XAFtm3hisKu3yXVoD7y2d/view?usp=drive_link",
+    "downloadUrl": "https://drive.google.com/file/d/1hjz6ecNGJQ7v61X6dUDks1PDcOxh56cm/view?usp=sharing",
     "badge": "3D",
     "icon": "fas fa-cubes",
-    "tags": ["3d", "element", "aex"],
-    "updated": "12.06.2026",
+    "tags": [
+      "3d",
+      "element",
+      "aex"
+    ],
+    "updated": "24.10.2026",
     "compatibility": "After Effects 2020+ / лучше AE 2022 и новее"
   },
   {
@@ -229,7 +315,12 @@ window.AE_PLUGINS = [
     "downloadUrl": "https://drive.google.com/file/d/1aaycttBCwIS72spP4pzZ1OYk9NtJJ5r4/view?usp=drive_link",
     "badge": "Ретро",
     "icon": "fas fa-tv",
-    "tags": ["crt", "ретро", "glitch", "aex"],
+    "tags": [
+      "crt",
+      "ретро",
+      "glitch",
+      "aex"
+    ],
     "updated": "12.06.2026",
     "compatibility": "After Effects 2020+ / лучше AE 2022 и новее"
   },
@@ -244,11 +335,15 @@ window.AE_PLUGINS = [
     "version": "Обновляется",
     "size": "Обновляется",
     "status": "available",
-    "downloadUrl": "https://drive.google.com/file/d/18GofsHWLpY3CT0tzuw2L-LK5nw99ZesL/view?usp=drive_link",
+    "downloadUrl": "https://drive.google.com/file/d/1O4GuMfUMY0zcR8QSzflNTQlk-xehxJRw/view?usp=sharing",
     "badge": "Цвет",
     "icon": "fas fa-film",
-    "tags": ["цвет", "film", "aex"],
-    "updated": "12.06.2026",
+    "tags": [
+      "цвет",
+      "film",
+      "aex"
+    ],
+    "updated": "24.10.2026",
     "compatibility": "After Effects 2020+ / лучше AE 2022 и новее"
   },
   {
@@ -265,7 +360,11 @@ window.AE_PLUGINS = [
     "downloadUrl": "#",
     "badge": "Эффект",
     "icon": "fas fa-video",
-    "tags": ["эффекты", "ffx", "film"],
+    "tags": [
+      "эффекты",
+      "ffx",
+      "film"
+    ],
     "updated": "Обновляется",
     "compatibility": "After Effects 2020+ / лучше AE 2022 и новее"
   },
@@ -283,13 +382,27 @@ window.AE_PLUGINS = [
     "downloadUrl": "https://drive.google.com/file/d/1KRXEiGgy4XFaOIyMMqDtBG702uljfu43/view?usp=drive_link",
     "badge": "Выбор версии",
     "icon": "fas fa-wave-square",
-    "tags": ["утилиты", "jsx", "flow", "versions"],
-    "updated": "12.06.2026",
+    "tags": [
+      "утилиты",
+      "jsx",
+      "flow",
+      "versions"
+    ],
+    "updated": "24.10.2026",
     "compatibility": "After Effects 2019+ / лучше AE 2022 и новее",
     "versions": [
-      { "label": "Flow v1.4.1", "status": "available", "downloadUrl": "https://drive.google.com/file/d/1tyKN0vTzWbjKpd_eziVGAR-jKLqG9PPb/view?usp=drive_link" },
-      { "label": "Flow v1.5.2", "status": "available", "downloadUrl": "https://drive.google.com/file/d/1KRXEiGgy4XFaOIyMMqDtBG702uljfu43/view?usp=drive_link" }
-    ]
+      {
+        "label": "Flow v1.4.1",
+        "status": "available",
+        "downloadUrl": "https://drive.google.com/file/d/1fybF9U8S7P0LTqed7hM-0jlvqoNnfLCb/view?usp=sharing"
+      },
+      {
+        "label": "Flow v1.5.2",
+        "status": "available",
+        "downloadUrl": "https://drive.google.com/file/d/1KRXEiGgy4XFaOIyMMqDtBG702uljfu43/view?usp=drive_link"
+      }
+    ],
+    "downloadLabel": "Скачать v1.5.2"
   },
   {
     "id": "fxaa",
@@ -305,7 +418,11 @@ window.AE_PLUGINS = [
     "downloadUrl": "https://drive.google.com/file/d/167nT41DKD5PfDhU65q6_wxzC1ltIvWG2/view?usp=drive_link",
     "badge": "Эффект",
     "icon": "fas fa-border-all",
-    "tags": ["эффекты", "fxaa", "aex"],
+    "tags": [
+      "эффекты",
+      "fxaa",
+      "aex"
+    ],
     "updated": "12.06.2026",
     "compatibility": "After Effects 2020+ / лучше AE 2022 и новее"
   },
@@ -317,15 +434,33 @@ window.AE_PLUGINS = [
     "categoryLabel": "Утилиты",
     "package": "jsx",
     "minAe": "2022",
-    "version": "v1.0.5",
-    "size": "1.4 MB",
+    "version": "1.0.7 / 1.0.5",
+    "size": "3 MB · установщик 1.0.7",
     "status": "available",
-    "downloadUrl": "https://drive.google.com/file/d/14hDha5z5quu9WeH_FEJCBPRYbunBiN-8/view?usp=drive_link",
+    "downloadUrl": "https://t.me/ae_plugins_vault/91",
     "badge": "Утилита",
     "icon": "fas fa-layer-group",
-    "tags": ["утилиты", "jsx"],
-    "updated": "15.05.2026",
-    "compatibility": "After Effects 2022+ / лучше AE 2022 и новее"
+    "tags": [
+      "утилиты",
+      "jsx"
+    ],
+    "updated": "24.10.2026",
+    "compatibility": "After Effects 2022+ / лучше AE 2022 и новее",
+    "downloadLabel": "Скачать v1.0.7",
+    "versions": [
+      {
+        "key": "v107",
+        "label": "FXConsole v1.0.7 · установщик Windows",
+        "downloadUrl": "https://t.me/ae_plugins_vault/91",
+        "status": "available"
+      },
+      {
+        "key": "v105",
+        "label": "FXConsole v1.0.5 · архив Google Диска",
+        "downloadUrl": "https://drive.google.com/file/d/1TawQiInbiTXbQVz99monH8GrVMcLmX-a/view?usp=sharing",
+        "status": "available"
+      }
+    ]
   },
   {
     "id": "glitchify",
@@ -337,12 +472,16 @@ window.AE_PLUGINS = [
     "minAe": "2020",
     "version": "Обновляется",
     "size": "Обновляется",
-    "status": "updating",
-    "downloadUrl": "#",
+    "status": "available",
+    "downloadUrl": "https://drive.google.com/file/d/1kremDiH-BpS1g3CAaRnoIKTnJjqDKTA1/view?usp=sharing",
     "badge": "Glitch",
     "icon": "fas fa-bolt",
-    "tags": ["glitch", "эффекты", "aex"],
-    "updated": "Обновляется",
+    "tags": [
+      "glitch",
+      "эффекты",
+      "aex"
+    ],
+    "updated": "24.10.2026",
     "compatibility": "After Effects 2020+ / лучше AE 2022 и новее"
   },
   {
@@ -359,7 +498,11 @@ window.AE_PLUGINS = [
     "downloadUrl": "https://drive.google.com/file/d/1srf-egNe04y68GRW5ZoTXysGMS9vGtHR/view?usp=drive_link",
     "badge": "Эффект",
     "icon": "fas fa-temperature-high",
-    "tags": ["heat", "distortion", "aex"],
+    "tags": [
+      "heat",
+      "distortion",
+      "aex"
+    ],
     "updated": "12.06.2026",
     "compatibility": "After Effects 2020+ / лучше AE 2022 и новее"
   },
@@ -377,7 +520,11 @@ window.AE_PLUGINS = [
     "downloadUrl": "#",
     "badge": "Новый",
     "icon": "fas fa-water",
-    "tags": ["частицы", "aex", "new"],
+    "tags": [
+      "частицы",
+      "aex",
+      "new"
+    ],
     "updated": "Обновляется",
     "compatibility": "After Effects 2023+ / лучше AE 2022 и новее"
   },
@@ -395,7 +542,11 @@ window.AE_PLUGINS = [
     "downloadUrl": "https://drive.google.com/file/d/1AqMyKyC67G4xJE_zZWC7NUvcXI14X7hj/view?usp=drive_link",
     "badge": "Glitch",
     "icon": "fas fa-image",
-    "tags": ["jpeg", "glitch", "aex"],
+    "tags": [
+      "jpeg",
+      "glitch",
+      "aex"
+    ],
     "updated": "12.06.2026",
     "compatibility": "After Effects 2020+ / лучше AE 2022 и новее"
   },
@@ -413,27 +564,37 @@ window.AE_PLUGINS = [
     "downloadUrl": "#",
     "badge": "Утилита",
     "icon": "fas fa-vector-square",
-    "tags": ["mask", "jsx", "утилиты"],
+    "tags": [
+      "mask",
+      "jsx",
+      "утилиты"
+    ],
     "updated": "Обновляется",
     "compatibility": "After Effects 2021+ / лучше AE 2022 и новее"
   },
   {
     "id": "maxon-looks-trapcode",
-    "name": "Maxon Looks / Trapcode",
-    "description": "Набор Maxon для стилизации, цветокоррекции, эффектов и motion graphics.",
-    "category": "suite",
-    "categoryLabel": "Комплект",
+    "name": "Magic Bullet Looks",
+    "description": "Инструменты цветокоррекции и кинематографических образов: пресеты, LUT, плёночная стилизация и настройка цепочки обработки.",
+    "category": "color",
+    "categoryLabel": "Цвет",
     "package": "aex",
     "minAe": "2021",
-    "version": "Обновляется",
-    "size": "Обновляется",
+    "version": "Suite 2023.2",
+    "size": "Размер уточняется",
     "status": "available",
-    "downloadUrl": "https://drive.google.com/file/d/1v8hyREN9FILZummmurScv31pU1PDbBLY/view?usp=drive_link",
+    "downloadUrl": "https://drive.google.com/file/d/1l_AgdKMG7QFkxXUr_rScZGBdanfm4U8K/view?usp=sharing",
     "badge": "Комплект",
     "icon": "fas fa-gem",
-    "tags": ["maxon", "looks", "trapcode", "комплект"],
-    "updated": "12.06.2026",
-    "compatibility": "After Effects 2021+ / лучше AE 2022 и новее"
+    "tags": [
+      "maxon",
+      "magic bullet",
+      "looks",
+      "цветокоррекция"
+    ],
+    "updated": "24.10.2026",
+    "compatibility": "After Effects 2021+ / лучше AE 2022 и новее",
+    "sourcePage": "https://www.maxon.net/en/product-detail/red-giant/color/magicbullet-looks"
   },
   {
     "id": "mocha-pro",
@@ -449,7 +610,11 @@ window.AE_PLUGINS = [
     "downloadUrl": "https://drive.google.com/file/d/1t-mMID-pjZcd3e5PnOvcqrZI3FJtkKSX/view?usp=drive_link",
     "badge": "Новый",
     "icon": "fas fa-bullseye",
-    "tags": ["трекинг", "aex", "new"],
+    "tags": [
+      "трекинг",
+      "aex",
+      "new"
+    ],
     "updated": "15.05.2026",
     "compatibility": "After Effects 2021+ / лучше AE 2022 и новее"
   },
@@ -467,7 +632,12 @@ window.AE_PLUGINS = [
     "downloadUrl": "#",
     "badge": "Новый",
     "icon": "fas fa-bolt",
-    "tags": ["утилиты", "jsx", "new", "motion"],
+    "tags": [
+      "утилиты",
+      "jsx",
+      "new",
+      "motion"
+    ],
     "updated": "Обновляется",
     "compatibility": "After Effects 2021+ / лучше AE 2022 и новее"
   },
@@ -485,7 +655,11 @@ window.AE_PLUGINS = [
     "downloadUrl": "https://drive.google.com/file/d/1PKQSGpqQAEDukyiccwORV3eYCEWdvHSN/view?usp=drive_link",
     "badge": "Физика",
     "icon": "fas fa-atom",
-    "tags": ["physics", "animation", "aex"],
+    "tags": [
+      "physics",
+      "animation",
+      "aex"
+    ],
     "updated": "12.06.2026",
     "compatibility": "After Effects 2020+ / лучше AE 2022 и новее"
   },
@@ -500,11 +674,15 @@ window.AE_PLUGINS = [
     "version": "v2.2",
     "size": "925 KB",
     "status": "available",
-    "downloadUrl": "https://drive.google.com/file/d/1ZBRR40rfj8tdTnjzlo4HYJ_1XCKXsz60/view?usp=drive_link",
+    "downloadUrl": "https://drive.google.com/file/d/1celmDeHRNUlE_hl2q5WarwlV6qn4Q3Vz/view?usp=sharing",
     "badge": "Популярный",
     "icon": "fas fa-wind",
-    "tags": ["эффекты", "aex", "popular"],
-    "updated": "15.05.2026",
+    "tags": [
+      "эффекты",
+      "aex",
+      "popular"
+    ],
+    "updated": "24.10.2026",
     "compatibility": "After Effects 2023+ / лучше AE 2022 и новее"
   },
   {
@@ -515,14 +693,18 @@ window.AE_PLUGINS = [
     "categoryLabel": "Эффекты",
     "package": "aex",
     "minAe": "2020",
-    "version": "Обновляется",
-    "size": "Обновляется",
+    "version": "1.3.5",
+    "size": "Размер уточняется",
     "status": "available",
-    "downloadUrl": "https://drive.google.com/file/d/1j9DlwhfFCFvhNTR5lYVfoPijbNUHuzsx/view?usp=drive_link",
+    "downloadUrl": "https://drive.google.com/file/d/1FjWI3K98pdgtPQC7TwMkZEgkXIffHUdp/view?usp=sharing",
     "badge": "Эффект",
     "icon": "fas fa-star",
-    "tags": ["flare", "light", "aex"],
-    "updated": "12.06.2026",
+    "tags": [
+      "flare",
+      "light",
+      "aex"
+    ],
+    "updated": "24.10.2026",
     "compatibility": "After Effects 2020+ / лучше AE 2022 и новее"
   },
   {
@@ -536,11 +718,15 @@ window.AE_PLUGINS = [
     "version": "Обновляется",
     "size": "Обновляется",
     "status": "available",
-    "downloadUrl": "https://drive.google.com/file/d/15ZkbLU4AFUFTKsFtOLTbdGhsD9vTtIMM/view?usp=drive_link",
+    "downloadUrl": "https://drive.google.com/file/d/1rfspxpYQfpDR0o83dxfcOyLjXJrG-FnI/view?usp=sharing",
     "badge": "Ретро",
     "icon": "fas fa-grip",
-    "tags": ["pixel", "dither", "aex"],
-    "updated": "12.06.2026",
+    "tags": [
+      "pixel",
+      "dither",
+      "aex"
+    ],
+    "updated": "24.10.2026",
     "compatibility": "After Effects 2020+ / лучше AE 2022 и новее"
   },
   {
@@ -557,7 +743,11 @@ window.AE_PLUGINS = [
     "downloadUrl": "https://drive.google.com/file/d/1siauiMI2H5R4IyPJ2gxjU36fsxXvskhc/view?usp=drive_link",
     "badge": "Утилита",
     "icon": "fas fa-bezier-curve",
-    "tags": ["trace", "vector", "jsx"],
+    "tags": [
+      "trace",
+      "vector",
+      "jsx"
+    ],
     "updated": "12.06.2026",
     "compatibility": "After Effects 2021+ / лучше AE 2022 и новее"
   },
@@ -575,7 +765,11 @@ window.AE_PLUGINS = [
     "downloadUrl": "https://drive.google.com/file/d/1SZaCDICiOB2cWzMSuZVGl9U5u8oRauW5/view?usp=drive_link",
     "badge": "Популярный",
     "icon": "fas fa-gem",
-    "tags": ["комплект", "aex", "popular"],
+    "tags": [
+      "комплект",
+      "aex",
+      "popular"
+    ],
     "updated": "15.05.2026",
     "compatibility": "After Effects 2021+ / лучше AE 2022 и новее"
   },
@@ -593,7 +787,11 @@ window.AE_PLUGINS = [
     "downloadUrl": "https://drive.google.com/file/d/1SZaCDICiOB2cWzMSuZVGl9U5u8oRauW5/view?usp=drive_link",
     "badge": "Утилита",
     "icon": "fas fa-camera",
-    "tags": ["red giant", "shooter", "утилиты"],
+    "tags": [
+      "red giant",
+      "shooter",
+      "утилиты"
+    ],
     "updated": "12.06.2026",
     "compatibility": "After Effects 2022+ / лучше AE 2022 и новее"
   },
@@ -611,7 +809,13 @@ window.AE_PLUGINS = [
     "downloadUrl": "https://drive.google.com/file/d/1N2LpqPtnmo68cjE7JaTs5nCspR2B4RwJ/view?usp=drive_link",
     "badge": "Популярный",
     "icon": "fas fa-wind",
-    "tags": ["эффекты", "aex", "popular", "motion", "blur"],
+    "tags": [
+      "эффекты",
+      "aex",
+      "popular",
+      "motion",
+      "blur"
+    ],
     "updated": "15.05.2026",
     "compatibility": "After Effects 2020+ / лучше AE 2022 и новее"
   },
@@ -623,14 +827,18 @@ window.AE_PLUGINS = [
     "categoryLabel": "Эффекты",
     "package": "aex",
     "minAe": "2019",
-    "version": "v2.1.0",
-    "size": "18 MB",
+    "version": "1.0.40",
+    "size": "Размер уточняется",
     "status": "available",
-    "downloadUrl": "https://drive.google.com/file/d/1gHqIG88EmMeiBXbcMawqsE5q5efoVN5I/view?usp=drive_link",
+    "downloadUrl": "https://drive.google.com/file/d/1cmqukR14amNtf2y74OH6QnOVI7Yl1WvE/view?usp=sharing",
     "badge": "Популярный",
     "icon": "fas fa-jedi",
-    "tags": ["эффекты", "aex", "popular"],
-    "updated": "15.05.2026",
+    "tags": [
+      "эффекты",
+      "aex",
+      "popular"
+    ],
+    "updated": "24.10.2026",
     "compatibility": "After Effects 2019+ / лучше AE 2022 и новее"
   },
   {
@@ -641,14 +849,17 @@ window.AE_PLUGINS = [
     "categoryLabel": "3D",
     "package": "aex",
     "minAe": "2020",
-    "version": "v3.0.5",
-    "size": "65 MB",
+    "version": "1.0.5 · Win + Mac",
+    "size": "Размер уточняется",
     "status": "available",
-    "downloadUrl": "https://drive.google.com/file/d/1qfWPtSQuOElGVADNDLLZyQUoba4UcfuV/view?usp=drive_link",
+    "downloadUrl": "https://drive.google.com/file/d/1OwR6Nswl_49KD5_SBxCAJDwGqNuYABrA/view?usp=sharing",
     "badge": "3D",
     "icon": "fas fa-cube",
-    "tags": ["3d", "aex"],
-    "updated": "15.05.2026",
+    "tags": [
+      "3d",
+      "aex"
+    ],
+    "updated": "24.10.2026",
     "compatibility": "After Effects 2020+ / лучше AE 2022 и новее"
   },
   {
@@ -665,7 +876,11 @@ window.AE_PLUGINS = [
     "downloadUrl": "https://drive.google.com/file/d/1IgYLwYH-HJdJ06fM2mbyXFtXBGHVY5zR/view?usp=drive_link",
     "badge": "Анимация",
     "icon": "fas fa-signal",
-    "tags": ["animation", "signal", "jsx"],
+    "tags": [
+      "animation",
+      "signal",
+      "jsx"
+    ],
     "updated": "12.06.2026",
     "compatibility": "After Effects 2020+ / лучше AE 2022 и новее"
   },
@@ -683,7 +898,11 @@ window.AE_PLUGINS = [
     "downloadUrl": "https://drive.google.com/file/d/15y8xAdc1huXTf8Vemb_-dQ8vyqSRj1gW/view?usp=drive_link",
     "badge": "AI",
     "icon": "fas fa-up-right-and-down-left-from-center",
-    "tags": ["ai", "upscale", "video"],
+    "tags": [
+      "ai",
+      "upscale",
+      "video"
+    ],
     "updated": "12.06.2026",
     "compatibility": "Отдельная программа / совместимо с монтажным пайплайном"
   },
@@ -701,7 +920,11 @@ window.AE_PLUGINS = [
     "downloadUrl": "https://drive.google.com/file/d/178XAKNo1sMIVvOzSNGBgvhRBOW7etBx3/view?usp=drive_link",
     "badge": "Анимация",
     "icon": "fas fa-route",
-    "tags": ["trace", "animation", "jsx"],
+    "tags": [
+      "trace",
+      "animation",
+      "jsx"
+    ],
     "updated": "12.06.2026",
     "compatibility": "After Effects 2020+ / лучше AE 2022 и новее"
   },
@@ -716,11 +939,15 @@ window.AE_PLUGINS = [
     "version": "v5.2.1",
     "size": "8.5 MB",
     "status": "available",
-    "downloadUrl": "https://drive.google.com/file/d/1tNym4KYR8jc_1N_02WOdyz_Yf1SmO0g7/view?usp=drive_link",
+    "downloadUrl": "https://drive.google.com/file/d/1t2M3nxuC9o5kLKvm_JiDpZz2a6nRA_nn/view?usp=sharing",
     "badge": "Эффект",
     "icon": "fas fa-tv",
-    "tags": ["эффекты", "aex", "glitch"],
-    "updated": "15.05.2026",
+    "tags": [
+      "эффекты",
+      "aex",
+      "glitch"
+    ],
+    "updated": "24.10.2026",
     "compatibility": "After Effects 2018+ / лучше AE 2022 и новее"
   },
   {
@@ -734,11 +961,16 @@ window.AE_PLUGINS = [
     "version": "v8.1.1",
     "size": "31.4 MB",
     "status": "available",
-    "downloadUrl": "https://drive.google.com/file/d/1Ql_Lc0ouKvY06qOolS5gh19DcpMTa1G_/view?usp=drive_link",
+    "downloadUrl": "https://drive.google.com/file/d/1SG2EGpvd2w1PfjyDjIko0KfukAmUjU_h/view?usp=sharing",
     "badge": "Популярный",
     "icon": "fas fa-magic",
-    "tags": ["эффекты", "aex", "popular", "slow motion"],
-    "updated": "15.05.2026",
+    "tags": [
+      "эффекты",
+      "aex",
+      "popular",
+      "slow motion"
+    ],
+    "updated": "24.10.2026",
     "compatibility": "After Effects 2020+ / лучше AE 2022 и новее"
   },
   {
@@ -755,8 +987,544 @@ window.AE_PLUGINS = [
     "downloadUrl": "https://drive.google.com/file/d/1xHQRrIQ-GX_kX3rxYpI9ZZ7hu25MSJyP/view?usp=drive_link",
     "badge": "Цвет",
     "icon": "fas fa-palette",
-    "tags": ["color", "vibrance", "aex"],
+    "tags": [
+      "color",
+      "vibrance",
+      "aex"
+    ],
     "updated": "12.06.2026",
     "compatibility": "After Effects 2019+ / лучше AE 2022 и новее"
+  },
+  {
+    "id": "rowbyte-bundle",
+    "name": "Rowbyte Bundle",
+    "description": "Комплект инструментов Rowbyte для моушн-графики, частиц, объёмных композиций и обработки изображения. Состав указан в установщике.",
+    "category": "suite",
+    "categoryLabel": "Комплект",
+    "package": "exe",
+    "minAe": "",
+    "version": "2025.8",
+    "size": "12.6 MB",
+    "status": "available",
+    "downloadUrl": "https://t.me/ae_plugins_vault/87",
+    "badge": "Новый",
+    "icon": "fas fa-puzzle-piece",
+    "tags": [
+      "rowbyte bundle",
+      "suite"
+    ],
+    "updated": "24.10.2026",
+    "compatibility": "Совместимость конкретной сборки уточняется",
+    "sourcePage": "https://www.rowbyte.com/products"
+  },
+  {
+    "id": "revision-effections-plus",
+    "name": "RE:Vision Effections Plus",
+    "description": "Комплект RE:Vision Effects для ретайминга, размытия движения, подавления шума и обработки видео.",
+    "category": "suite",
+    "categoryLabel": "Комплект",
+    "package": "exe",
+    "minAe": "",
+    "version": "25.08",
+    "size": "155.9 MB",
+    "status": "available",
+    "downloadUrl": "https://t.me/ae_plugins_vault/88",
+    "badge": "Новый",
+    "icon": "fas fa-puzzle-piece",
+    "tags": [
+      "re:vision effections plus",
+      "suite"
+    ],
+    "updated": "24.10.2026",
+    "compatibility": "Совместимость конкретной сборки уточняется",
+    "sourcePage": "https://revisionfx.com/products/effections/"
+  },
+  {
+    "id": "mister-horse-product-manager",
+    "name": "Mister Horse Product Manager",
+    "description": "Менеджер установки и обновления инструментов Mister Horse, включая Animation Composer. Это установщик менеджера, а не отдельный набор пресетов.",
+    "category": "utility",
+    "categoryLabel": "Утилиты",
+    "package": "msi",
+    "minAe": "",
+    "version": "3.1.0",
+    "size": "5.4 MB",
+    "status": "available",
+    "downloadUrl": "https://t.me/ae_plugins_vault/89",
+    "badge": "Новый",
+    "icon": "fas fa-puzzle-piece",
+    "tags": [
+      "mister horse product manager",
+      "utility"
+    ],
+    "updated": "24.10.2026",
+    "compatibility": "Совместимость конкретной сборки уточняется",
+    "sourcePage": "https://misterhorse.com/product-manager"
+  },
+  {
+    "id": "mettle-plugins-bundle",
+    "name": "Mettle Plugins Bundle",
+    "description": "Комплект инструментов Mettle для 3D-графики, деформации поверхностей и объёмных эффектов. Состав и поддерживаемые приложения зависят от сборки.",
+    "category": "suite",
+    "categoryLabel": "Комплект",
+    "package": "exe",
+    "minAe": "",
+    "version": "2018.10",
+    "size": "75 MB",
+    "status": "available",
+    "downloadUrl": "https://t.me/ae_plugins_vault/90",
+    "badge": "Новый",
+    "icon": "fas fa-puzzle-piece",
+    "tags": [
+      "mettle plugins bundle",
+      "suite"
+    ],
+    "updated": "24.10.2026",
+    "compatibility": "Совместимость конкретной сборки уточняется",
+    "sourcePage": "https://www.mettle.com/"
+  },
+  {
+    "id": "filmconvert-pro",
+    "name": "FilmConvert Pro",
+    "description": "Плёночная цветопередача и зерно для стилизации цифрового видео. Классическая версия FilmConvert, отдельная от Nitrate.",
+    "category": "color",
+    "categoryLabel": "Цвет",
+    "package": "exe",
+    "minAe": "",
+    "version": "2.3.6 · Windows",
+    "size": "122 MB",
+    "status": "available",
+    "downloadUrl": "https://t.me/ae_plugins_vault/93",
+    "badge": "Новый",
+    "icon": "fas fa-palette",
+    "tags": [
+      "filmconvert pro",
+      "color"
+    ],
+    "updated": "24.10.2026",
+    "compatibility": "Совместимость конкретной сборки уточняется",
+    "sourcePage": "https://www.filmconvert.com/"
+  },
+  {
+    "id": "dehancer-pro",
+    "name": "Dehancer Pro",
+    "description": "Инструменты плёночной стилизации: цветопередача, зерно и характер оптических эффектов. Файл предназначен для After Effects и Premiere Pro.",
+    "category": "color",
+    "categoryLabel": "Цвет",
+    "package": "exe",
+    "minAe": "",
+    "version": "1.3.1",
+    "size": "39.9 MB",
+    "status": "available",
+    "downloadUrl": "https://t.me/ae_plugins_vault/94",
+    "badge": "Новый",
+    "icon": "fas fa-palette",
+    "tags": [
+      "dehancer pro",
+      "color"
+    ],
+    "updated": "24.10.2026",
+    "compatibility": "Совместимость конкретной сборки уточняется",
+    "sourcePage": "https://www.dehancer.com/shop/video/aepr"
+  },
+  {
+    "id": "trapcode",
+    "name": "Trapcode",
+    "description": "Комплект инструментов Maxon для частиц, объёмных структур и процедурной моушн-графики.",
+    "category": "particles",
+    "categoryLabel": "Частицы",
+    "package": "zip",
+    "minAe": "",
+    "version": "Red Giant 2025.4.1",
+    "size": "Размер уточняется",
+    "status": "available",
+    "downloadUrl": "https://drive.google.com/file/d/1hwRVgMeOLzVUm94GLKwpIawKm6SnFK7r/view?usp=sharing",
+    "badge": "Новый",
+    "icon": "fas fa-puzzle-piece",
+    "tags": [
+      "trapcode",
+      "particles"
+    ],
+    "updated": "24.10.2026",
+    "compatibility": "Совместимость конкретной сборки уточняется",
+    "sourcePage": "https://www.maxon.net/en/red-giant-1"
+  },
+  {
+    "id": "universe",
+    "name": "Universe",
+    "description": "Коллекция эффектов, стилизаций и переходов Maxon для монтажа и моушн-дизайна.",
+    "category": "suite",
+    "categoryLabel": "Комплект",
+    "package": "zip",
+    "minAe": "",
+    "version": "Версия уточняется",
+    "size": "Размер уточняется",
+    "status": "available",
+    "downloadUrl": "https://drive.google.com/file/d/18eKuNruT7lz-dOvDdFb6A3a-XZQj3sPk/view?usp=sharing",
+    "badge": "Новый",
+    "icon": "fas fa-puzzle-piece",
+    "tags": [
+      "universe",
+      "suite"
+    ],
+    "updated": "24.10.2026",
+    "compatibility": "Совместимость конкретной сборки уточняется",
+    "sourcePage": "https://www.maxon.net/en/red-giant/universe"
+  },
+  {
+    "id": "glitch-7-in-1",
+    "name": "Glitch 7 in 1",
+    "description": "Сборник из семи инструментов для цифровых искажений и глитч-стилизации. Точный состав указан в архиве.",
+    "category": "suite",
+    "categoryLabel": "Комплект",
+    "package": "zip",
+    "minAe": "",
+    "version": "Версия уточняется",
+    "size": "Размер уточняется",
+    "status": "available",
+    "downloadUrl": "https://drive.google.com/file/d/1Pug91AUrpGsWOJdArqHEXyO-sc5bA4jK/view?usp=sharing",
+    "badge": "Новый",
+    "icon": "fas fa-puzzle-piece",
+    "tags": [
+      "glitch 7 in 1",
+      "suite"
+    ],
+    "updated": "24.10.2026",
+    "compatibility": "Совместимость конкретной сборки уточняется",
+    "sourcePage": null
+  },
+  {
+    "id": "vc-orb",
+    "name": "VC Orb",
+    "description": "Создание объёмных сфер и планет в After Effects: материалы, отражения, карты рельефа и освещение.",
+    "category": "3d",
+    "categoryLabel": "3D",
+    "package": "zip",
+    "minAe": "",
+    "version": "1.0.3 · Windows",
+    "size": "Размер уточняется",
+    "status": "available",
+    "downloadUrl": "https://drive.google.com/file/d/13JGVtPLibEa_J3vG_qnBq0Zj4Lojj5Gi/view?usp=sharing",
+    "badge": "Новый",
+    "icon": "fas fa-puzzle-piece",
+    "tags": [
+      "vc orb",
+      "3d"
+    ],
+    "updated": "24.10.2026",
+    "compatibility": "Совместимость конкретной сборки уточняется",
+    "sourcePage": "https://www.videocopilot.net/orb/"
+  },
+  {
+    "id": "vc-orb-textures",
+    "name": "VC Orb Textures",
+    "description": "Набор текстур для VC Orb. Это материалы для сфер и планет; для работы нужен сам плагин VC Orb.",
+    "category": "resources",
+    "categoryLabel": "Материалы",
+    "package": "zip",
+    "minAe": "",
+    "version": "Версия уточняется",
+    "size": "Размер уточняется",
+    "status": "available",
+    "downloadUrl": "https://drive.google.com/file/d/1fb1ShIvFmUndF1R1uxm90-mqCD4nnm0O/view?usp=sharing",
+    "badge": "Текстуры",
+    "icon": "fas fa-puzzle-piece",
+    "tags": [
+      "orb",
+      "textures",
+      "текстуры",
+      "планеты"
+    ],
+    "updated": "24.10.2026",
+    "compatibility": "Совместимость конкретной сборки уточняется",
+    "sourcePage": "https://www.videocopilot.net/orb/"
+  },
+  {
+    "id": "autofill",
+    "name": "AutoFill",
+    "description": "Автоматическая анимация заполнения логотипов, текста и иллюстраций с управлением направлением и скоростью роста.",
+    "category": "animation",
+    "categoryLabel": "Анимация",
+    "package": "zip",
+    "minAe": "",
+    "version": "2.0.0 · Windows",
+    "size": "Размер уточняется",
+    "status": "available",
+    "downloadUrl": "https://drive.google.com/file/d/1sEbh9Phf98aGzFio-O1iok_OUnXkNv7e/view?usp=sharing",
+    "badge": "Новый",
+    "icon": "fas fa-puzzle-piece",
+    "tags": [
+      "autofill",
+      "animation"
+    ],
+    "updated": "24.10.2026",
+    "compatibility": "Совместимость конкретной сборки уточняется",
+    "sourcePage": "https://aescripts.com/autofill/"
+  },
+  {
+    "id": "ignite",
+    "name": "Ignite",
+    "description": "Коллекция эффектов FXhome для композитинга, стилизации и создания визуальных эффектов. Совместимость зависит от версии в архиве.",
+    "category": "suite",
+    "categoryLabel": "Комплект",
+    "package": "zip",
+    "minAe": "",
+    "version": "Версия уточняется",
+    "size": "Размер уточняется",
+    "status": "available",
+    "downloadUrl": "https://drive.google.com/file/d/15SL1XF1XPfOF_bpJ5cl-0ZHX4NZEa6AI/view?usp=sharing",
+    "badge": "Новый",
+    "icon": "fas fa-puzzle-piece",
+    "tags": [
+      "ignite",
+      "suite"
+    ],
+    "updated": "24.10.2026",
+    "compatibility": "Совместимость конкретной сборки уточняется",
+    "sourcePage": "https://fxhome.com/product/ignite-pro"
+  },
+  {
+    "id": "data-glitch",
+    "name": "Data Glitch",
+    "description": "Цифровые искажения изображения: блоки, сдвиги, полосы и артефакты сжатия для эффектов и переходов.",
+    "category": "effects",
+    "categoryLabel": "Эффекты",
+    "package": "zip",
+    "minAe": "",
+    "version": "Версия уточняется",
+    "size": "Размер уточняется",
+    "status": "available",
+    "downloadUrl": "https://drive.google.com/file/d/1WMVmAJleYLn7fTWX9_cin0KsNKX5BW3n/view?usp=sharing",
+    "badge": "Новый",
+    "icon": "fas fa-puzzle-piece",
+    "tags": [
+      "data glitch",
+      "effects"
+    ],
+    "updated": "24.10.2026",
+    "compatibility": "Совместимость конкретной сборки уточняется",
+    "sourcePage": "https://aescripts.com/data-glitch/"
+  },
+  {
+    "id": "loopflow",
+    "name": "loopFlow",
+    "description": "Зацикленная анимация фрагментов статичного изображения по направляющим маскам для живых фотографий и фонов.",
+    "category": "animation",
+    "categoryLabel": "Анимация",
+    "package": "zip",
+    "minAe": "",
+    "version": "1.3.0 · Win + Mac",
+    "size": "Размер уточняется",
+    "status": "available",
+    "downloadUrl": "https://drive.google.com/file/d/1T9wZngK28jTqmObA07YFBYZb4P4PssLy/view?usp=sharing",
+    "badge": "Новый",
+    "icon": "fas fa-puzzle-piece",
+    "tags": [
+      "loopflow",
+      "animation"
+    ],
+    "updated": "24.10.2026",
+    "compatibility": "Совместимость конкретной сборки уточняется",
+    "sourcePage": "https://aescripts.com/loopflow/"
+  },
+  {
+    "id": "depth-scanner",
+    "name": "Depth Scanner",
+    "description": "Автоматическое построение карт глубины из изображения и видео для тумана, размытия и пространственных эффектов.",
+    "category": "3d",
+    "categoryLabel": "3D",
+    "package": "zip",
+    "minAe": "",
+    "version": "1.7.2",
+    "size": "Размер уточняется",
+    "status": "available",
+    "downloadUrl": "https://drive.google.com/file/d/1pQaxzvffzLyhyt6vPrPVqNUVqUyiLOv8/view?usp=sharing",
+    "badge": "Новый",
+    "icon": "fas fa-puzzle-piece",
+    "tags": [
+      "depth scanner",
+      "3d"
+    ],
+    "updated": "24.10.2026",
+    "compatibility": "Совместимость конкретной сборки уточняется",
+    "sourcePage": "https://aescripts.com/depth-scanner/"
+  },
+  {
+    "id": "lockdown",
+    "name": "Lockdown",
+    "description": "Отслеживание деформирующихся поверхностей для закрепления графики и обработки движущихся объектов.",
+    "category": "tracking",
+    "categoryLabel": "Трекинг",
+    "package": "zip",
+    "minAe": "",
+    "version": "Версия уточняется",
+    "size": "Размер уточняется",
+    "status": "available",
+    "downloadUrl": "https://drive.google.com/file/d/1M3hzdjLj5UdsehNDnHdPoS8AZHxfwJFr/view?usp=sharing",
+    "badge": "Новый",
+    "icon": "fas fa-puzzle-piece",
+    "tags": [
+      "lockdown",
+      "tracking"
+    ],
+    "updated": "24.10.2026",
+    "compatibility": "Совместимость конкретной сборки уточняется",
+    "sourcePage": "https://aescripts.com/lockdown/"
+  },
+  {
+    "id": "filmconvert-halation",
+    "name": "FilmConvert Halation",
+    "description": "Воссоздание тёплого плёночного ореола вокруг ярких участков изображения с настройкой интенсивности и распределения.",
+    "category": "color",
+    "categoryLabel": "Цвет",
+    "package": "zip",
+    "minAe": "",
+    "version": "Версия уточняется",
+    "size": "Размер уточняется",
+    "status": "available",
+    "downloadUrl": "https://drive.google.com/file/d/1EOry8uyUfgrOe8kS6nJa5iw-lHod5lfD/view?usp=sharing",
+    "badge": "Новый",
+    "icon": "fas fa-palette",
+    "tags": [
+      "filmconvert halation",
+      "color"
+    ],
+    "updated": "24.10.2026",
+    "compatibility": "Совместимость конкретной сборки уточняется",
+    "sourcePage": "https://www.filmconvert.com/halation"
+  },
+  {
+    "id": "filmconvert-hazy",
+    "name": "FilmConvert Hazy",
+    "description": "Мягкая диффузия света, bloom и эффект оптических mist-фильтров для более атмосферного изображения.",
+    "category": "color",
+    "categoryLabel": "Цвет",
+    "package": "zip",
+    "minAe": "",
+    "version": "Версия уточняется",
+    "size": "Размер уточняется",
+    "status": "available",
+    "downloadUrl": "https://drive.google.com/file/d/1_gOOQyOI15Luge-qBbMFfrYJg_USfFQI/view?usp=sharing",
+    "badge": "Новый",
+    "icon": "fas fa-palette",
+    "tags": [
+      "filmconvert hazy",
+      "color"
+    ],
+    "updated": "24.10.2026",
+    "compatibility": "Совместимость конкретной сборки уточняется",
+    "sourcePage": "https://www.filmconvert.com/hazy"
+  },
+  {
+    "id": "crossphere-bokeh",
+    "name": "Crossphere Bokeh",
+    "description": "Управляемое размытие объектива с настраиваемой формой боке, картами глубины и обработкой ярких участков.",
+    "category": "effects",
+    "categoryLabel": "Эффекты",
+    "package": "zip",
+    "minAe": "",
+    "version": "1.4.0",
+    "size": "Размер уточняется",
+    "status": "available",
+    "downloadUrl": "https://drive.google.com/file/d/1S-ZwKP3xjOVGewnyx16HZXqjrGqTeutM/view?usp=sharing",
+    "badge": "Новый",
+    "icon": "fas fa-puzzle-piece",
+    "tags": [
+      "crossphere bokeh",
+      "effects"
+    ],
+    "updated": "24.10.2026",
+    "compatibility": "Совместимость конкретной сборки уточняется",
+    "sourcePage": "https://aescripts.com/crossphere-bokeh/"
+  },
+  {
+    "id": "displacer-pro",
+    "name": "Displacer Pro",
+    "description": "GPU-ускоренные искажения по карте смещения: позиция, поворот, масштаб, хроматическая аберрация и размытие движения.",
+    "category": "effects",
+    "categoryLabel": "Эффекты",
+    "package": "zip",
+    "minAe": "",
+    "version": "1.0",
+    "size": "Размер уточняется",
+    "status": "available",
+    "downloadUrl": "https://drive.google.com/file/d/1iooZPSaOdtFvnCbYgUYkgqiiZnBiNPfN/view?usp=sharing",
+    "badge": "Новый",
+    "icon": "fas fa-puzzle-piece",
+    "tags": [
+      "displace pro",
+      "displacer",
+      "distortion",
+      "искажения"
+    ],
+    "updated": "24.10.2026",
+    "compatibility": "Совместимость конкретной сборки уточняется",
+    "sourcePage": "https://aescripts.com/displacer-pro/"
+  },
+  {
+    "id": "goodbye-greenscreen",
+    "name": "Goodbye Greenscreen",
+    "description": "Автоматическое отделение людей от фона и создание масок с помощью нейросетевых моделей.",
+    "category": "utility",
+    "categoryLabel": "Утилиты",
+    "package": "zip",
+    "minAe": "",
+    "version": "1.13.3 · Windows",
+    "size": "Размер уточняется",
+    "status": "available",
+    "downloadUrl": "https://drive.google.com/file/d/1v7nXjwyKriGLi1760SnrCNFCGBAfprbL/view?usp=sharing",
+    "badge": "Новый",
+    "icon": "fas fa-puzzle-piece",
+    "tags": [
+      "goodbye greenscreen",
+      "utility"
+    ],
+    "updated": "24.10.2026",
+    "compatibility": "Совместимость конкретной сборки уточняется",
+    "sourcePage": "https://aescripts.com/goodbye-greenscreen/"
+  },
+  {
+    "id": "geotracker",
+    "name": "GeoTracker",
+    "description": "Трекинг положения и вращения 3D-объектов по видео для совмещения моделей и графики с отснятым материалом.",
+    "category": "tracking",
+    "categoryLabel": "Трекинг",
+    "package": "zip",
+    "minAe": "",
+    "version": "2024.1.0.763",
+    "size": "Размер уточняется",
+    "status": "available",
+    "downloadUrl": "https://drive.google.com/file/d/1e-ZO43wnzjU2HmW7dSjLsw6mxi6Ie-1f/view?usp=sharing",
+    "badge": "Новый",
+    "icon": "fas fa-puzzle-piece",
+    "tags": [
+      "geotracker",
+      "tracking"
+    ],
+    "updated": "24.10.2026",
+    "compatibility": "Совместимость конкретной сборки уточняется",
+    "sourcePage": "https://keentools.io/products/geotracker-for-after-effects"
+  },
+  {
+    "id": "ae-pixel-sorter-2",
+    "name": "AE Pixel Sorter 2",
+    "description": "Пиксельная сортировка для создания потёков, абстрактных узоров, цифровых искажений и глитч-переходов.",
+    "category": "effects",
+    "categoryLabel": "Эффекты",
+    "package": "zip",
+    "minAe": "",
+    "version": "2.1.0",
+    "size": "Размер уточняется",
+    "status": "available",
+    "downloadUrl": "https://drive.google.com/file/d/19YmBDYNXQpRvBM0BP1u4Y5F5BiCZTNlz/view?usp=sharing",
+    "badge": "Новый",
+    "icon": "fas fa-puzzle-piece",
+    "tags": [
+      "ae pixel sorter 2",
+      "effects"
+    ],
+    "updated": "24.10.2026",
+    "compatibility": "Совместимость конкретной сборки уточняется",
+    "sourcePage": "https://aescripts.com/ae-pixel-sorter/"
   }
 ];

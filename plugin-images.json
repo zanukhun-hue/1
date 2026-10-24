@@ -303,15 +303,230 @@
     "fit": "contain"
   },
   "maxon-looks-trapcode": {
-    "image": "/assets/plugins/red-giant.webp",
-    "source": "user-provided",
-    "artworkType": "brand-logo",
-    "fit": "contain"
+    "image": "/assets/plugins-new/magic-bullet-looks.webp",
+    "sourcePage": "https://www.maxon.net/en/product-detail/red-giant/color/magicbullet-looks",
+    "sourceImage": "https://maxonassets.imgix.net/images/Magic_Bullet_Looks_2024_01.jpg?fm=webp&w=1280&q=85",
+    "width": 1280,
+    "height": 720,
+    "fit": "cover",
+    "artworkType": "sourced-product-artwork"
   },
   "ezco-crt-emulator": {
     "image": "/assets/plugins/ezco-crt-emulator.svg",
     "source": "site-original",
     "artworkType": "custom-cover",
     "fit": "fill"
+  },
+  "rowbyte-bundle": {
+    "image": "/assets/plugins-new/rowbyte-bundle.webp",
+    "sourcePage": "https://www.rowbyte.com/products",
+    "sourceImage": "https://www.rowbyte.com/assets/images/rwb_compressed.png",
+    "width": 800,
+    "height": 155,
+    "fit": "contain",
+    "artworkType": "sourced-product-artwork"
+  },
+  "revision-effections-plus": {
+    "image": "/assets/plugins-new/revision-effections-plus.webp",
+    "sourcePage": "https://revisionfx.com/products/effections/",
+    "sourceImage": "https://revisionfx.com/images/videos/effections-overview.png",
+    "width": 1600,
+    "height": 900,
+    "fit": "cover",
+    "artworkType": "sourced-product-artwork"
+  },
+  "mister-horse-product-manager": {
+    "image": "/assets/plugins-new/mister-horse-product-manager.webp",
+    "sourcePage": "https://misterhorse.com/product-manager",
+    "sourceImage": "https://d23mmnx9ld45h.cloudfront.net/misterhorse.com_web_v3/Products/Product+Manager/product-manager.jpg",
+    "width": 1600,
+    "height": 988,
+    "fit": "cover",
+    "artworkType": "sourced-product-artwork"
+  },
+  "mettle-plugins-bundle": {
+    "image": "/assets/plugins-new/mettle-plugins-bundle.webp",
+    "sourcePage": "https://www.mettle.com/",
+    "sourceImage": "https://www.mettle.com/wp-content/uploads/2015/05/Mettle-Logo_Icon_200.png",
+    "width": 200,
+    "height": 52,
+    "fit": "contain",
+    "artworkType": "sourced-product-artwork"
+  },
+  "filmconvert-pro": {
+    "image": "/assets/plugins-new/filmconvert-pro.svg",
+    "sourcePage": "https://www.filmconvert.com/",
+    "sourceImage": "https://www.filmconvert.com/assets/img/FC_Logo.svg",
+    "fit": "contain",
+    "artworkType": "sourced-product-artwork"
+  },
+  "dehancer-pro": {
+    "image": "/assets/plugins-new/dehancer-pro.webp",
+    "sourcePage": "https://www.dehancer.com/shop/video/aepr",
+    "sourceImage": "https://www.dehancer.com/cdn/dehancer.og-meta.png",
+    "width": 1200,
+    "height": 630,
+    "fit": "cover",
+    "artworkType": "sourced-product-artwork"
+  },
+  "universe": {
+    "image": "/assets/plugins-new/universe.webp",
+    "sourcePage": "https://www.maxon.net/en/red-giant/universe",
+    "sourceImage": "https://maxonassets.imgix.net/images/Products/Universe/Universe_GSA_HERO.jpg?fm=webp&w=1280&q=85",
+    "width": 1280,
+    "height": 720,
+    "fit": "cover",
+    "artworkType": "sourced-product-artwork"
+  },
+  "vc-orb": {
+    "image": "/assets/plugins-new/vc-orb.webp",
+    "sourcePage": "https://www.videocopilot.net/orb/",
+    "sourceImage": "https://d3jddrml5mymee.cloudfront.net/assets/public/images/v12/products/free/2/landing/features/image.jpg",
+    "width": 795,
+    "height": 465,
+    "fit": "cover",
+    "artworkType": "sourced-product-artwork"
+  },
+  "vc-orb-textures": {
+    "image": "/assets/plugins-new/vc-orb-textures.webp",
+    "sourcePage": "https://www.videocopilot.net/orb/",
+    "sourceImage": "https://d3jddrml5mymee.cloudfront.net/assets/public/images/v12/products/free/2/landing/bump-mapping/image.jpg",
+    "width": 649,
+    "height": 318,
+    "fit": "cover",
+    "artworkType": "sourced-product-artwork"
+  },
+  "autofill": {
+    "image": "/assets/plugins-new/autofill.webp",
+    "sourcePage": "https://aescripts.com/autofill/",
+    "sourceImage": "https://images.squarespace-cdn.com/content/v1/598944b3f5e231b64a518aa6/1691423752922-AKIZ35BC50VVWPYRQ14I/033_AutoFill_New.jpg?format=1500w",
+    "width": 800,
+    "height": 800,
+    "fit": "cover",
+    "artworkType": "sourced-product-artwork"
+  },
+  "ignite": {
+    "image": "/assets/plugins-new/ignite.webp",
+    "sourcePage": "https://fxhome.com/product/ignite-pro",
+    "sourceImage": "https://www.pngkit.com/png/detail/242-2422804_fxhome-hitfilm-ignite-pro-chroma-key-video.png",
+    "width": 596,
+    "height": 1000,
+    "fit": "contain",
+    "artworkType": "sourced-product-artwork"
+  },
+  "data-glitch": {
+    "image": "/assets/plugins-new/data-glitch.webp",
+    "sourcePage": "https://aescripts.com/data-glitch/",
+    "sourceImage": "https://www.rowbyte.com/media/pages/tv-distortion-bundle/eda46ce205-1487657387/tv_dist_large.jpg",
+    "width": 600,
+    "height": 300,
+    "fit": "cover",
+    "artworkType": "sourced-product-artwork"
+  },
+  "loopflow": {
+    "image": "/assets/plugins-new/loopflow.webp",
+    "sourcePage": "https://aescripts.com/loopflow/",
+    "sourceImage": "https://i.ytimg.com/vi/dESyYHMXCBo/maxresdefault.jpg",
+    "width": 1280,
+    "height": 720,
+    "fit": "cover",
+    "artworkType": "sourced-product-artwork"
+  },
+  "depth-scanner": {
+    "image": "/assets/plugins-new/depth-scanner.webp",
+    "sourcePage": "https://aescripts.com/depth-scanner/",
+    "sourceImage": "https://aescripts.com/media/mageplaza/blog/post/Depth_Scanner_for_After_Effects_Overview.jpg",
+    "width": 1280,
+    "height": 720,
+    "fit": "cover",
+    "artworkType": "sourced-product-artwork"
+  },
+  "lockdown": {
+    "image": "/assets/plugins-new/lockdown.webp",
+    "sourcePage": "https://aescripts.com/lockdown/",
+    "sourceImage": "https://aescripts.com/media/mageplaza/blog/post/Lockdown_Animalism_Tutorial.jpg",
+    "width": 1600,
+    "height": 900,
+    "fit": "cover",
+    "artworkType": "sourced-product-artwork"
+  },
+  "filmconvert-halation": {
+    "image": "/assets/plugins-new/filmconvert-halation.webp",
+    "sourcePage": "https://www.filmconvert.com/halation",
+    "sourceImage": "https://www.filmconvert.com/assets/img/logo/hal-stand-white@3x.png",
+    "width": 353,
+    "height": 110,
+    "fit": "contain",
+    "artworkType": "sourced-product-artwork"
+  },
+  "filmconvert-hazy": {
+    "image": "/assets/plugins-new/filmconvert-hazy.webp",
+    "sourcePage": "https://www.filmconvert.com/hazy",
+    "sourceImage": "https://www.filmconvert.com/assets/img/logo/hazy-white@3x.png",
+    "width": 285,
+    "height": 125,
+    "fit": "contain",
+    "artworkType": "sourced-product-artwork"
+  },
+  "crossphere-bokeh": {
+    "image": "/assets/plugins-new/crossphere-bokeh.webp",
+    "sourcePage": "https://aescripts.com/crossphere-bokeh/",
+    "sourceImage": "https://aescripts.com/media/mageplaza/blog/post/How_to_add_a_beautiful_Depth_of_Field_Bokeh_Effect_to_Element_3D_Renders.jpg",
+    "width": 810,
+    "height": 450,
+    "fit": "cover",
+    "artworkType": "sourced-product-artwork"
+  },
+  "displacer-pro": {
+    "image": "/assets/plugins-new/displacer-pro.webp",
+    "sourcePage": "https://aescripts.com/displacer-pro/",
+    "sourceImage": "https://images.squarespace-cdn.com/content/v1/598944b3f5e231b64a518aa6/8b43a7a8-090e-48e8-a074-be858ba80f3b/UI_Expanded.jpg",
+    "width": 520,
+    "height": 1000,
+    "fit": "contain",
+    "artworkType": "sourced-product-artwork"
+  },
+  "goodbye-greenscreen": {
+    "image": "/assets/plugins-new/goodbye-greenscreen.webp",
+    "sourcePage": "https://aescripts.com/goodbye-greenscreen/",
+    "sourceImage": "https://i.ytimg.com/vi/RAM2REmEa9A/maxresdefault.jpg",
+    "width": 1280,
+    "height": 720,
+    "fit": "cover",
+    "artworkType": "sourced-product-artwork"
+  },
+  "ae-pixel-sorter-2": {
+    "image": "/assets/plugins-new/ae-pixel-sorter-2.webp",
+    "sourcePage": "https://aescripts.com/ae-pixel-sorter/",
+    "sourceImage": "https://s3.amazonaws.com/east.toolfarm.com/featured_image/aepixelsorter2_featured.jpg",
+    "width": 1280,
+    "height": 720,
+    "fit": "cover",
+    "artworkType": "sourced-product-artwork"
+  },
+  "trapcode": {
+    "image": "/assets/plugins-new/trapcode.webp",
+    "sourcePage": "https://www.maxon.net/en/red-giant-1",
+    "sourceImage": "https://maxonassets.imgix.net/images/Products/Red-Giant/Particles_3D_banner_V2.jpg?fm=webp&w=1280&q=85",
+    "width": 1280,
+    "height": 720,
+    "fit": "cover",
+    "artworkType": "sourced-product-artwork"
+  },
+  "glitch-7-in-1": {
+    "image": "/assets/plugins-new/glitch-7-in-1.webp",
+    "width": 1672,
+    "height": 941,
+    "fit": "cover",
+    "artworkType": "original-ai-catalog-cover"
+  },
+  "geotracker": {
+    "image": "/assets/plugins-new/geotracker.webp",
+    "sourcePage": "https://keentools.io/products/geotracker-for-after-effects",
+    "sourceImage": "https://cdn.prod.website-files.com/58c5480657a2703f67305c6c/632ac24c65970c13c70568bc_22.1-GTAE-1280.jpg",
+    "width": 1280,
+    "height": 720,
+    "fit": "cover",
+    "artworkType": "sourced-product-artwork"
   }
 }

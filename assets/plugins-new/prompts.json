@@ -1,0 +1,13 @@
+{
+  "tool": "Built-in imagegen",
+  "assets": [
+    {
+      "file": "glitch-7-in-1.webp",
+      "intent": "Original catalogue artwork for a user-curated bundle; not official product branding",
+      "prompt": "Create a polished 16:9 widescreen product thumbnail for a Russian After Effects plugin catalogue. Product: a user-curated collection named GLITCH 7 IN 1. Make a rich abstract digital glitch artwork: sharp electric cyan and violet glass-like ribbons and distorted typographic fragments tearing horizontally across near-black background, with elegant RGB channel separation, vivid magenta sparks, dense but deliberate digital texture, cinematic contrast. Large exact headline 'GLITCH' clean heavy white typography, exact subheadline '7 IN 1' below in small spaced typography. The artwork must fill the entire frame, no black letterbox bars, no borders, no mockup devices, no packaging, no other text, no third-party logos. This is original catalogue artwork, not a fake official brand. High-quality motion-design still, crisp readable at card thumbnail size.",
+      "transparent_background": false,
+      "width": 1672,
+      "height": 941
+    }
+  ]
+}

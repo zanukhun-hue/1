@@ -49,7 +49,7 @@
   function setupReveals(){const items=$$('.reveal:not(.revealed)');if(!('IntersectionObserver'in window)){items.forEach(x=>x.classList.add('revealed'));return}const o=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('revealed');o.unobserve(e.target)}}),{threshold:.08});items.forEach(x=>o.observe(x))}
 
   function cardText(c){return[c.dataset.name||'',c.textContent||'',c.dataset.searchExtra||''].join(' ').toLowerCase()}
-  function sortCards(cards,sort){return cards.sort((a,b)=>{const an=a.dataset.name||'',bn=b.dataset.name||'';if(sort==='az')return an.localeCompare(bn,'ru');if(sort==='available')return Number(b.dataset.status==='available')-Number(a.dataset.status==='available')||an.localeCompare(bn,'ru');if(sort==='size')return Number(a.dataset.size||0)-Number(b.dataset.size||0);if(sort==='new')return Number(/нов/i.test(b.textContent))-Number(/нов/i.test(a.textContent))||an.localeCompare(bn,'ru');return Number(/популяр/i.test(b.textContent))-Number(/популяр/i.test(a.textContent))||Number(b.dataset.status==='available')-Number(a.dataset.status==='available')||an.localeCompare(bn,'ru')})}
+  function sortCards(cards,sort){const badge=card=>card.querySelector('.plugin-badge')?.textContent||'';return cards.sort((a,b)=>{const an=a.dataset.name||'',bn=b.dataset.name||'';if(sort==='az')return an.localeCompare(bn,'ru');if(sort==='available')return Number(b.dataset.status==='available')-Number(a.dataset.status==='available')||an.localeCompare(bn,'ru');if(sort==='size')return Number(a.dataset.size||0)-Number(b.dataset.size||0);if(sort==='new')return Number(/нов/i.test(badge(b)))-Number(/нов/i.test(badge(a)))||an.localeCompare(bn,'ru');return Number(/популяр/i.test(badge(b)))-Number(/популяр/i.test(badge(a)))||Number(b.dataset.status==='available')-Number(a.dataset.status==='available')||an.localeCompare(bn,'ru')})}
   function filterCatalog(){const g=$('#pluginsGrid');if(!g)return;const cards=$$('[data-plugin-card]',g),q=($('#pluginSearch')?.value||'').trim().toLowerCase(),cat=$('#categoryFilters .filter-btn.active')?.dataset.category||'all',task=$('#taskFilters .task-filter.active')?.dataset.task||'all',words=q.replace(/ё/g,'е').split(/\s+/).filter(word=>!['хочу','сделать','нужно','надо','для','видео','плагин','как','на','и','с','в','чтобы','мне'].includes(word)),fo=$('#favoritesOnly')?.classList.contains('active'),fav=getFavorites();let n=0;cards.forEach(c=>{const show=(!readEnvironment().only||compatibilityState(c.dataset.id).matches)&&(cat==='all'||c.dataset.category===cat)&&(task==='all'||(c.dataset.tasks||'').split(' ').includes(task))&&(!q||words.every(word=>cardText(c).replace(/ё/g,'е').includes(word)))&&(!fo||fav.includes(c.dataset.id));c.style.display=show?'':'none';c.hidden=!show;if(show)n++});sortCards(cards,$('#sortPlugins')?.value||'popular').forEach(c=>g.appendChild(c));if($('#resultCount'))$('#resultCount').textContent=`Найдено: ${n}`;if($('#activeFilterLabel'))$('#activeFilterLabel').textContent=($('#categoryFilters .filter-btn.active')?.textContent||'Все категории')+(task!=='all'?' · '+$('#taskFilters .task-filter.active').textContent:'')+(fo?' · избранное':'');if($('#emptyState'))$('#emptyState').hidden=n!==0}
 
   function initTaskSearch(){
@@ -155,6 +155,9 @@
       if(!link)return;
       const url=new URL(link.href,location.href);
       if(url.origin!==location.origin||!/^\/download\/[^/]+$/.test(url.pathname)||url.searchParams.get('open')==='1')return;
+      const plugin=workspace.plugins.find(p=>p.id===decodeURIComponent(url.pathname.split('/')[2]));
+      const version=plugin?.versions?.find(v=>v.key===url.searchParams.get('version'));
+      const provider=version?.downloadProvider||plugin?.downloadProvider||'external';
       // Drive can require an archive confirmation and blocks embedded viewers.
       // Keep native link navigation so its download page is visible to the user.
       link.target='_blank';
@@ -167,18 +170,18 @@
         notice.setAttribute('role','status');
         container.appendChild(notice);
       }
-      notice.replaceChildren(document.createTextNode('Загрузка откроется в новой вкладке. Если Google Диск попросит подтверждение, нажми «Всё равно скачать». '));
+      const message=provider==='telegram'?'Файл откроется в Telegram. Открой сообщение и нажми на файл для скачивания. ':provider==='google-drive'?'Загрузка откроется в новой вкладке. Если Google Диск попросит подтверждение, нажми «Всё равно скачать». ':'Источник файла откроется в новой вкладке. ';
+      notice.replaceChildren(document.createTextNode(message));
       const fallback=document.createElement('a');
       url.searchParams.set('open','1');
       fallback.href=url.pathname+url.search;
       fallback.target='_blank';
       fallback.rel='noopener';
-      fallback.textContent='Открыть файл на Google Диске';
+      fallback.textContent=provider==='telegram'?'Открыть сообщение в Telegram':provider==='google-drive'?'Открыть файл на Google Диске':'Открыть источник файла';
       notice.appendChild(fallback);
     });
   }
 
-  function initFlowVersionSelector(){if(location.pathname!=='/plugin/flow')return;const a=$('.plugin-detail-content .hero-actions'),dl=$('.plugin-detail-content .hero-actions .btn-primary');if(!a||!dl||$('#flowVersionSelector'))return;const box=document.createElement('details');box.id='flowVersionSelector';box.className='version-selector reveal revealed';box.innerHTML=`<summary><span><i class="fas fa-code-branch"></i> Выбрать версию Flow</span><i class="fas fa-chevron-down chevron"></i></summary><div class="version-selector-body"><div class="version-selector-list"><a class="version-option" href="/download/flow?version=v141" target="_blank" rel="noopener"><i class="fas fa-download"></i> Скачать v1.4.1</a><a class="version-option active" href="/download/flow" target="_blank" rel="noopener"><i class="fas fa-check-circle"></i> Скачать v1.5.2</a></div><div class="version-note">Нажми на нужную версию. Основная кнопка скачивания ведёт на Flow v1.5.2.</div></div>`;a.parentNode.insertBefore(box,a);dl.innerHTML='<i class="fas fa-download"></i> Скачать v1.5.2'}
   const pluginId=()=>{const m=location.pathname.match(/^\/plugin\/([^/]+)/);return m?decodeURIComponent(m[1]):''};
   function initPluginReport(){const id=pluginId();if(!id)return;const name=$('h1')?.textContent?.replace(/ для After Effects/i,'').trim()||id;document.addEventListener('click',e=>{if(e.target.closest('.report-link-btn'))$('#pluginReportForm')&&($('#pluginReportForm').hidden=!$('#pluginReportForm').hidden)});$('#pluginReportForm')?.addEventListener('submit',async e=>{e.preventDefault();const wait=canSubmit('report',30000);if(wait)return setStatus('#pluginReportStatus',`Подожди ${wait} сек.`,'error');try{setStatus('#pluginReportStatus','Отправляю...',null);await fetch('/api/plugin-reports',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({plugin_id:id,plugin_name:name,message:$('#pluginReportMessage')?.value||null})}).then(async r=>{if(!r.ok)throw new Error((await r.json().catch(()=>({}))).error||'Ошибка')});e.target.reset();setStatus('#pluginReportStatus','Жалоба отправлена. Спасибо!','success')}catch(err){setStatus('#pluginReportStatus',err.message,'error')}})}
 
@@ -630,5 +633,5 @@
     document.addEventListener('click',e=>{const b=e.target.closest('.favorite-btn[data-id]');if(b){e.preventDefault();toggleFavorite(b.dataset.id)}});
     const top=$('#backToTop');window.addEventListener('scroll',()=>top?.classList.toggle('show',window.scrollY>500));top?.addEventListener('click',()=>scrollTo({top:0,behavior:'smooth'}));
   }
-  document.addEventListener('DOMContentLoaded',()=>{injectUiFixes();initTheme();initWorkspace();initCart();initCommandPalette();initEmptyParticles();initMagneticBuild();initHeroPlayground();initPluginGallery();initCardTilt();initPresetPreviews();initVisits();initEvents();syncFavoriteUI();initFlowVersionSelector();initDownloads();initButtonGlow();initPluginReport();initVideoComparisons();if(page==='plugins'){initCatalog();initSortMenu();initTaskSearch()}setupReveals()});
+  document.addEventListener('DOMContentLoaded',()=>{injectUiFixes();initTheme();initWorkspace();initCart();initCommandPalette();initEmptyParticles();initMagneticBuild();initHeroPlayground();initPluginGallery();initCardTilt();initPresetPreviews();initVisits();initEvents();syncFavoriteUI();initDownloads();initButtonGlow();initPluginReport();initVideoComparisons();if(page==='plugins'){initCatalog();initSortMenu();initTaskSearch()}setupReveals()});
 })();

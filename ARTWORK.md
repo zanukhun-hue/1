@@ -64,3 +64,7 @@ The source Optical Flares image was already a blue music-video still. Its existi
 - `tools/artwork-delivery.py`: WebP format encoding only, preserving pixel dimensions.
 
 To rerun the local inspection or delivery encoding, use the bundled Python runtime with the corresponding script. Image generation itself is documented by the saved prompt set and was performed with the built-in tool.
+
+## Catalogue expansion, 24 October 2026
+
+New product images are stored in `assets/plugins-new/`. Their source URLs, file mapping and format information are in `assets/plugins-new/source-audit.json`; image types are identified in `plugin-images.json`. Official promotional imagery, developer demo thumbnails and interface images were used where available. The original Glitch 7 in 1 cover was generated with the built-in imagegen tool; its exact prompt is saved in `assets/plugins-new/prompts.json`. See `assets/plugins-new/README.md` for naming and deduplication details.
