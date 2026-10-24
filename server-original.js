@@ -320,7 +320,17 @@ app.post('/api/telegram/webhook', async (req, res) => {
     handleTelegramAction(req.body).catch((error) => console.error('Telegram action failed:', error.message));
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
-app.post('/api/plugin-reports', limit('report', 5), async (req, res) => { try { const body = req.body || {}; const clean = { plugin_id: String(body.plugin_id || '').trim(), plugin_name: String(body.plugin_name || '').trim(), message: String(body.message || '').trim() || null, status: 'pending' }; if (!clean.plugin_id) return res.status(400).json({ error: 'Не найден плагин.' }); const data = await supabaseRequest('plugin_reports', { method: 'POST', headers: { 'Content-Type': 'application/json', Prefer: 'return=representation' }, body: JSON.stringify(clean) }); const row = Array.isArray(data) ? data[0] : null; notifyTelegram(`Жалоба на ссылку\n${clean.plugin_name}\n${clean.message || 'Без комментария'}`, row?.id ? closeKeyboard('report', row.id) : undefined); res.json({ ok: true }); } catch (error) { res.status(error.status || 500).json({ error: error.message, details: error.data || null }); } });
+async function insertPluginReport(clean) {
+  const admin = serviceReady();
+  // Public INSERT is allowed, but reports are private. RETURNING needs SELECT.
+  const data = await supabaseRequest('plugin_reports', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Prefer: admin ? 'return=representation' : 'return=minimal' },
+    body: JSON.stringify(clean)
+  }, admin);
+  return Array.isArray(data) ? data[0] : null;
+}
+app.post('/api/plugin-reports', limit('report', 5), async (req, res) => { try { const body = req.body || {}; const clean = { plugin_id: String(body.plugin_id || '').trim(), plugin_name: String(body.plugin_name || '').trim(), message: String(body.message || '').trim() || null, status: 'pending' }; if (!clean.plugin_id) return res.status(400).json({ error: 'Не найден плагин.' }); const row = await insertPluginReport(clean); notifyTelegram(`Жалоба на ссылку\n${clean.plugin_name}\n${clean.message || 'Без комментария'}`, row?.id ? closeKeyboard('report', row.id) : undefined); res.json({ ok: true }); } catch (error) { res.status(error.status || 500).json({ error: error.message, details: error.data || null }); } });
 
 app.get('/', async (req, res) => res.send(await homePage()));
 app.get('/index.html', (req, res) => res.redirect(301, '/'));

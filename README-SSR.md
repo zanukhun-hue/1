@@ -25,4 +25,6 @@ http://localhost:3000
 
 ## Хостинг
 
+Настройка таблиц, прав доступа и серверного ключа Supabase: [SUPABASE.md](SUPABASE.md). Полная повторно запускаемая схема — `supabase_schema.sql`; проверка — `npm run test:schema`.
+
 Для такого варианта нужен хостинг с Node.js: Render, Railway, Vercel Serverless/Node, VPS или аналог. GitHub Pages запускает только статические файлы и серверный SSR не выполнит.

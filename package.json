@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
+    "test:schema": "node tools/check-supabase-schema.cjs",
     "build:scene": "esbuild assets/model-viewer-source.js --bundle --format=esm --minify --outfile=assets/model-viewer.js --legal-comments=eof"
   },
   "engines": {
@@ -15,6 +16,7 @@
     "express": "^4.19.2"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.5.11",
     "esbuild": "0.28.2",
     "three": "0.186.1"
   }
