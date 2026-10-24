@@ -155,16 +155,10 @@
       if(!link)return;
       const url=new URL(link.href,location.href);
       if(url.origin!==location.origin||!/^\/download\/[^/]+$/.test(url.pathname)||url.searchParams.get('open')==='1')return;
-      event.preventDefault();
-      let frame=document.getElementById('pluginDownloadFrame');
-      if(!frame){
-        frame=document.createElement('iframe');
-        frame.id='pluginDownloadFrame';
-        frame.hidden=true;
-        frame.title='Загрузка файла';
-        document.body.appendChild(frame);
-      }
-      frame.src=url.href;
+      // Drive can require an archive confirmation and blocks embedded viewers.
+      // Keep native link navigation so its download page is visible to the user.
+      link.target='_blank';
+      link.rel='noopener';
       const container=link.closest('.cart-item,.version-selector-body,.plugin-detail-content,.plugin-card')||link.parentElement;
       let notice=container.querySelector('.download-notice');
       if(!notice){
@@ -173,13 +167,13 @@
         notice.setAttribute('role','status');
         container.appendChild(notice);
       }
-      notice.replaceChildren(document.createTextNode('Запрос на скачивание отправлен. Если загрузка не началась — '));
+      notice.replaceChildren(document.createTextNode('Загрузка откроется в новой вкладке. Если Google Диск попросит подтверждение, нажми «Всё равно скачать». '));
       const fallback=document.createElement('a');
       url.searchParams.set('open','1');
       fallback.href=url.pathname+url.search;
       fallback.target='_blank';
       fallback.rel='noopener';
-      fallback.textContent='открыть Google Диск';
+      fallback.textContent='Открыть файл на Google Диске';
       notice.appendChild(fallback);
     });
   }
