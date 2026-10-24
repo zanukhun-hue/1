@@ -46,7 +46,7 @@ const compatibility = JSON.parse(fs.readFileSync(path.join(ROOT, 'compatibility.
 const recipes = JSON.parse(fs.readFileSync(path.join(ROOT, 'recipes.json'), 'utf8'));
 const presetLibrary = require('./preset-library');
 const presetCatalog = presetLibrary.read(ROOT);
-const presetStore = require('./telegram-preset-store').store({api:telegramApi,adminChat:site.tgChatId});
+const presetStore = require('./preset-shop').createPresetSales({telegramApi,site,supabase,supabaseRequest});
 
 const esc = (value) => String(value ?? '').replace(/[&<>'"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char]));
 const escXml = (value) => String(value ?? '').replace(/[&<>'"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&apos;', '"': '&quot;' }[char]));
@@ -104,40 +104,6 @@ async function telegramApi(method, payload) {
   if (!response.ok || !data?.ok) throw new Error(data?.description || `Telegram ${method} failed`);
   return data.result;
 }
-async function notifyTelegram(text, replyMarkup) {
-  if (!site.tgBotToken || !site.tgChatId) return;
-  try {
-    await telegramApi('sendMessage', {
-      chat_id: site.tgChatId,
-      text,
-      disable_web_page_preview: true,
-      reply_markup: replyMarkup || undefined
-    });
-  } catch (error) { console.error('Telegram notify failed:', error.message); }
-}
-function mainKeyboard() {
-  return {
-    keyboard: [
-      [{ text: '📊 Статистика' }, { text: '📋 Pending' }]
-    ],
-    resize_keyboard: true,
-    persistent: true
-  };
-}
-function closeKeyboard(type, id) {
-  return { inline_keyboard: [[{ text: '✅ Закрыть', callback_data: `${type}:done:${id}` } ]] };
-}
-async function answerCallback(id, text) {
-  try { await telegramApi('answerCallbackQuery', { callback_query_id: id, text, show_alert: false }); } catch (_) {}
-}
-async function editTelegramMessage(chatId, messageId, text) {
-  try { await telegramApi('editMessageText', { chat_id: chatId, message_id: messageId, text, disable_web_page_preview: true }); } catch (_) {}
-}
-function isAllowedTelegramChat(update) {
-  const chatId = update?.message?.chat?.id || update?.callback_query?.message?.chat?.id || update?.callback_query?.from?.id;
-  return String(chatId) === String(site.tgChatId);
-}
-
 function websiteSchema() { return { '@context': 'https://schema.org', '@type': 'WebSite', name: site.title, url: site.url, description: site.description, inLanguage: 'ru-RU' }; }
 function collectionSchema(name, description, route) { return { '@context': 'https://schema.org', '@type': 'CollectionPage', name, description, url: absoluteUrl(route), isPartOf: { '@type': 'WebSite', name: site.title, url: site.url } }; }
 function softwareSchema(plugin) { return { '@context': 'https://schema.org', '@type': 'SoftwareApplication', name: plugin.name, description: plugin.description, applicationCategory: 'MultimediaApplication', operatingSystem: 'Windows, macOS', softwareVersion: plugin.version, url: absoluteUrl(`/plugin/${enc(plugin.id)}`) }; }
@@ -195,52 +161,8 @@ async function countRows(resource, filter = '', admin = false) {
     return Number.isFinite(total) ? total : 0;
   } catch (_) { return 0; }
 }
-async function topDownloadedPlugins(limit = 4) {
-  if (!hasSupabase()) return sortPlugins(plugins).slice(0, limit).map((plugin) => ({ plugin, downloads: 0 }));
-  try {
-    const rows = await supabaseRequest('site_events?select=plugin_id&event_type=eq.download&plugin_id=not.is.null&order=created_at.desc&limit=1000');
-    const counts = new Map();
-    (Array.isArray(rows) ? rows : []).forEach((row) => counts.set(row.plugin_id, (counts.get(row.plugin_id) || 0) + 1));
-    return plugins.map((plugin) => ({ plugin, downloads: counts.get(plugin.id) || 0 })).sort((a, b) => b.downloads - a.downloads || a.plugin.name.localeCompare(b.plugin.name, 'ru')).slice(0, limit);
-  } catch (_) { return sortPlugins(plugins).slice(0, limit).map((plugin) => ({ plugin, downloads: 0 })); }
-}
-async function getModerationData() {
- const [reports,topDownloads,pendingReports]=await Promise.all([supabaseRequest('plugin_reports?select=*&status=eq.pending&order=created_at.desc&limit=100',{},true),topDownloadedPlugins(8),countRows('plugin_reports','status=eq.pending',true)]);
- return {reports,topDownloads,stats:{pendingReports,plugins:plugins.length}};
-}
-function moderationSummaryText(data) {return `Сводка Null-Object-AE\n\nЖалобы на ссылки: ${data.stats.pendingReports||0}\nПлагинов в каталоге: ${data.stats.plugins||0}`;}
-async function sendPendingToTelegram() {
- const data=await getModerationData();await notifyTelegram(moderationSummaryText(data));
- for(const row of data.reports.slice(0,5))await notifyTelegram(`Жалоба на ссылку\n${row.plugin_name||row.plugin_id}\n${row.message||'Без комментария'}`,closeKeyboard('report',row.id));
-}
 async function handleTelegramAction(update) {
-  if (await presetStore.handle(update)) return;
-  if (!isAllowedTelegramChat(update)) return;
-  if (update.message) {
-    const raw = String(update.message.text || '').trim();
-    const text = raw.toLowerCase();
-    if (['/start', '/help'].includes(text)) return notifyTelegram('Панель управления включена. Нажимай кнопки снизу или используй команды:\n/stats — статистика\n/pending — жалобы на ссылки', mainKeyboard());
-    if (text === '/stats' || raw === '📊 Статистика') return notifyTelegram(moderationSummaryText(await getModerationData()), { inline_keyboard: [[{ text: '📋 Показать pending', callback_data: 'dash:pending' } ]] });
-    if (text === '/pending' || raw === '📋 Pending') return sendPendingToTelegram();
-    return;
-  }
-  const cb = update.callback_query;
-  if (!cb) return;
-  const [type, action, id] = String(cb.data || '').split(':');
-  const chatId = cb.message?.chat?.id;
-  const messageId = cb.message?.message_id;
-  if (type === 'dash' && action === 'pending') {
-    await answerCallback(cb.id, 'Загружаю pending...');
-    return sendPendingToTelegram();
-  }
-  if (!id) return answerCallback(cb.id, 'Нет ID записи');
-  if (type === 'report') {
-    await supabaseRequest(`plugin_reports?id=eq.${enc(id)}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', Prefer: 'return=minimal' }, body: JSON.stringify({ status: 'done' }) }, true);
-    await answerCallback(cb.id, 'Жалоба закрыта');
-    if (chatId && messageId) await editTelegramMessage(chatId, messageId, `${cb.message.text || ''}\n\nСтатус: закрыто ✅`);
-    return;
-  }
-
+  return presetStore.handle(update);
 }
 
 function pluginGallery() {
@@ -281,7 +203,7 @@ function pluginComparison(plugin) {
 }
 function pluginsPage() { const filters = getCategories().map(([id, label]) => `<button class="filter-btn ${id === 'all' ? 'active' : ''}" data-category="${esc(id)}">${esc(label)}</button>`).join(''); const categoryLinks = getCategories().filter(([id]) => id !== 'all').map(([id, label]) => `<a class="filter-btn" href="/category/${enc(id)}">${esc(label)}</a>`).join(''); return layout({ active: 'plugins', route: '/plugins', title: 'Каталог плагинов After Effects', description: 'Плагины, скрипты и пресеты для After Effects.', schema: collectionSchema('Каталог плагинов After Effects', 'Плагины, скрипты и пресеты для Adobe After Effects.', '/plugins'), body: `<section class="subpage-hero"><div class="container"><span class="eyebrow"><i class="fas fa-plug"></i> Каталог</span><h1>Плагины для After Effects</h1><p>Ищи по названию или задаче — например, «замедлить» или «убрать шум». <a class="text-link" href="/collections">Посмотреть наборы →</a></p></div></section><section class="section catalog-section"><div class="container"><div class="catalog-panel reveal"><div class="search-box"><i class="fas fa-search"></i><input id="pluginSearch" type="text" aria-label="Поиск плагинов по названию или задаче" placeholder="Название или задача: замедлить, свечение, убрать шум..."><button id="clearSearch" type="button" aria-label="Очистить поиск"><span aria-hidden="true">×</span></button></div>${taskFilters()}${environmentControls()}<div class="catalog-row"><div class="filter-tabs" id="categoryFilters">${filters}</div><div class="catalog-controls"><select id="sortPlugins"><option value="popular">Сначала популярные</option><option value="new">Сначала новые</option><option value="az">По названию A–Z</option><option value="available">Сначала доступные</option><option value="size">По размеру файла</option></select><button class="favorites-filter-btn" id="favoritesOnly" type="button"><i class="far fa-heart"></i> Только избранные</button></div></div><div class="catalog-meta"><span id="resultCount">Найдено: ${plugins.length}</span><span id="activeFilterLabel">Все категории</span></div></div><div class="basket-guide"><div><strong>Собери плагины в корзину</strong><p class="basket-guide-desktop">Зажми «Перетащить в корзину» на карточке и перетащи плагин в выделенную область внизу экрана.</p><p class="basket-guide-touch">Нажимай «В корзину» на нужных карточках. Затем открой корзину и скачай выбранное.</p></div><button type="button" class="btn btn-ghost" data-cart-open>Открыть корзину <span data-build-count>0</span></button></div><div class="plugins-grid" id="pluginsGrid">${sortPlugins(plugins).map(pluginCard).join('')}</div><div class="empty-state" id="emptyState" hidden><canvas class="empty-particles" data-empty-particles aria-hidden="true"></canvas><h3>Ничего не найдено</h3><p>Попробуй другую задачу или убери часть фильтров.</p></div></div></section>` }); }
 function presetsPage(req) {
-  return layout({active:'presets',route:'/presets',title:'Купить пресеты After Effects — наборы по 149 ₽',description:'9 тематических паков FFX: шейки, CC, текст, свечение и другие эффекты. Оплата через Telegram.',schema:collectionSchema('Пресеты для After Effects','Готовые пресеты .ffx для Adobe After Effects.','/presets'),body:`<link rel="stylesheet" href="/assets/preset-library.css?v=${enc(BUILD)}"><section class="subpage-hero"><div class="container"><span class="eyebrow"><i class="fas fa-sliders"></i> Пресеты</span><h1>Авторские пресеты After Effects</h1><p>9 тематических наборов по 149 ₽. Заказ через Telegram, выдача вручную после подтверждения оплаты. <a class="text-link" href="/install">Как установить .ffx →</a></p></div></section><section class="section"><div class="container">${presetLibrary.render(presetCatalog,req.query,ROOT,esc,enc,process.env.TELEGRAM_BOT_URL || 'https://t.me/netuegobl')}</div></section>`});
+  return layout({active:'presets',route:'/presets',title:'Купить пресеты After Effects — наборы по 100 Stars',description:'9 тематических паков FFX: шейки, CC, текст, свечение и другие эффекты. Оплата через Telegram.',schema:collectionSchema('Пресеты для After Effects','Готовые пресеты .ffx для Adobe After Effects.','/presets'),body:`<link rel="stylesheet" href="/assets/preset-library.css?v=${enc(BUILD)}"><section class="subpage-hero"><div class="container"><span class="eyebrow"><i class="fas fa-sliders"></i> Пресеты</span><h1>Авторские пресеты After Effects</h1><p>9 тематических наборов по 100 ⭐. Оплата в Telegram, ZIP автоматически после покупки. <a class="text-link" href="/install">Как установить .ffx →</a></p></div></section><section class="section"><div class="container">${presetLibrary.render(presetCatalog,req.query,ROOT,esc,enc,'https://t.me/null_object_ae_bot')}</div></section>`});
 }
 function categoryPage(id) { const category = categoryById(id); if (!category) return notFoundPage(); const [, label] = category; const list = sortPlugins(plugins.filter((plugin) => plugin.category === id)); return layout({ active: 'plugins', route: `/category/${enc(id)}`, title: `${label} для After Effects`, description: `Плагины категории ${label} для Adobe After Effects.`, schema: collectionSchema(`${label} для After Effects`, `Плагины категории ${label}.`, `/category/${enc(id)}`), body: `<section class="subpage-hero"><div class="container"><a class="back-link" href="/plugins"><i class="fas fa-arrow-left"></i> Назад в каталог</a><span class="eyebrow"><i class="fas fa-folder"></i> Категория</span><h1>${esc(label)} для After Effects</h1><p>В этой категории найдено: ${list.length}</p></div></section><section class="section"><div class="container"><div class="plugins-grid">${list.map(pluginCard).join('')}</div></div></section>` }); }
 function installText(type) { return ({ aex: '.aex копируется в папку Plug-ins вашей версии After Effects.', jsx: '.jsx / .jsxbin копируется в Scripts или ScriptUI Panels.', ffx: '.ffx копируется в Documents → Adobe → After Effects → User Presets.' })[type] || 'Смотрите общую инструкцию по установке.'; }
@@ -316,8 +238,8 @@ app.post('/api/telegram/webhook', async (req, res) => {
   try {
     if (!site.tgSecret) return res.status(403).json({ error: 'Telegram webhook secret is not configured' });
     if (String(req.headers['x-telegram-bot-api-secret-token'] || '') !== site.tgSecret) return res.status(401).json({ error: 'Bad Telegram secret' });
+    await handleTelegramAction(req.body);
     res.json({ ok: true });
-    handleTelegramAction(req.body).catch((error) => console.error('Telegram action failed:', error.message));
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
 async function insertPluginReport(clean) {
@@ -330,7 +252,7 @@ async function insertPluginReport(clean) {
   }, admin);
   return Array.isArray(data) ? data[0] : null;
 }
-app.post('/api/plugin-reports', limit('report', 5), async (req, res) => { try { const body = req.body || {}; const clean = { plugin_id: String(body.plugin_id || '').trim(), plugin_name: String(body.plugin_name || '').trim(), message: String(body.message || '').trim() || null, status: 'pending' }; if (!clean.plugin_id) return res.status(400).json({ error: 'Не найден плагин.' }); const row = await insertPluginReport(clean); notifyTelegram(`Жалоба на ссылку\n${clean.plugin_name}\n${clean.message || 'Без комментария'}`, row?.id ? closeKeyboard('report', row.id) : undefined); res.json({ ok: true }); } catch (error) { res.status(error.status || 500).json({ error: error.message, details: error.data || null }); } });
+app.post('/api/plugin-reports', limit('report', 5), async (req, res) => { try { const body = req.body || {}; const clean = { plugin_id: String(body.plugin_id || '').trim(), plugin_name: String(body.plugin_name || '').trim(), message: String(body.message || '').trim() || null, status: 'pending' }; if (!clean.plugin_id) return res.status(400).json({ error: 'Не найден плагин.' }); await insertPluginReport(clean); res.json({ ok: true }); } catch (error) { res.status(error.status || 500).json({ error: error.message, details: error.data || null }); } });
 
 app.get('/', async (req, res) => res.send(await homePage()));
 app.get('/index.html', (req, res) => res.redirect(301, '/'));

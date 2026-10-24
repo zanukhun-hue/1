@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const zlib = require('zlib');
 
-const PRICE_RUB = 149;
+const {PRICE_STARS, telegramLink} = require('./preset-products');
 const CATEGORIES = [
   { id: 'shakes', title: 'Шейки и движения', short: 'Шейки', icon: 'fa-wave-square', accent: 'violet', description: 'Потряхивания камеры, Twitch и динамичные переходы.' },
   { id: 'color', title: 'Цветокоррекция', short: 'CC', icon: 'fa-palette', accent: 'rose', description: 'Готовые стили цвета, тон и обработка изображения.' },
@@ -28,7 +28,6 @@ function read(root) {
 }
 
 function orderUrl(telegram, category) {
-  const { telegramLink } = require('./telegram-preset-store');
   return telegramLink(telegram, category.id);
 }
 
@@ -47,12 +46,12 @@ function render(items, query, root, esc, enc, telegram) {
         <div class="preset-preview-icon preset-pack-${esc(category.accent)}"><i class="fas ${esc(category.icon)}" aria-hidden="true"></i></div>
         <div><span class="preset-preview-kicker">АВТОРСКИЙ НАБОР · ${category.count} ПРЕСЕТОВ</span><h2 id="presetPreviewTitle">${esc(category.title)}</h2><p>${esc(category.description)}</p></div>
       </div>
-      <div class="preset-preview-facts"><span><i class="fas fa-file-archive" aria-hidden="true"></i> ZIP-архив</span><span><i class="fas fa-layer-group" aria-hidden="true"></i> ${category.count} файлов .ffx</span><span><i class="fas fa-tag" aria-hidden="true"></i> ${PRICE_RUB} ₽</span></div>
+      <div class="preset-preview-facts"><span><i class="fas fa-file-archive" aria-hidden="true"></i> ZIP-архив</span><span><i class="fas fa-layer-group" aria-hidden="true"></i> ${category.count} файлов .ffx</span><span><i class="fas fa-tag" aria-hidden="true"></i> ${PRICE_STARS} ⭐</span></div>
       <div class="preset-preview-placeholder"><i class="fas fa-circle-play" aria-hidden="true"></i><div><strong>Видеопревью в разработке</strong><span>Пока ниже доступен полный список пресетов из набора.</span></div></div>
       <h3 class="preset-preview-list-title">Что входит в набор</h3>
       <ol class="preset-preview-list">${category.presets.map(p => `<li>${esc(p.title)}</li>`).join("")}</ol>
       <p class="preset-preview-help">В наборе исходные .ffx для Adobe After Effects. Для отдельных эффектов могут потребоваться дополнительные плагины.</p>
-      <div class="preset-preview-footer"><strong>${PRICE_RUB} ₽</strong>${orderUrl(telegram, category) ? `<a class="preset-purchase" href="${esc(orderUrl(telegram,category))}" target="_blank" rel="noopener noreferrer"><i class="fab fa-telegram-plane" aria-hidden="true"></i> Заказать в боте ↗</a>` : `<span class="preset-pending">Продажи скоро откроются</span>`}</div>
+      <div class="preset-preview-footer"><strong>${PRICE_STARS} ⭐</strong>${orderUrl(telegram, category) ? `<a class="preset-purchase" href="${esc(orderUrl(telegram,category))}" target="_blank" rel="noopener noreferrer"><i class="fab fa-telegram-plane" aria-hidden="true"></i> Заказать в боте ↗</a>` : `<span class="preset-pending">Продажи скоро откроются</span>`}</div>
     </template>`).join("");
   const cards = shown.map(category => `
     <article class="plugin-card preset-pack preset-pack-${esc(category.accent)} reveal" id="pack-${esc(category.id)}" data-preset-pack="${esc(category.id)}">
@@ -63,15 +62,15 @@ function render(items, query, root, esc, enc, telegram) {
         <p class="preset-description">${esc(category.description)}</p>
         <div class="preset-pack-includes"><strong>Внутри набора:</strong><ul>${sample(category)}</ul>${category.count > 3 ? `<span>+ ещё ${category.count - 3} пресетов</span>` : ""}</div>
         <button class="preset-preview-trigger" type="button" data-pack-preview="${esc(category.id)}" aria-label="Посмотреть содержимое набора ${esc(category.title)}"><i class="fas fa-eye" aria-hidden="true"></i> Посмотреть состав <i class="fas fa-arrow-right" aria-hidden="true"></i></button>
-        <div class="preset-pack-purchase"><div><span>Цена за набор</span><strong>${PRICE_RUB} ₽</strong></div>${orderUrl(telegram,category) ? `<a class="preset-purchase" href="${esc(orderUrl(telegram,category))}" target="_blank" rel="noopener noreferrer"><i class="fab fa-telegram-plane" aria-hidden="true"></i> Купить в боте</a>` : `<span class="preset-pending">Продажи скоро откроются</span>`}</div>
+        <div class="preset-pack-purchase"><div><span>Цена за набор</span><strong>${PRICE_STARS} ⭐</strong></div>${orderUrl(telegram,category) ? `<a class="preset-purchase" href="${esc(orderUrl(telegram,category))}" target="_blank" rel="noopener noreferrer"><i class="fab fa-telegram-plane" aria-hidden="true"></i> Купить в боте</a>` : `<span class="preset-pending">Продажи скоро откроются</span>`}</div>
       </div>
     </article>`).join("");
   return `<div class="preset-store">
     <div class="preset-store-intro">
       <span class="preset-store-eyebrow">NULL-OBJECT-AE / PRESET STORE</span>
       <h2>Готовые эффекты. Сделано вручную.</h2>
-      <p>Выбери набор, посмотри полный список пресетов и оформи заказ через нашего Telegram-бота. Выдача ZIP после подтверждения оплаты.</p>
-      <div class="preset-store-stats"><span><strong>${categories.length}</strong> наборов</span><span><strong>${items.length}</strong> пресетов</span><span><strong>${PRICE_RUB} ₽</strong> за набор</span></div>
+      <p>Выбери набор, посмотри полный список пресетов и оплати 100 ⭐ в Telegram-боте. ZIP придёт автоматически после оплаты.</p>
+      <div class="preset-store-stats"><span><strong>${categories.length}</strong> наборов</span><span><strong>${items.length}</strong> пресетов</span><span><strong>${PRICE_STARS} ⭐</strong> за набор</span></div>
     </div>
     <form action="/presets" class="preset-search">
       <i class="fas fa-magnifying-glass" aria-hidden="true"></i>
@@ -84,7 +83,7 @@ function render(items, query, root, esc, enc, telegram) {
     ${previewTemplates}
     <section class="preset-howto">
       <h2>Как купить пресеты</h2>
-      <ol><li><strong>Выбери набор.</strong> Каждая категория продаётся отдельно за ${PRICE_RUB} ₽.</li><li><strong>Нажми «Купить в Telegram».</strong> Название и цена добавятся в черновик сообщения.</li><li><strong>Согласуй оплату с магазином.</strong> После подтверждения оплаты автор вручную отправит ZIP-архив.</li></ol>
+      <ol><li><strong>Выбери набор.</strong> Каждая категория продаётся отдельно за ${PRICE_STARS} ⭐.</li><li><strong>Нажми «Купить в Telegram».</strong> Откроется выбранный набор в боте.</li><li><strong>Оплати Telegram Stars.</strong> Бот автоматически отправит ZIP-архив. Повторная выдача доступна в «Мои покупки».</li></ol>
       <p><i class="fas fa-circle-info" aria-hidden="true"></i> Формат файлов — .ffx для Adobe After Effects. Некоторым эффектам нужны дополнительные плагины. Совместимость зависит от версии AE. Плагины и скрипты в <a href="/plugins">бесплатном каталоге</a> продаваемыми пресетами не являются.</p>
     </section>
   </div>`;

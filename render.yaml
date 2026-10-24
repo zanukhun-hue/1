@@ -15,4 +15,4 @@ services:
       - key: TELEGRAM_URL
         value: https://t.me/ae_plugins_vault
       - key: TELEGRAM_BOT_URL
-        value: https://t.me/netuegobl
+        value: https://t.me/null_object_ae_bot
