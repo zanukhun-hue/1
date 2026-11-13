@@ -168,7 +168,10 @@ async function handleTelegramAction(update) {
 function pluginGallery() {
   const tiles = sortPlugins(plugins).filter(plugin => plugin.status === 'available');
   const images = JSON.parse(fs.readFileSync(path.join(ROOT, 'plugin-images.json'), 'utf8'));
-  const rings = [{ count: 6, radius: 350 }, { count: 12, radius: 700 }, { count: 18, radius: 1050 }];
+  const innerCount = 6;
+  const middleCount = 12;
+  const outerCount = Math.max(18, tiles.length - innerCount - middleCount);
+  const rings = [{ count: innerCount, radius: 350 }, { count: middleCount, radius: 700 }, { count: outerCount, radius: 1050 }];
   let offset = 0;
   const nodes = rings.flatMap((ring, level) => Array.from({ length: ring.count }, (_, i) => {
     const angle = -Math.PI / 2 + i * Math.PI * 2 / ring.count + (level % 2 ? Math.PI / ring.count : 0);
@@ -212,12 +215,24 @@ function installPage() { return layout({ active: 'install', route: '/install', t
 function faqPage() { const items = [['Почему плагин не появился?', 'Проверьте папку версии AE и перезапустите программу.'], ['Как сообщить о нерабочей ссылке?', 'На странице плагина нажмите кнопку “Ссылка не работает”.'], ['Что значит “Обновляется”?', 'Ссылка пока не добавлена или файл временно обновляется.']]; return layout({ active: 'faq', route: '/faq', title: 'FAQ по плагинам After Effects', description: 'Частые вопросы по плагинам After Effects.', schema: collectionSchema('FAQ по плагинам After Effects', 'Частые вопросы.', '/faq'), body: `<section class="subpage-hero"><div class="container"><span class="eyebrow"><i class="fas fa-circle-question"></i> FAQ</span><h1>Частые вопросы</h1></div></section><section class="section"><div class="container faq-list">${items.map(([q, a], index) => `<details class="faq-item" ${index === 0 ? 'open' : ''}><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join('')}</div></section>` }); }
 function contactPage() { return layout({ active: 'contact', route: '/contact', title: 'Связь и правообладателям', description: 'Контакты и информация для правообладателей.', body: `<section class="subpage-hero"><div class="container"><span class="eyebrow"><i class="fas fa-envelope"></i> Связь</span><h1>Правообладателям и обратная связь</h1><p>Если материал нарушает права или ссылку нужно убрать, можно связаться через Telegram.</p><div class="hero-actions"><a class="btn btn-primary" href="${esc(site.telegramUrl)}" target="_blank" rel="noopener"><i class="fab fa-telegram"></i> Telegram</a></div></div></section><section class="section"><div class="container"><article class="install-card"><h2>Удаление материала</h2><p>В сообщении укажите ссылку на страницу и причину обращения.</p></article></div></section>` }); }
 function notFoundPage() { return layout({ active: 'home', route: '/404', robots: 'noindex,follow', title: 'Страница не найдена', description: 'Страница не найдена.', body: '<section class="subpage-hero"><div class="container"><h1>Страница не найдена</h1><a class="btn btn-primary" href="/">На главную</a></div></section>' }); }
-function sitemapXml() { const now = new Date().toISOString(); const categoryPages = getCategories().filter(([id]) => id !== 'all').map(([id]) => [`/category/${enc(id)}`, 'weekly', '0.72']); const pages = [['/', 'daily', '1.0'], ['/plugins', 'daily', '0.95'], ['/presets', 'weekly', '0.8'], ['/collections', 'weekly', '0.75'], ['/recipes', 'monthly', '0.7'], ['/gallery', 'weekly', '0.7'], ['/install', 'monthly', '0.75'], ['/faq', 'monthly', '0.7'], ['/contact', 'monthly', '0.45'], ...categoryPages, ...plugins.map((plugin) => [`/plugin/${enc(plugin.id)}`, 'weekly', plugin.status === 'available' ? '0.9' : '0.65'])]; return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${pages.map(([route, changefreq, priority]) => `  <url>\n    <loc>${escXml(absoluteUrl(route))}</loc>\n    <lastmod>${now}</lastmod>\n    <changefreq>${changefreq}</changefreq>\n    <priority>${priority}</priority>\n  </url>`).join('\n')}\n</urlset>`; }
+function sitemapXml() {
+  const categoryPages = getCategories().filter(([id]) => id !== 'all').map(([id]) => [`/category/${enc(id)}`, 'weekly', '0.72']);
+  const pages = [
+    ['/', 'daily', '1.0'], ['/plugins', 'daily', '0.95'], ['/presets', 'weekly', '0.8'],
+    ['/collections', 'weekly', '0.75'], ['/recipes', 'monthly', '0.7'], ['/gallery', 'weekly', '0.7'],
+    ['/install', 'monthly', '0.75'], ['/faq', 'monthly', '0.7'], ['/contact', 'monthly', '0.45'],
+    ...categoryPages,
+    ...plugins.map((plugin) => [`/plugin/${enc(plugin.id)}`, 'weekly', plugin.status === 'available' ? '0.9' : '0.65'])
+  ];
+  const urls = pages.map(([route, changefreq, priority]) => `  <url>\n    <loc>${escXml(absoluteUrl(route))}</loc>\n    <changefreq>${changefreq}</changefreq>\n    <priority>${priority}</priority>\n  </url>`);
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join('\n')}\n</urlset>`;
+}
 function robotsTxt() { return `User-agent: *\nAllow: /\n\nSitemap: ${absoluteUrl('/sitemap.xml')}\n`; }
 
 app.use((req, res, next) => { if (req.path === '/1' || req.path === '/1/') return res.redirect(301, '/'); if (req.path.startsWith('/1/')) return res.redirect(301, req.originalUrl.replace(/^\/1/, '') || '/'); next(); });
-app.get('/google3dda0bd7c0af07a0.html', (req, res) => res.type('text/html').send('google-site-verification: google3dda0bd7c0af07a0.html'));
-app.get('/yandex_4c9bf369d0611ade.html', (req, res) => res.type('text/html').send('<html><body>Verification: 4c9bf369d0611ade</body></html>'));
+for (const verificationFile of ['google3dda0bd7c0af07a0.html', 'yandex_4c9bf369d0611ade.html']) {
+  app.get(`/${verificationFile}`, (req, res) => res.sendFile(verificationFile, { root: ROOT }));
+}
 app.get('/robots.txt', (req, res) => res.type('text/plain').send(robotsTxt()));
 app.get('/sitemap.xml', (req, res) => res.type('application/xml').send(sitemapXml()));
 app.get('/favicon.ico', (req, res) => res.sendFile(path.join(ROOT, 'assets', 'brand', 'favicon.ico'), { maxAge: '1d' }));
