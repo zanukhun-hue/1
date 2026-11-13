@@ -5,7 +5,6 @@ const express = require('express');
 const redesign = require('./redesign');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 const ROOT = __dirname;
 const BUILD = process.env.RENDER_GIT_COMMIT || 'living-collection-v9';
 
@@ -17,7 +16,7 @@ const serviceEnvName = ['SUPABASE', 'SERVICE', 'ROLE', 'KEY'].join('_');
 const site = {
   title: 'Null-Object-AE',
   description: 'Каталог плагинов, скриптов и пресетов для Adobe After Effects.',
-  url: (process.env.SITE_URL || 'https://null-object-ae.onrender.com').replace(/\/$/, ''),
+  url: (process.env.SITE_URL || process.env.URL || 'https://null-object-ae.onrender.com').replace(/\/$/, ''),
   telegramUrl: process.env.TELEGRAM_URL || 'https://t.me/ae_plugins_vault',
   creatorTelegramUrl: process.env.CREATOR_TELEGRAM_URL || 'https://t.me/endfire',
   tgBotToken: process.env.TELEGRAM_BOT_TOKEN || '',
@@ -319,4 +318,4 @@ app.get('/download/:id', (req, res) => {
   res.redirect(302, directDownloadUrl(url));
 });
 app.use((req, res) => res.status(404).send(notFoundPage()));
-app.listen(PORT, () => console.log(`SSR server started: http://localhost:${PORT}`));
+module.exports = { app, robotsTxt, sitemapXml };

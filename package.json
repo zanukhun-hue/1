@@ -14,7 +14,8 @@
     "node": ">=18"
   },
   "dependencies": {
-    "express": "^4.19.2"
+    "express": "^4.19.2",
+    "serverless-http": "^4.0.0"
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.5.11",
