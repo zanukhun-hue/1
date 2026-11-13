@@ -15,7 +15,7 @@ fs.cpSync(path.join(root, 'assets'), path.join(publish, 'assets'), {
   }
 });
 
-for (const file of ['style.css', 'client.js', 'google3dda0bd7c0af07a0.html', 'yandex_4c9bf369d0611ade.html']) {
+for (const file of ['style.css', 'client.js', 'google3dda0bd7c0af07a0.html', 'yandex_4c9bf369d0611ade.html', 'yandex_7a84205949cb17c4.html']) {
   fs.copyFileSync(path.join(root, file), path.join(publish, file));
 }
 fs.copyFileSync(path.join(root, 'assets', 'brand', 'favicon.ico'), path.join(publish, 'favicon.ico'));
